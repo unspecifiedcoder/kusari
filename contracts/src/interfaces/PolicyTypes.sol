@@ -19,19 +19,28 @@ struct SwapIntent {
     PoolId poolId;
     bool zeroForOne;
     uint256 amountIn;
+    uint256 minAmountOut; // checked against the swap's actual BalanceDelta in afterSwap
     uint256 nonce;
     uint256 deadline;
 }
 
 library PolicyTypes {
     bytes32 internal constant SWAP_INTENT_TYPEHASH = keccak256(
-        "SwapIntent(address agent,address vault,bytes32 poolId,bool zeroForOne,uint256 amountIn,uint256 nonce,uint256 deadline)"
+        "SwapIntent(address agent,address vault,bytes32 poolId,bool zeroForOne,uint256 amountIn,uint256 minAmountOut,uint256 nonce,uint256 deadline)"
     );
 
     function hash(SwapIntent memory i) internal pure returns (bytes32) {
         return keccak256(
             abi.encode(
-                SWAP_INTENT_TYPEHASH, i.agent, i.vault, i.poolId, i.zeroForOne, i.amountIn, i.nonce, i.deadline
+                SWAP_INTENT_TYPEHASH,
+                i.agent,
+                i.vault,
+                i.poolId,
+                i.zeroForOne,
+                i.amountIn,
+                i.minAmountOut,
+                i.nonce,
+                i.deadline
             )
         );
     }

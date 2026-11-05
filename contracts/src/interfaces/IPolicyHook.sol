@@ -8,6 +8,8 @@ interface IPolicyHook {
     error PolicyInactive();
     error PoolNotAllowed();
     error ExactInputOnly();
+    error DirectionNotAllowed();
+    error InsufficientOutput();
     error IntentMismatch();
     error ExceedsPerSwap();
     error ExceedsDaily();

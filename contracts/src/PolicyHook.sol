@@ -87,9 +87,10 @@ contract PolicyHook is BaseHook, EIP712, IPolicyHook {
         return (BaseHook.beforeSwap.selector, BeforeSwapDeltaLibrary.ZERO_DELTA, 0);
     }
 
-    /// @dev A hook can't see the trader's minAmountOut, so it bounds price impact instead.
-    /// Reverting here rolls back the entire swap.
-    function _afterSwap(address, PoolKey calldata key, SwapParams calldata, BalanceDelta, bytes calldata hookData)
+    /// @dev Post-trade checks on the swap that actually happened. Reverting here rolls back the entire swap.
+    /// 1. price impact: the pool price may not move more than the policy's maxImpactBps
+    /// 2. output: the vault must receive at least the minAmountOut the agent signed (bounds sandwich loss)
+    function _afterSwap(address, PoolKey calldata key, SwapParams calldata, BalanceDelta delta, bytes calldata hookData)
         internal
         override
         returns (bytes4, int128)
@@ -101,6 +102,11 @@ contract PolicyHook is BaseHook, EIP712, IPolicyHook {
             }
             _sqrtPriceBefore = 0;
             _maxImpactBps = 0;
+
+            (SwapIntent memory intent,) = abi.decode(hookData, (SwapIntent, bytes));
+            // zeroForOne only (enforced in beforeSwap): the vault receives token1, a positive amount1 for the caller
+            int128 out = delta.amount1();
+            if (out <= 0 || uint256(uint128(out)) < intent.minAmountOut) revert IPolicyHook.InsufficientOutput();
         }
         return (BaseHook.afterSwap.selector, 0);
     }
@@ -119,6 +125,9 @@ contract PolicyHook is BaseHook, EIP712, IPolicyHook {
         SwapIntent memory intent
     ) internal pure {
         if (params.amountSpecified >= 0) revert IPolicyHook.ExactInputOnly();
+        // Caps are denominated in token0 (the vault's funding token), so the agent may only sell token0.
+        // Selling the bought token1 back is the owner's call (withdraw), not the agent's.
+        if (!intent.zeroForOne) revert IPolicyHook.DirectionNotAllowed();
         if (
             sender != intent.vault || PoolId.unwrap(intent.poolId) != PoolId.unwrap(key.toId())
                 || params.zeroForOne != intent.zeroForOne || uint256(-params.amountSpecified) != intent.amountIn

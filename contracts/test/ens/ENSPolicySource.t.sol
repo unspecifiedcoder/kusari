@@ -32,6 +32,27 @@ interface IPermissionedResolverV2 {
     function setData(bytes calldata name, string calldata key, bytes calldata value) external;
 }
 
+/// The attacker-controlled "registry + resolver" from the auditor's proof of concept.
+contract FakeENS {
+    address immutable who;
+
+    constructor(address w) {
+        who = w;
+    }
+
+    function getOwner(uint256) external view returns (address) {
+        return who;
+    }
+
+    function hasRoles(uint256, uint256 bm, address) external pure returns (bool) {
+        return bm == (1 << 16);
+    }
+
+    function roles(uint256, address) external pure returns (uint256) {
+        return 1 << 16;
+    }
+}
+
 /// Runs ENSPolicySource against the REAL live ENSv2 contracts on a Sepolia fork, exactly as the live setup will:
 /// our own UserRegistry + PermissionedResolver proxies from ENS's VerifiableFactory, real roles, real records.
 contract ENSPolicySourceForkTest is Test {
@@ -64,7 +85,6 @@ contract ENSPolicySourceForkTest is Test {
         vm.etch(owner, "");
         vm.etch(agent, "");
         node = vm.ensNamehash("alpha.kusari-demo.eth");
-        source = new ENSPolicySource();
 
         EACGrant[] memory grants = new EACGrant[](1);
         grants[0] = EACGrant(owner, ALL);
@@ -81,11 +101,12 @@ contract ENSPolicySourceForkTest is Test {
         );
 
         registry.register(LABEL, owner, address(0), address(resolver), ALL, uint64(block.timestamp + 365 days));
+        source = new ENSPolicySource(address(registry)); // pinned trust root
 
         policy = Policy({maxPerSwap: 5e18, dailyCap: 20e18, maxImpactBps: 200, allowedPool: PoolId.wrap(keccak256("pool")), active: true});
         resolver.setData(DNS_NAME, source.POLICY_KEY(), abi.encode(policy));
 
-        source.bind(agent, address(registry), LABEL, DNS_NAME, node);
+        source.bind(agent, LABEL, DNS_NAME, node);
         registry.grantRoles(labelId, ROLE_RENEW, agent);
         vm.stopPrank();
     }
@@ -126,7 +147,7 @@ contract ENSPolicySourceForkTest is Test {
     function test_onlyNameOwnerCanBind() public {
         vm.expectRevert(ENSPolicySource.NotNameOwner.selector);
         vm.prank(makeAddr("kusari.ens.fork.stranger"));
-        source.bind(makeAddr("kusari.ens.fork.other"), address(registry), LABEL, DNS_NAME, node);
+        source.bind(makeAddr("kusari.ens.fork.other"), LABEL, DNS_NAME, node);
     }
 
     function test_unboundAgent_isInactive() public {
@@ -141,6 +162,51 @@ contract ENSPolicySourceForkTest is Test {
         vm.prank(owner);
         resolver.setData(DNS_NAME, key, abi.encode(policy));
         assertEq(source.policyOf(agent).maxPerSwap, 1e18);
+    }
+
+    // ---- regression: the readiness review's bind() bypass ----
+
+    /// The agent (with its stolen key) tries to re-bind itself. The registry is pinned, and the agent
+    /// owns no label in it, so it cannot. Its real binding and the kill switch stay intact.
+    function test_agentCannotRebindItself() public {
+        vm.prank(agent);
+        vm.expectRevert(ENSPolicySource.NotNameOwner.selector);
+        source.bind(agent, LABEL, DNS_NAME, node);
+        assertEq(source.bindingOf(agent).node, node);
+    }
+
+    /// A stranger can't re-point (and so grief-freeze) somebody else's agent.
+    function test_strangerCannotRebindAnAgent() public {
+        vm.prank(makeAddr("kusari.ens.fork.stranger"));
+        vm.expectRevert(ENSPolicySource.NotNameOwner.selector);
+        source.bind(agent, "other", DNS_NAME, node);
+        assertTrue(source.isAuthorized(agent));
+    }
+
+    /// The source ignores any registry but the pinned one: a fake "registry" that lies about owners,
+    /// roles and policy has no effect, because it's never consulted.
+    function test_fakeRegistryIsNeverConsulted() public {
+        FakeENS fake = new FakeENS(agent);
+        assertTrue(source.registry() == address(registry));
+        assertTrue(address(fake) != source.registry());
+        // the only state the source reads is the pinned registry's:
+        vm.prank(owner);
+        registry.revokeRoles(labelId, ROLE_RENEW, agent);
+        assertFalse(source.isAuthorized(agent));
+    }
+
+    /// Exactly the marker role: an agent that holds anything else on the label is not authorized.
+    /// (ENSv2 itself refuses to grant admin roles after registration: EACCannotGrantRoles.)
+    function test_agentWithExtraRole_isNotAuthorized() public {
+        vm.prank(owner);
+        registry.grantRoles(labelId, 1 << 36, agent); // ROLE_SET_URI
+        assertFalse(source.isAuthorized(agent));
+    }
+
+    function test_adminRolesCannotBeGrantedAfterRegistration() public {
+        vm.prank(owner);
+        vm.expectRevert();
+        registry.grantRoles(labelId, ROLE_RENEW << 128, agent);
     }
 
     function test_agentCannotWriteItsOwnPolicy() public {

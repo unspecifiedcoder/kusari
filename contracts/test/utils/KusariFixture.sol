@@ -85,6 +85,7 @@ abstract contract KusariFixture is BaseTest {
             poolId: poolId,
             zeroForOne: true,
             amountIn: amountIn,
+            minAmountOut: 0,
             nonce: nonce,
             deadline: block.timestamp + 1 hours
         });
