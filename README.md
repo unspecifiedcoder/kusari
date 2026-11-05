@@ -6,7 +6,7 @@
 
 Built at **ETHGlobal Mumbai 2026** · Uniswap v4 · ENSv2 · Ethereum Foundation Anon-RPC
 
-> 🚧 **Status: being built during the hackathon.** Nothing below is deployed yet. See [Status](#status).
+> 🚧 **Status: being built during the hackathon.** Core contracts are live on Sepolia; ENS-backed policy is next. See [Status](#status).
 
 ---
 
@@ -143,18 +143,34 @@ config/      chains.json: per-chain PoolManager and token addresses
 | ENSv2 Universal Resolver (proxy) | `0xeEeEEEeE14D718C2B47D9923Deab1335E144EeEe` |
 | Anon-RPC Nox worker specifier | `0x35133267A8F7EC35046a83DCA0f4Ca8A6e1b7A9A` |
 
-Kusari's own contracts: _TBD after deploy._
+### Kusari on Sepolia
+
+| Contract | Address |
+|---|---|
+| PolicyHook | [`0x98AB1A3DBe7b5755AbC5D9Ad96c8B6cD276A00C0`](https://sepolia.etherscan.io/address/0x98AB1A3DBe7b5755AbC5D9Ad96c8B6cD276A00C0) |
+| PolicyMirror (policy source, until the ENS source is wired in) | [`0x8bc288dE95a94e9f55Cb665aCedf95E8EeCEA557`](https://sepolia.etherscan.io/address/0x8bc288dE95a94e9f55Cb665aCedf95E8EeCEA557) |
+| AgentVaultFactory | [`0x42732527bdF096c26B49Fa2a5624eC8C941443f1`](https://sepolia.etherscan.io/address/0x42732527bdF096c26B49Fa2a5624eC8C941443f1) |
+| Demo AgentVault | [`0x43A415e69CA3AC04D479E430dDF4d98C09313026`](https://sepolia.etherscan.io/address/0x43A415e69CA3AC04D479E430dDF4d98C09313026) |
+| kUSD / kETH (test tokens) | [`0x2589…ed12`](https://sepolia.etherscan.io/address/0x25894881BAAa271C58125726A181A76F8A8bed12) / [`0x62EE…d774`](https://sepolia.etherscan.io/address/0x62EE50271225DE5f3E84C89F9a64A5827aE0d774) |
+
+First live run:
+- an agent swap within policy: [`0x59f9…a369`](https://sepolia.etherscan.io/tx/0x59f995d5bf5b7af8a30ae8375e385ab4d1e79119c292fc49c3b888676820a369)
+- a 100 kUSD drain attempt reverted on-chain by the hook (`ExceedsPerSwap`): [`0xcdb3…c394`](https://sepolia.etherscan.io/tx/0xcdb3143f1ee8c62b7b526fdb9a5c0281b87833c8a92e39338ebaf8d5cae8c394)
+
+> Deploying on Sepolia: code deposit is priced far above what Foundry's local EVM assumes (we measured ~1,500 gas per byte), so run `forge script` with `--skip-simulation` to let the node estimate gas, and keep the optimizer on.
 
 ---
 
 ## Status
 
-- [ ] PolicyHook + AgentVault, with Foundry tests (over-cap, daily cap, revoked role, wrong pool, replayed nonce)
-- [ ] ENSv2 subname with roles and policy record on Sepolia
-- [ ] Agent reads through Anon-RPC (Nox)
-- [ ] LLM agent loop + staged injection demo
-- [ ] Dashboard with revoke button
-- [ ] Deployed on Sepolia
+- [x] PolicyHook + AgentVault + factory, with 50 Foundry tests (caps, impact, signatures, replay, wrong pool, kill switch)
+- [x] `ENSPolicySource`, tested against the real ENSv2 registry on a Sepolia fork (roles, revoke, operator fail-safe)
+- [ ] ENSv2 subname with roles and policy record live on Sepolia
+- [x] Agent reads through Anon-RPC (Nox) via a local JSON-RPC bridge (~1.5–2.5 s per batched read)
+- [x] LLM agent loop (Gemini) + staged injection demo
+- [x] Demo dashboard with live agent feed and provider-vs-mixnet split screen
+- [ ] Revoke from the owner's phone on Sepolia
+- [x] Deployed on Sepolia
 - [ ] Multi-chain mirrors (stretch)
 - [ ] `FEEDBACK.md` for the Uniswap track
 
