@@ -9,3 +9,4 @@ out/
 cache/
 broadcast/
 deployments/*-fork.json
+dist/
