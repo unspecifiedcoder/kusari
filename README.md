@@ -163,4 +163,4 @@ Kusari's own contracts: _TBD after deploy._
 - [Uniswap v4](https://github.com/Uniswap/v4-core) and the [v4-template](https://github.com/uniswapfoundation/v4-template)
 - [ENSv2 contracts](https://github.com/ensdomains/contracts-v2)
 - [Anon-RPC](https://github.com/ethereum/anon-rpc) by the Ethereum Foundation
-- [Nox](https://github.com/hisoka-io/nox): a mixnet built by a team member **before** this hackathon, used unchanged as the Anon-RPC worker. All Kusari code (vault, hook, ENS policy, agent, dashboard) is new work done at the event.
+- [Nox](https://github.com/hisoka-io/nox): a mixnet in Anon RPC
