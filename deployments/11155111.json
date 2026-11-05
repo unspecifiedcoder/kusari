@@ -1,0 +1,11 @@
+{
+  "chainId": 11155111,
+  "demoVault": "0x0F1B45E9bd237EDe0129cB4639558AD7C52A2d5F",
+  "policyHook": "0x126fd488dCc0dc3d8Fdbf9f8F8c3489570f340C0",
+  "policyKind": "external",
+  "policySource": "0x77fAe55481d7b86797714205F468fC0CAe2f4F71",
+  "poolId": "0x807a6a989ca04287f99555862aa7ec869b1d808f0b93ab0a6b4a66251c5b39a0",
+  "token0": "0x10394A242e08d5374032595cFa48d90fF1b6a8d3",
+  "token1": "0x977391B47a7eE456eD1741DD9421b60e1d9D0D2E",
+  "vaultFactory": "0xb6b0d917706f06531406d82Bc07751C67f520AD4"
+}
