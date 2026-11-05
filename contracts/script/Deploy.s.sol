@@ -25,12 +25,16 @@ import {AgentVaultFactory} from "src/AgentVaultFactory.sol";
 import {IPolicySource} from "src/interfaces/IPolicySource.sol";
 import {Policy} from "src/interfaces/PolicyTypes.sol";
 import {MockPolicySource} from "src/mocks/MockPolicySource.sol";
+import {PolicyMirror} from "src/PolicyMirror.sol";
 
 /// @notice Deploys Kusari on any chain listed in config/chains.json and writes deployments/<chainId>.json.
 ///
 /// Env:
-///   POLICY_SOURCE   address of an IPolicySource (ENSPolicySource / PolicyMirror). Unset = deploy MockPolicySource.
-///   AGENT_ADDRESS   optional: create a demo vault for this agent, fund it, and (mock only) authorize it.
+///   POLICY_SOURCE   address of an existing IPolicySource (e.g. ENSPolicySource). Overrides POLICY_KIND.
+///   POLICY_KIND     "mirror" = deploy an owner-controlled PolicyMirror (use on public chains)
+///                   "mock"   = MockPolicySource, NO access control (local forks only). Default: mock.
+///   AGENT_ADDRESS   optional: create a demo vault for this agent, fund it, and authorize it (mock/mirror).
+///   OWNER_ADDRESS   optional: owner of the demo vault (can withdraw + freeze). Default: the deployer.
 ///   DEPLOY_TAG      optional filename suffix, e.g. "-fork" for local runs (gitignored).
 ///
 /// Local:  anvil --fork-url $SEPOLIA_RPC_URL   then
@@ -56,6 +60,7 @@ contract Deploy is Script {
     IPositionManager posm;
     IPermit2 permit2;
     Out out;
+    string kind;
 
     function run() external returns (Out memory) {
         string memory cfg = vm.readFile(string.concat(vm.projectRoot(), "/../config/chains.json"));
@@ -65,19 +70,30 @@ contract Deploy is Script {
         permit2 = IPermit2(vm.parseJsonAddress(cfg, string.concat(k, "permit2")));
         address agent = vm.envOr("AGENT_ADDRESS", address(0));
         address source = vm.envOr("POLICY_SOURCE", address(0));
-        bool mock = source == address(0);
+        kind = source != address(0) ? "external" : vm.envOr("POLICY_KIND", string("mock"));
 
         vm.startBroadcast();
-        out.policySource = mock ? address(new MockPolicySource()) : source;
-        if (mock) console2.log("WARNING: using MockPolicySource (set POLICY_SOURCE for ENS)");
+        address owner = vm.envOr("OWNER_ADDRESS", msg.sender);
+        if (_is("external")) out.policySource = source;
+        else if (_is("mirror")) out.policySource = address(new PolicyMirror(msg.sender));
+        else if (_is("mock")) out.policySource = address(new MockPolicySource());
+        else revert("POLICY_KIND must be mirror or mock");
+        if (_is("mock")) {
+            require(block.chainid == 31337 || vm.envOr("ALLOW_MOCK", false), "mock policy has no access control: forks only (ALLOW_MOCK=true)");
+            console2.log("WARNING: MockPolicySource has no access control. Local forks only.");
+        }
         _deployHook();
         PoolKey memory key = _deployPool(msg.sender);
         out.factory = address(new AgentVaultFactory(poolManager, out.hook));
-        if (agent != address(0)) _demoVault(agent, mock, key);
+        if (agent != address(0)) _demoVault(agent, owner, key);
         vm.stopBroadcast();
 
         _write(out);
         return out;
+    }
+
+    function _is(string memory k) internal view returns (bool) {
+        return keccak256(bytes(kind)) == keccak256(bytes(k));
     }
 
     /// @dev Hook at a mined CREATE2 address whose low bits encode BEFORE_SWAP | AFTER_SWAP.
@@ -122,15 +138,17 @@ contract Deploy is Script {
         posm.modifyLiquidities(abi.encode(actions, params), block.timestamp + 600);
     }
 
-    function _demoVault(address agent, bool mock, PoolKey memory) internal {
-        AgentVault v = AgentVaultFactory(out.factory).create(agent);
+    /// @dev The vault is owned by `owner` (not the deployer) so the owner wallet can withdraw and freeze.
+    function _demoVault(address agent, address owner, PoolKey memory) internal {
+        AgentVault v = new AgentVault(poolManager, owner, agent, out.hook);
         MockERC20(out.token0).transfer(address(v), VAULT_FUNDING);
         out.demoVault = address(v);
-        if (mock) {
+        Policy memory p = Policy({maxPerSwap: 5e18, dailyCap: 20e18, maxImpactBps: 200, allowedPool: out.poolId, active: true});
+        if (_is("mirror")) {
+            PolicyMirror(out.policySource).setPolicy(agent, owner, p);
+        } else if (_is("mock")) {
             MockPolicySource(out.policySource).setAuthorized(agent, true);
-            MockPolicySource(out.policySource).setPolicy(
-                agent, Policy({maxPerSwap: 5e18, dailyCap: 20e18, maxImpactBps: 200, allowedPool: out.poolId, active: true})
-            );
+            MockPolicySource(out.policySource).setPolicy(agent, p);
         }
     }
 
@@ -142,6 +160,7 @@ contract Deploy is Script {
     function _write(Out memory d) internal {
         string memory o = "deployment";
         vm.serializeUint(o, "chainId", block.chainid);
+        vm.serializeString(o, "policyKind", kind);
         vm.serializeAddress(o, "policySource", d.policySource);
         vm.serializeAddress(o, "policyHook", d.hook);
         vm.serializeAddress(o, "vaultFactory", d.factory);
