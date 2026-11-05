@@ -81,6 +81,7 @@ async function cycle() {
     emit("error", { message: (e as Error).message.split("\n")[0] });
   } finally {
     busy = false;
+    emit("idle"); // the dashboard treats the agent as busy from "reading" until "idle"
   }
 }
 

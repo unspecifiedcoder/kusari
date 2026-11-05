@@ -47,7 +47,9 @@ export default function Demo() {
   const state = latest ?? status.lastState ?? undefined;
   const injectEvent = agent.entries.find((e) => e.type === "inject");
   const injected = injectEvent ? Boolean(injectEvent.injected) : Boolean(status.injected);
-  const running = agent.entries[0]?.type === "reading" || agent.entries[0]?.type === "swapping";
+  // Busy from "reading" until "idle". Live Sepolia cycles take ~20s (mixnet reads + tx confirmation).
+  const lastCycleEvent = agent.entries.find((e) => e.type === "reading" || e.type === "idle");
+  const running = lastCycleEvent?.type === "reading";
 
   const post = (path: string) => fetch(`${AGENT}${path}`, { method: "POST" }).catch(() => {});
 
