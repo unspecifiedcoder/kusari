@@ -3,6 +3,7 @@
 import { useConnection } from "wagmi";
 import { deployment, deploymentFile } from "@/generated/deployment";
 import { walletConnectEnabled } from "@/lib/wagmi";
+import { VaultSetup } from "@/components/VaultSetup";
 
 // F1: app shell. The wizard steps are wired up in F2-F7.
 const STEPS = [
@@ -35,16 +36,18 @@ export default function Home() {
           )}
         </div>
       ) : (
-        <ol className="grid gap-4 sm:grid-cols-2">
-          {STEPS.map((s, i) => (
-            <li key={s.id} className="rounded-xl border border-zinc-800 p-5">
-              <div className="text-xs text-zinc-500">Step {i + 1}</div>
-              <div className="pt-1 font-medium">{s.title}</div>
-              <p className="pt-1 text-sm text-zinc-400">{s.body}</p>
-              <div className="pt-3 text-xs text-zinc-600">Coming next</div>
-            </li>
-          ))}
-        </ol>
+        <>
+          <VaultSetup />
+          <ol className="grid gap-4 sm:grid-cols-2">
+            {STEPS.filter((s) => s.id === "F3" || s.id === "F4").map((s) => (
+              <li key={s.id} className="rounded-xl border border-zinc-800 p-5 opacity-70">
+                <div className="font-medium">{s.title}</div>
+                <p className="pt-1 text-sm text-zinc-400">{s.body}</p>
+                <div className="pt-3 text-xs text-zinc-600">Coming next</div>
+              </li>
+            ))}
+          </ol>
+        </>
       )}
 
       <footer className="text-xs text-zinc-600">
