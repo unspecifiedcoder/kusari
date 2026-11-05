@@ -1,6 +1,7 @@
 import { readFileSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import type { Address, Hex } from "viem";
+import { privateKeyToAccount } from "viem/accounts";
 
 const root = fileURLToPath(new URL("../../", import.meta.url));
 if (existsSync(root + ".env")) process.loadEnvFile(root + ".env");
@@ -29,7 +30,10 @@ export const config = {
   // Transactions go here (public by nature; see README limitations).
   writeRpc: process.env.AGENT_WRITE_RPC_URL ?? process.env.AGENT_READ_RPC_URL ?? chain.rpc,
   stateView: chain.uniswap.stateView as Address,
-  agentAddress: process.env.AGENT_ADDRESS as Address | undefined,
+  agentAddress: (process.env.AGENT_ADDRESS ||
+    (process.env.AGENT_PRIVATE_KEY ? privateKeyToAccount(process.env.AGENT_PRIVATE_KEY as Hex).address : undefined)) as
+    | Address
+    | undefined,
   agentKey: process.env.AGENT_PRIVATE_KEY as Hex | undefined,
   model: process.env.AGENT_MODEL ?? "claude-haiku-5-5",
   eventsPort: Number(process.env.AGENT_EVENTS_PORT ?? 8787),
