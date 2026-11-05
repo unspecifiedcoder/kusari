@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.26;
+pragma solidity ^0.8.28;
 
 import {BaseHook} from "@openzeppelin/uniswap-hooks/src/base/BaseHook.sol";
+import {StateLibrary} from "@uniswap/v4-core/src/libraries/StateLibrary.sol";
+import {FullMath} from "@uniswap/v4-core/src/libraries/FullMath.sol";
 import {Hooks} from "@uniswap/v4-core/src/libraries/Hooks.sol";
 import {IPoolManager, SwapParams} from "@uniswap/v4-core/src/interfaces/IPoolManager.sol";
 import {PoolKey} from "@uniswap/v4-core/src/types/PoolKey.sol";
@@ -19,11 +21,16 @@ import {Policy, SwapIntent} from "./interfaces/PolicyTypes.sol";
 /// Agent funds can only reach the pool via an AgentVault, which always attaches a SwapIntent.
 contract PolicyHook is BaseHook {
     using PoolIdLibrary for PoolKey;
+    using StateLibrary for IPoolManager;
 
     IPolicySource public immutable policySource;
 
     /// @notice agent => day (unix days) => amount spent
     mapping(address => mapping(uint256 => uint256)) public spentOn;
+
+    // Carried from beforeSwap to afterSwap within the same swap (EIP-1153 transient storage).
+    uint160 transient _sqrtPriceBefore;
+    uint16 transient _maxImpactBps;
 
     constructor(IPoolManager _poolManager, IPolicySource _policySource) BaseHook(_poolManager) {
         policySource = _policySource;
@@ -56,17 +63,38 @@ contract PolicyHook is BaseHook {
         if (hookData.length != 0) {
             (SwapIntent memory intent,) = abi.decode(hookData, (SwapIntent, bytes));
             _checkIntentMatchesSwap(sender, key, params, intent);
-            _enforcePolicy(key, intent);
+            uint16 maxImpactBps = _enforcePolicy(key, intent);
+
+            // Remember the pre-swap price for the impact check in afterSwap.
+            (uint160 sqrtPriceBefore,,,) = poolManager.getSlot0(key.toId());
+            _sqrtPriceBefore = sqrtPriceBefore;
+            _maxImpactBps = maxImpactBps;
         }
         return (BaseHook.beforeSwap.selector, BeforeSwapDeltaLibrary.ZERO_DELTA, 0);
     }
 
-    function _afterSwap(address, PoolKey calldata, SwapParams calldata, BalanceDelta, bytes calldata)
+    /// @dev A hook can't see the trader's minAmountOut, so it bounds price impact instead.
+    /// Reverting here rolls back the entire swap.
+    function _afterSwap(address, PoolKey calldata key, SwapParams calldata, BalanceDelta, bytes calldata hookData)
         internal
         override
         returns (bytes4, int128)
     {
+        if (hookData.length != 0) {
+            (uint160 sqrtPriceAfter,,,) = poolManager.getSlot0(key.toId());
+            if (priceImpactBps(_sqrtPriceBefore, sqrtPriceAfter) > _maxImpactBps) {
+                revert IPolicyHook.PriceImpactTooHigh();
+            }
+            _sqrtPriceBefore = 0;
+            _maxImpactBps = 0;
+        }
         return (BaseHook.afterSwap.selector, 0);
+    }
+
+    /// @notice |price_after / price_before - 1| in basis points, where price = sqrtPrice^2.
+    function priceImpactBps(uint160 sqrtBefore, uint160 sqrtAfter) public pure returns (uint256) {
+        uint256 ratioBps = FullMath.mulDiv(FullMath.mulDiv(sqrtAfter, sqrtAfter, sqrtBefore), 10_000, sqrtBefore);
+        return ratioBps > 10_000 ? ratioBps - 10_000 : 10_000 - ratioBps;
     }
 
     /// @dev The swap actually executed must be exactly what the agent signed, sent by the vault it named.
@@ -83,7 +111,7 @@ contract PolicyHook is BaseHook {
         ) revert IPolicyHook.IntentMismatch();
     }
 
-    function _enforcePolicy(PoolKey calldata key, SwapIntent memory intent) internal {
+    function _enforcePolicy(PoolKey calldata key, SwapIntent memory intent) internal returns (uint16) {
         if (!policySource.isAuthorized(intent.agent)) revert IPolicyHook.NotAuthorized();
         Policy memory p = policySource.policyOf(intent.agent);
         if (!p.active) revert IPolicyHook.PolicyInactive();
@@ -96,5 +124,6 @@ contract PolicyHook is BaseHook {
         spentOn[intent.agent][day] = spent;
 
         emit IPolicyHook.SwapApproved(intent.agent, intent.vault, intent.amountIn, spent);
+        return p.maxImpactBps;
     }
 }
