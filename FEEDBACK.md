@@ -1,6 +1,6 @@
 # Uniswap v4 developer feedback: Kusari
 
-Kusari is a v4 hook (`beforeSwap` + `afterSwap`) that enforces an AI trading agent's policy on-chain: per-swap cap, daily cap, allowed pool, max price impact, and an EIP-712 signed intent. The agent's funds sit in a vault that calls `PoolManager.unlock` directly. Built at ETHGlobal Mumbai 2026 on Sepolia.
+Kusari is a v4 hook (`beforeSwap` + `afterSwap`) that enforces an AI trading agent's policy on-chain: per-swap cap, daily cap, allowed pool, max price impact, a signed minimum output, and an EIP-712 signed intent. The policy itself is read from ENSv2. The agent's funds sit in a vault that calls `PoolManager.unlock` directly. Built at ETHGlobal Mumbai 2026 on Sepolia.
 
 Code: [`contracts/src/PolicyHook.sol`](contracts/src/PolicyHook.sol), [`contracts/src/AgentVault.sol`](contracts/src/AgentVault.sol), [`contracts/script/Deploy.s.sol`](contracts/script/Deploy.s.sol).
 
@@ -16,7 +16,7 @@ Code: [`contracts/src/PolicyHook.sol`](contracts/src/PolicyHook.sol), [`contract
 
 1. **Hook reverts are hard to decode off-chain.** A custom error from the hook reaches the caller wrapped as `WrappedError(address target, bytes4 selector, bytes reason, bytes details)` (ERC-7751). viem shows it as `WrappedError`, so to show users *"Blocked: exceeds the per-swap cap"* we had to decode `args[2]` against the hook ABI ourselves. A short docs section ("decoding hook reverts in viem/ethers") with a snippet would save every hook team this step. It also bit our Foundry tests: `vm.expectRevert(IPolicyHook.ExceedsPerSwap.selector)` doesn't match; you need the full wrapped encoding.
 
-2. **A hook can't see the trader's slippage bound.** `minAmountOut` lives in the router, so a risk hook can only bound *price impact* (via `slot0` before and after), not the trader's actual tolerance. That's fine for us, but a documented pattern for "policy hooks" (what a hook can and can't enforce about the trade) would help people reason about guarantees.
+2. **Slippage bounds live in the router, not the swap.** `SwapParams` carries only a price limit, and the trader's `minAmountOut` usually stays in the router. A policy hook that should enforce the trader's tolerance has to receive it some other way. We put a signed `minAmountOut` in `hookData` and check it in `afterSwap` against the `BalanceDelta` the hook receives, which works well because our vault *is* the router. A documented pattern for "policy hooks" (what a hook can and can't enforce about a trade, and how to pass the trader's bounds in) would help people reason about guarantees.
 
 3. **Template vs docs drift.** The docs and older examples use `Deployers` from v4-core test utils, while the current template tests use `BaseTest` + `EasyPosm`. Also, `EasyPosm.mint` uses `address(this)`, which `forge script` rejects ("Usage of address(this) detected in script contract"), so we couldn't reuse it in our deploy script and had to call `PositionManager.modifyLiquidities` directly. A script-safe liquidity helper in the template would help.
 
