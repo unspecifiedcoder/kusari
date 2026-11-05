@@ -2,8 +2,8 @@ import { http, createConfig } from "wagmi";
 import { sepolia } from "wagmi/chains";
 import { injected, walletConnect } from "wagmi/connectors";
 
-// In local dev this points at the anvil Sepolia fork (same chain id 11155111).
-const rpc = process.env.NEXT_PUBLIC_RPC_URL ?? "http://localhost:8545";
+// Live Sepolia by default. For the local anvil fork set NEXT_PUBLIC_RPC_URL=http://localhost:8545.
+const rpc = process.env.NEXT_PUBLIC_RPC_URL ?? "https://ethereum-sepolia-rpc.publicnode.com";
 const projectId = process.env.NEXT_PUBLIC_REOWN_PROJECT_ID;
 
 export const wagmiConfig = createConfig({

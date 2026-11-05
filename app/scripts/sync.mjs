@@ -1,5 +1,5 @@
 // Copies shared types + the current deployment into src/generated (Next can't import outside its root).
-// Runs automatically before dev/build. Pick a deployment with DEPLOYMENT_FILE (default: local fork).
+// Runs automatically before dev/build. Pick a deployment with DEPLOYMENT_FILE (default: live Sepolia; set DEPLOYMENT_FILE=deployments/11155111-fork.json for the local fork).
 import { copyFile, mkdir, readFile, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 
@@ -9,7 +9,7 @@ await mkdir(out, { recursive: true });
 
 await copyFile(new URL("shared/types.ts", root), new URL("types.ts", out));
 
-const file = process.env.DEPLOYMENT_FILE ?? "deployments/11155111-fork.json";
+const file = process.env.DEPLOYMENT_FILE ?? "deployments/11155111.json";
 const src = new URL(file, root);
 const deployment = existsSync(src) ? JSON.parse(await readFile(src, "utf8")) : null;
 const chains = JSON.parse(await readFile(new URL("config/chains.json", root), "utf8"));

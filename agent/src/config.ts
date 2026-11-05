@@ -18,7 +18,7 @@ export interface Deployment {
 }
 
 const chains = JSON.parse(readFileSync(root + "config/chains.json", "utf8"));
-const deploymentFile = process.env.DEPLOYMENT_FILE ?? "deployments/11155111-fork.json";
+const deploymentFile = process.env.DEPLOYMENT_FILE ?? "deployments/11155111.json";
 export const deployment: Deployment = JSON.parse(readFileSync(root + deploymentFile, "utf8"));
 const chain = chains[String(deployment.chainId)];
 
