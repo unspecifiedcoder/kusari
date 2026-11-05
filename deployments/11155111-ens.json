@@ -7,9 +7,10 @@
   "parentRegistered": "yes",
   "parentLinked": "yes",
   "labelRegistered": "yes",
-  "policySource": "0x77fae55481d7b86797714205f468fc0cae2f4f71",
   "dnsName": "0x05616c7068610b6b75736172692d64656d6f0365746800",
   "node": "0xed85351803dba314bbc009cc605442772874754b8b919d22cc7e1710e72fb75e",
+  "roleGranted": "yes",
+  "policySource": "0xd1188dbab240f4dc20be742b1b8ec7f03759762e",
   "bound": "yes",
-  "roleGranted": "yes"
+  "records": "yes"
 }

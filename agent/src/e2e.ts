@@ -69,6 +69,19 @@ const r3 = await executeSwap(0.1, { sendEvenIfBlocked: true });
 check("kill switch (ENS revoke)", rv.ok && r3.status === "blocked" && r3.reason === "NotAuthorized",
   `revoke ${link(rv.hash)} -> next 0.1 swap: ${r3.status} ${r3.reason ?? ""} ${link(r3.hash)}`);
 
+// 5. The readiness review's attack: with its (stolen) key, the agent tries to re-bind itself to a policy it
+//    controls. The source is pinned to kusari-demo.eth's registry and the agent owns no label there.
+const bindAbi = parseAbi(["function bind(address agent, string label, bytes dnsName, bytes32 node)", "error NotNameOwner()"]);
+let rebindBlocked = false;
+let rebindReason = "";
+try {
+  await pub.simulateContract({ account: agentAccount, address: deployment.policySource, abi: bindAbi, functionName: "bind", args: [agentAccount.address, "alpha", ens.dnsName, ens.node] });
+} catch (e) {
+  rebindBlocked = true;
+  rebindReason = String((e as Error).message).match(/NotNameOwner/)?.[0] ?? String((e as Error).message).split("\n")[0];
+}
+check("agent can't re-bind its own policy", rebindBlocked && rebindReason === "NotNameOwner", `bind() as the agent -> ${rebindReason || "NOT reverted"}`);
+
 // restore
 const gr = await ownerRole("grantRoles");
 const r4 = await executeSwap(0.1);
