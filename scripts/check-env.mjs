@@ -29,7 +29,8 @@ const CHECKS = [
   ["OWNER_PRIVATE_KEY", "wallet", isPk, "0x + 64 hex chars"],
   ["AGENT_PRIVATE_KEY", "wallet", isPk, "0x + 64 hex chars"],
   ["DEPLOYER_PRIVATE_KEY", "wallet", isPk, "0x + 64 hex chars"],
-  ["ANTHROPIC_API_KEY", "secret", (v) => v.startsWith("sk-ant-") && v.length > 40, 'starts with "sk-ant-"'],
+  ["ANTHROPIC_API_KEY", "llm", (v) => v.startsWith("sk-ant-") && v.length > 40, 'starts with "sk-ant-"'],
+  ["GEMINI_API_KEY", "llm", (v) => /^AIza[0-9A-Za-z_-]{35}$/.test(v), 'starts with "AIza", 39 chars'],
   ["NEXT_PUBLIC_REOWN_PROJECT_ID", "optional", (v) => /^[0-9a-f]{32}$/.test(v), "32 hex chars"],
   ["ETHERSCAN_API_KEY", "optional", (v) => /^[A-Z0-9]{34}$/.test(v), "34 chars, A-Z 0-9"],
   ["SEPOLIA_RPC_URL", "optional", (v) => /^https?:\/\//.test(v), "starts with https://"],
@@ -37,11 +38,14 @@ const CHECKS = [
 
 const addresses = {};
 let problems = 0;
+const llmSet = CHECKS.some(([n, k]) => k === "llm" && (process.env[n] ?? "").trim());
 for (const [name, kind, valid, hint] of CHECKS) {
   const v = (process.env[name] ?? "").trim();
   if (!v) {
-    console.log(`${kind === "optional" ? "·" : "✗"} ${name.padEnd(29)} empty${kind === "optional" ? " (optional)" : ""}`);
-    if (kind !== "optional") problems++;
+    // one LLM key is enough
+    const optional = kind === "optional" || (kind === "llm" && llmSet);
+    console.log(`${optional ? "·" : "✗"} ${name.padEnd(29)} empty${optional ? " (optional)" : ""}`);
+    if (!optional) problems++;
     continue;
   }
   const ok = valid(v);
@@ -53,6 +57,15 @@ for (const [name, kind, valid, hint] of CHECKS) {
   }
   const shown = name === "SEPOLIA_RPC_URL" ? v.replace(/\/[^/]{12,}$/, "/…") : mask(v);
   console.log(`${ok ? "✓" : "✗"} ${name.padEnd(29)} ${shown.padEnd(10)} len ${String(v.length).padEnd(4)}${ok ? "" : ` expected ${hint}`}${extra}`);
+}
+
+// Any other variables in .env: names + masked values only, so typos in names show up.
+const { parseEnv } = await import("node:util");
+const { readFileSync } = await import("node:fs");
+const known = new Set([...CHECKS.map((c) => c[0]), "AGENT_MODEL", "ENS_PARENT_NAME", "ENS_AGENT_LABEL"]);
+for (const [name, value] of Object.entries(parseEnv(readFileSync(root + ".env", "utf8")))) {
+  if (known.has(name)) continue;
+  console.log(`? ${name.padEnd(29)} ${value ? mask(value) : "empty"}  (not a variable Kusari reads; typo?)`);
 }
 
 const uniq = new Set(Object.values(addresses));
