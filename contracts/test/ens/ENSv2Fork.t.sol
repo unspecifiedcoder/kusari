@@ -16,6 +16,8 @@ contract ENSv2ForkTest is Test {
 
     function setUp() public {
         vm.createSelectFork(vm.envOr("SEPOLIA_RPC_URL", string("https://ethereum-sepolia-rpc.publicnode.com")));
+        // public RPCs are load-balanced; pin a few blocks back so every backend has the state
+        vm.rollFork(block.number - 8);
     }
 
     function test_universalResolver_pointsAtLiveRoot() public view {
