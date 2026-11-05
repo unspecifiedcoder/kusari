@@ -11,14 +11,27 @@ import {
 import { privateKeyToAccount } from "viem/accounts";
 import { sepolia } from "viem/chains";
 import { config, deployment } from "./config.ts";
-import { agentVaultAbi, policyHookAbi } from "./abi.ts";
+import { agentVaultAbi, policyHookAbi, stateViewAbi } from "./abi.ts";
 import { reader } from "./state.ts";
+
+const Q96 = 2n ** 96n;
 import { swapIntentTypes, kusariDomain, revertReasons } from "../../shared/types.ts";
 
 if (!config.agentKey) throw new Error("AGENT_PRIVATE_KEY not set");
 export const agentAccount = privateKeyToAccount(config.agentKey);
 
-const wallet = createWalletClient({ account: agentAccount, chain: sepolia, transport: http(config.writeRpc) });
+const makeWallet = (url: string) => createWalletClient({ account: agentAccount, chain: sepolia, transport: http(url, { timeout: 45_000 }) });
+let wallet = makeWallet(config.writeRpc);
+export let writeRpc = config.writeRpc;
+
+/** Switch where transactions are submitted (demo's Anon-RPC ON/OFF toggle). */
+export function setWriteRpc(url: string) {
+  writeRpc = url;
+  wallet = makeWallet(url);
+}
+
+/** Max slippage the agent accepts vs the pre-swap price, on top of the 0.3% pool fee. */
+const SLIPPAGE_BPS = BigInt(process.env.AGENT_SLIPPAGE_BPS ?? 300);
 
 export const poolKey = {
   currency0: deployment.token0,
@@ -60,13 +73,22 @@ export function explainRevert(err: unknown): { reason: string; message: string }
  * Sign the intent and send it. By default the swap is simulated first. With sendEvenIfBlocked the
  * transaction is broadcast anyway, so the demo can show the hook reverting it ON-CHAIN, with a tx hash.
  */
-export async function executeSwap(amountIn: number, { sendEvenIfBlocked = false } = {}): Promise<SwapResult> {
+export async function executeSwap(
+  amountIn: number,
+  { sendEvenIfBlocked = false, sqrtPriceX96 }: { sendEvenIfBlocked?: boolean; sqrtPriceX96?: bigint } = {},
+): Promise<SwapResult> {
+  const amountInWei = parseEther(String(amountIn));
+  // Signed minimum output, enforced by the hook against the real BalanceDelta (bounds sandwich loss).
+  const sqrtP = sqrtPriceX96 ?? (await reader.readContract({ address: config.stateView, abi: stateViewAbi, functionName: "getSlot0", args: [deployment.poolId] }))[0];
+  const quote = (((amountInWei * sqrtP) / Q96) * sqrtP) / Q96; // token1 out at the pre-swap price
+  const minAmountOut = (quote * (10_000n - 30n - SLIPPAGE_BPS)) / 10_000n;
   const intent = {
     agent: agentAccount.address,
     vault: deployment.demoVault,
     poolId: deployment.poolId,
-    zeroForOne: true, // the vault holds token0 and buys token1
-    amountIn: parseEther(String(amountIn)),
+    zeroForOne: true, // the vault holds token0 and buys token1 (the hook only allows this direction)
+    amountIn: amountInWei,
+    minAmountOut,
     nonce: BigInt(Date.now()) * 1_000_000n + BigInt(Math.floor(Math.random() * 1_000_000)),
     deadline: BigInt(Math.floor(Date.now() / 1000) + 300),
   };

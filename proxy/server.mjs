@@ -18,6 +18,7 @@ const KNOWN = {
   "0xc815641c": "getSlot0 (StateView)",
   "0x1e2eaeaf": "extsload (PoolManager)",
   "0xfa6793d5": "getLiquidity (StateView)",
+  "0x82ad56cb": "aggregate3 (Multicall3: the agent's batched state read)",
   "0xaa9d21cb": "quoteExactInputSingle",
 };
 

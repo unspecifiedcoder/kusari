@@ -4,17 +4,19 @@
 //   GET  /status          current settings + last state
 //   POST /tick            run one cycle now
 //   POST /inject?on=1|0   toggle the poisoned news article (the staged attack)
+//   POST /transport?mode=anon|leak   anon = Anon-RPC/Nox (default), leak = the logging "public provider" proxy
 //   AGENT_LOOP_SECONDS=N  also run a cycle every N seconds (default: manual only)
 //   AGENT_SCRIPTED=1      skip the LLM; scripted decisions (demo fallback, labelled as such)
 import { createServer, type ServerResponse } from "node:http";
 import { formatEther } from "viem";
-import { config, deployment } from "./config.ts";
-import { readState } from "./state.ts";
+import { config, deployment, ANON_RPC, LEAK_RPC } from "./config.ts";
+import { readState, setReadRpc, readRpc } from "./state.ts";
 import { decide, type Decision } from "./llm.ts";
 import { newsFeed } from "./news.ts";
-import { executeSwap, agentAccount } from "./swap.ts";
+import { executeSwap, agentAccount, setWriteRpc } from "./swap.ts";
 
 let injected = false;
+let transport: "anon" | "leak" = config.readRpc === LEAK_RPC ? "leak" : "anon";
 let busy = false;
 let lastState: Record<string, unknown> | null = null;
 const clients = new Set<ServerResponse>();
@@ -38,7 +40,7 @@ async function cycle() {
   if (busy) return emit("error", { message: "a cycle is already running" });
   busy = true;
   try {
-    emit("reading", { via: config.readRpc });
+    emit("reading", { via: readRpc, transport });
     const s = await readState(agentAccount.address);
     const vault = Number(formatEther(s.vaultToken0));
     const maxPerSwap = Number(formatEther(s.policy.maxPerSwap));
@@ -74,7 +76,7 @@ async function cycle() {
 
     if (d.action === "swap" && d.amountIn > 0) {
       emit("swapping", { amountIn: d.amountIn });
-      const r = await executeSwap(d.amountIn, { sendEvenIfBlocked: true });
+      const r = await executeSwap(d.amountIn, { sendEvenIfBlocked: true, sqrtPriceX96: s.sqrtPriceX96 });
       emit("swap", { ...r });
     }
   } catch (e) {
@@ -106,11 +108,20 @@ createServer(async (req, res) => {
     res.end(JSON.stringify(body));
   };
   if (url.pathname === "/status") {
-    return json(200, { agent: agentAccount.address, vault: deployment.demoVault, readRpc: config.readRpc, injected, scriptedOnly, busy, lastState });
+    return json(200, { agent: agentAccount.address, vault: deployment.demoVault, readRpc, transport, injected, scriptedOnly, busy, lastState });
   }
   if (req.method === "POST" && url.pathname === "/tick") {
     void cycle();
     return json(202, { started: true });
+  }
+  if (req.method === "POST" && url.pathname === "/transport") {
+    if (busy) return json(409, { error: "wait for the current cycle to finish" });
+    transport = url.searchParams.get("mode") === "leak" ? "leak" : "anon";
+    const target = transport === "leak" ? LEAK_RPC : ANON_RPC;
+    setReadRpc(target);
+    setWriteRpc(target);
+    emit("transport", { transport, via: target });
+    return json(200, { transport, via: target });
   }
   if (req.method === "POST" && url.pathname === "/inject") {
     injected = url.searchParams.get("on") === "1";
@@ -119,7 +130,7 @@ createServer(async (req, res) => {
   }
   json(404, { error: "not found" });
 }).listen(config.eventsPort, "127.0.0.1", () => {
-  console.log(`agent ${agentAccount.address} on http://localhost:${config.eventsPort} (reads via ${config.readRpc})`);
+  console.log(`agent ${agentAccount.address} on http://localhost:${config.eventsPort} (reads + txs via ${readRpc}, ${transport})`);
 });
 
 const loop = Number(process.env.AGENT_LOOP_SECONDS ?? 0);

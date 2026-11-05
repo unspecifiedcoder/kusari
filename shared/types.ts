@@ -15,6 +15,7 @@ export interface SwapIntent {
   poolId: Hex;
   zeroForOne: boolean;
   amountIn: bigint;
+  minAmountOut: bigint;
   nonce: bigint;
   deadline: bigint;
 }
@@ -26,6 +27,7 @@ export const swapIntentTypes = {
     { name: "poolId", type: "bytes32" },
     { name: "zeroForOne", type: "bool" },
     { name: "amountIn", type: "uint256" },
+    { name: "minAmountOut", type: "uint256" },
     { name: "nonce", type: "uint256" },
     { name: "deadline", type: "uint256" },
   ],
@@ -41,6 +43,8 @@ export const revertReasons: Record<string, string> = {
   PolicyInactive: "Blocked: the policy is switched off",
   PoolNotAllowed: "Blocked: this pool isn't allowed",
   ExactInputOnly: "Blocked: only exact-input swaps are allowed",
+  DirectionNotAllowed: "Blocked: the agent may only buy, not sell back",
+  InsufficientOutput: "Blocked: received less than the signed minimum (slippage/sandwich)",
   IntentMismatch: "Blocked: the swap doesn't match the signed intent",
   ExceedsPerSwap: "Blocked: exceeds the per-swap cap",
   ExceedsDaily: "Blocked: exceeds the daily cap",

@@ -8,12 +8,12 @@ import { fileURLToPath } from "node:url";
 import { createPublicClient, createWalletClient, http, parseAbi, encodeAbiParameters, parseEther, formatEther, keccak256, toHex, type Address, type Hex } from "viem";
 import { privateKeyToAccount, nonceManager } from "viem/accounts";
 import { sepolia } from "viem/chains";
-import { deployment } from "./config.ts";
+import { deployment, ANON_RPC } from "./config.ts";
 
 const root = fileURLToPath(new URL("../../", import.meta.url));
 const ens = JSON.parse(readFileSync(root + (process.env.ENS_OUT ?? "deployments/11155111-ens.json"), "utf8"));
 const owner = privateKeyToAccount(process.env.OWNER_PRIVATE_KEY as Hex, { nonceManager });
-const rpc = process.env.SEPOLIA_RPC_URL || "https://ethereum-sepolia-rpc.publicnode.com";
+const rpc = process.env.SEPOLIA_RPC_URL || ANON_RPC; // owner actions go through Anon-RPC too
 const pub = createPublicClient({ chain: sepolia, transport: http(rpc, { timeout: 60_000 }) });
 const wallet = createWalletClient({ account: owner, chain: sepolia, transport: http(rpc, { timeout: 60_000 }) });
 

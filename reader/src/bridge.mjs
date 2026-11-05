@@ -26,15 +26,66 @@ function latencyStats() {
   return { count: xs.length, median: xs[Math.floor(xs.length / 2)], p90: xs[Math.floor(xs.length * 0.9)], max: xs.at(-1) };
 }
 
-console.log("booting Anon-RPC worker (Nox)...");
-const ab = await startAnonBrowser();
-if (!ab.ready.ok) {
-  console.error("worker failed to boot:", ab.ready.error, "\n" + ab.logs.slice(-20).join("\n"));
-  process.exit(1);
+// ---- worker lifecycle: boot, and reboot automatically if it dies or keeps failing ----
+const HOST = process.env.ANON_BRIDGE_HOST ?? "127.0.0.1"; // 0.0.0.0 to serve phones on the LAN
+const REQUEST_TIMEOUT_MS = Number(process.env.ANON_REQUEST_TIMEOUT_MS ?? 30_000);
+let ab = null;
+let booting = null;
+let consecutiveFailures = 0;
+metrics.restarts = 0;
+
+async function boot() {
+  console.log("booting Anon-RPC worker (Nox)...");
+  const next = await startAnonBrowser();
+  if (!next.ready.ok) {
+    await next.close().catch(() => {});
+    throw new Error(`worker failed to boot: ${next.ready.error}`);
+  }
+  console.log(`worker ready in ${next.bootMs} ms`);
+  metrics.bootMs = next.bootMs;
+  return next;
 }
-console.log(`worker ready in ${ab.bootMs} ms`);
-metrics.bootMs = ab.bootMs;
-const forward = MODE === "anon" ? ab.anon : ab.direct;
+
+async function restart(reason) {
+  if (booting) return booting;
+  const old = ab;
+  if (old || reason !== "initial boot") {
+    console.warn(`restarting worker: ${reason}`);
+    metrics.restarts++;
+  }
+  ab = null;
+  booting = (async () => {
+    await old?.close().catch(() => {});
+    for (let i = 0; ; i++) {
+      try {
+        ab = await boot();
+        consecutiveFailures = 0;
+        return ab;
+      } catch (e) {
+        console.error(String(e));
+        await new Promise((r) => setTimeout(r, Math.min(30_000, 2_000 * 2 ** i)));
+      }
+    }
+  })().finally(() => (booting = null));
+  return booting;
+}
+
+const withTimeout = (p, ms) =>
+  Promise.race([p, new Promise((resolve) => setTimeout(() => resolve({ ok: false, ms, error: `timed out after ${ms} ms` }), ms))]);
+
+async function forward(body) {
+  const worker = ab ?? (await (booting ?? restart("not running")));
+  const out = await withTimeout((MODE === "anon" ? worker.anon : worker.direct)(body), REQUEST_TIMEOUT_MS).catch((e) => ({
+    ok: false,
+    ms: 0,
+    error: String(e?.message ?? e), // e.g. the page or browser crashed
+  }));
+  if (out.ok) consecutiveFailures = 0;
+  else if (++consecutiveFailures >= 3 || /Target closed|has been closed|crash/i.test(out.error ?? "")) void restart(out.error);
+  return out;
+}
+
+ab = await restart("initial boot");
 
 const readBody = (req) =>
   new Promise((resolve, reject) => {
@@ -78,7 +129,7 @@ const server = createServer(async (req, res) => {
 
   const out = await forward(body); // single request or batch array, forwarded as-is
   const methods = Array.isArray(body) ? body.map((b) => b.method).join(",") : body.method;
-  // The provider-side view: only the mixnet exit is visible. We log method + timing, never the caller.
+  // What leaves this machine: only mixnet traffic. We log method + timing, never the caller.
   record({ t: Date.now(), method: methods, ms: out.ms, ok: out.ok, transport: metrics.transport });
   if (!out.ok) {
     const id = Array.isArray(body) ? null : (body.id ?? null);
@@ -88,11 +139,11 @@ const server = createServer(async (req, res) => {
   send(res, 200, out.body);
 });
 
-server.listen(PORT, "127.0.0.1", () => console.log(`Anon-RPC bridge on http://localhost:${PORT}`));
+server.listen(PORT, HOST, () => console.log(`Anon-RPC bridge on http://${HOST === "0.0.0.0" ? "<this-machine>" : "localhost"}:${PORT}`));
 
 const shutdown = async () => {
   server.close();
-  await ab.close();
+  await ab?.close();
   process.exit(0);
 };
 process.on("SIGINT", shutdown);

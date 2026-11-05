@@ -3,11 +3,18 @@ import { sepolia } from "viem/chains";
 import { config, deployment } from "./config.ts";
 import { stateViewAbi, erc20Abi, policySourceAbi, policyHookAbi } from "./abi.ts";
 
-export const reader = createPublicClient({
-  chain: sepolia,
-  transport: http(config.readRpc, { timeout: 30_000 }),
-  batch: { multicall: false },
-});
+const makeReader = (url: string) =>
+  createPublicClient({ chain: sepolia, transport: http(url, { timeout: 45_000, retryCount: 2 }), batch: { multicall: false } });
+
+/** Live binding: importers always see the current client, so the transport can be switched at runtime. */
+export let reader = makeReader(config.readRpc);
+export let readRpc = config.readRpc;
+
+/** Switch where reads go (used by the demo's Anon-RPC ON/OFF toggle). */
+export function setReadRpc(url: string) {
+  readRpc = url;
+  reader = makeReader(url);
+}
 
 export interface AgentState {
   blockNumber: bigint;

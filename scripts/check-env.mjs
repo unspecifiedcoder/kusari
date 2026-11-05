@@ -62,7 +62,7 @@ for (const [name, kind, valid, hint] of CHECKS) {
 // Any other variables in .env: names + masked values only, so typos in names show up.
 const { parseEnv } = await import("node:util");
 const { readFileSync } = await import("node:fs");
-const known = new Set([...CHECKS.map((c) => c[0]), "AGENT_MODEL", "ENS_PARENT_NAME", "ENS_AGENT_LABEL"]);
+const known = new Set([...CHECKS.map((c) => c[0]), "AGENT_MODEL", "ENS_PARENT_NAME", "ENS_PARENT_LABEL", "ENS_AGENT_LABEL", "AGENT_READ_RPC_URL", "AGENT_WRITE_RPC_URL"]);
 for (const [name, value] of Object.entries(parseEnv(readFileSync(root + ".env", "utf8")))) {
   if (known.has(name)) continue;
   console.log(`? ${name.padEnd(29)} ${value ? mask(value) : "empty"}  (not a variable Kusari reads; typo?)`);

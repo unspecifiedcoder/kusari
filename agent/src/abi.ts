@@ -2,7 +2,7 @@ import { parseAbi } from "viem";
 
 const POLICY = "(uint128 maxPerSwap, uint128 dailyCap, uint16 maxImpactBps, bytes32 allowedPool, bool active)";
 const INTENT =
-  "(address agent, address vault, bytes32 poolId, bool zeroForOne, uint256 amountIn, uint256 nonce, uint256 deadline)";
+  "(address agent, address vault, bytes32 poolId, bool zeroForOne, uint256 amountIn, uint256 minAmountOut, uint256 nonce, uint256 deadline)";
 const POOL_KEY = "(address currency0, address currency1, uint24 fee, int24 tickSpacing, address hooks)";
 
 export const stateViewAbi = parseAbi([
@@ -29,6 +29,8 @@ export const policyHookAbi = parseAbi([
   "error PolicyInactive()",
   "error PoolNotAllowed()",
   "error ExactInputOnly()",
+  "error DirectionNotAllowed()",
+  "error InsufficientOutput()",
   "error IntentMismatch()",
   "error ExceedsPerSwap()",
   "error ExceedsDaily()",

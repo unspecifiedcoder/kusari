@@ -10,7 +10,7 @@ import { createPublicClient, createWalletClient, http, parseAbi, encodeFunctionD
 import { privateKeyToAccount, nonceManager } from "viem/accounts";
 import { sepolia } from "viem/chains";
 import { packetToBytes } from "viem/ens";
-import { config } from "./config.ts";
+import { config, ANON_RPC } from "./config.ts";
 
 const root = fileURLToPath(new URL("../../", import.meta.url));
 const OUT = root + (process.env.ENS_OUT ?? "deployments/11155111-ens.json");
@@ -27,7 +27,7 @@ const ownerKey = process.env.OWNER_PRIVATE_KEY as Hex;
 if (!ownerKey) throw new Error("OWNER_PRIVATE_KEY not set");
 const owner = privateKeyToAccount(ownerKey, { nonceManager });
 const agent = config.agentAddress!;
-const rpc = process.env.SEPOLIA_RPC_URL || "https://ethereum-sepolia-rpc.publicnode.com";
+const rpc = process.env.SEPOLIA_RPC_URL || ANON_RPC; // owner actions go through Anon-RPC too
 const pub = createPublicClient({ chain: sepolia, transport: http(rpc, { timeout: 60_000 }) });
 const wallet = createWalletClient({ account: owner, chain: sepolia, transport: http(rpc, { timeout: 60_000 }) });
 
@@ -41,7 +41,7 @@ const registryAbi = parseAbi([
   "function getResolver(string label) view returns (address)",
   "function setParent(address parent, string label)",
 ]);
-const resolverAbi = parseAbi(["function initialize((address account, uint256 roleBitmap)[] grants, bytes[] calls)", "function setData(bytes name, string key, bytes value)"]);
+const resolverAbi = parseAbi(["function initialize((address account, uint256 roleBitmap)[] grants, bytes[] calls)", "function setData(bytes name, string key, bytes value)", "function setAddress(bytes name, uint256 coinType, bytes addressBytes)", "function setText(bytes name, string key, string value)"]);
 const registrarAbi = parseAbi([
   "function isAvailable(string label) view returns (bool)",
   "function getRegisterPrice(string label, uint64 duration, address paymentToken) view returns (uint256, uint256)",
@@ -51,7 +51,7 @@ const registrarAbi = parseAbi([
   "function register(string label, address owner, bytes32 secret, address subregistry, address resolver, uint64 duration, address paymentToken, bytes32 referrer) returns (uint256)",
 ]);
 const erc20Abi = parseAbi(["function mint(address to, uint256 amount)", "function approve(address spender, uint256 value) returns (bool)"]);
-const sourceAbi = parseAbi(["function bind(address agent, address registry, string label, bytes dnsName, bytes32 node)", "function isAuthorized(address agent) view returns (bool)"]);
+const sourceAbi = parseAbi(["function bind(address agent, string label, bytes dnsName, bytes32 node)", "function isAuthorized(address agent) view returns (bool)", "function registry() view returns (address)"]);
 
 type State = Record<string, string>;
 const state: State = existsSync(OUT) ? JSON.parse(readFileSync(OUT, "utf8")) : {};
@@ -132,7 +132,8 @@ await step("labelRegistered", `create ${FULL}`, async () => {
 
 await step("policySource", "deploy ENSPolicySource", async () => {
   const art = JSON.parse(readFileSync(root + "contracts/out/ENSPolicySource.sol/ENSPolicySource.json", "utf8"));
-  const hash = await wallet.deployContract({ abi: art.abi, bytecode: art.bytecode.object });
+  // pinned trust root: the only registry this source will ever read
+  const hash = await wallet.deployContract({ abi: art.abi, bytecode: art.bytecode.object, args: [state.userRegistry as Address] });
   const r = await pub.waitForTransactionReceipt({ hash });
   if (r.status !== "success" || !r.contractAddress) throw new Error(`deploy failed ${hash}`);
   console.log(`  ✓ ENSPolicySource ${r.contractAddress}  gas ${r.gasUsed}`);
@@ -145,12 +146,27 @@ state.dnsName = dnsName;
 state.node = node;
 
 await step("bound", "bind agent to the ENS name", async () => {
-  await send("bind", { address: state.policySource as Address, abi: sourceAbi, functionName: "bind", args: [agent, state.userRegistry as Address, LABEL, dnsName, node] } as never);
+  await send("bind", { address: state.policySource as Address, abi: sourceAbi, functionName: "bind", args: [agent, LABEL, dnsName, node] } as never);
   return "yes";
 });
 
 await step("roleGranted", "grant the agent ROLE_RENEW (the 'authorized' marker)", async () => {
   await send("grantRoles", { address: state.userRegistry as Address, abi: registryAbi, functionName: "grantRoles", args: [BigInt(keccak256(toHex(LABEL))), ROLE_RENEW, agent] } as never);
+  return "yes";
+});
+
+await step("records", "make the name resolve to the agent (addr + text records)", async () => {
+  await send("addr(60) -> agent", { address: state.resolver as Address, abi: resolverAbi, functionName: "setAddress", args: [dnsName, 60n, agent] } as never);
+  const texts: [string, string][] = [
+    ["description", "Kusari AI trading agent. Funds sit in a vault; every swap is checked by a Uniswap v4 hook against the policy in this name."],
+    ["url", "https://github.com/unspecifiedcoder/kusari"],
+    ["kusari.vault", process.env.KUSARI_VAULT ?? ""],
+    ["kusari.policy.format", "abi(uint128 maxPerSwap,uint128 dailyCap,uint16 maxImpactBps,bytes32 allowedPool,bool active) in data record kusari.policy"],
+  ];
+  for (const [k, v] of texts) {
+    if (!v) continue;
+    await send(`text ${k}`, { address: state.resolver as Address, abi: resolverAbi, functionName: "setText", args: [dnsName, k, v] } as never);
+  }
   return "yes";
 });
 

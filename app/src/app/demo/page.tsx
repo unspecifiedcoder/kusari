@@ -28,7 +28,8 @@ export default function Demo() {
   const proxy = useEventStream(PROXY_EVENTS);
   const bridge = useEventStream(BRIDGE_EVENTS);
   const agent = useEventStream(`${AGENT}/events`, 40);
-  const [status, setStatus] = useState<{ agent?: string; injected?: boolean; lastState?: AgentState | null }>({});
+  const [status, setStatus] = useState<{ agent?: string; injected?: boolean; transport?: string; lastState?: AgentState | null }>({});
+  const k = useKillSwitch();
 
   useEffect(() => {
     fetch(`${AGENT}/status`)
@@ -41,6 +42,8 @@ export default function Demo() {
   const state = latest ?? status.lastState ?? undefined;
   const injectEvent = agent.entries.find((e) => e.type === "inject");
   const injected = injectEvent ? Boolean(injectEvent.injected) : Boolean(status.injected);
+  const transportEvent = agent.entries.find((e) => e.type === "transport");
+  const anonOn = (transportEvent ? String(transportEvent.transport) : (status.transport ?? "anon")) === "anon";
   // Busy from "reading" until "idle". Live Sepolia cycles take ~20s (mixnet reads + tx confirmation).
   const lastCycleEvent = agent.entries.find((e) => e.type === "reading" || e.type === "idle");
   const running = lastCycleEvent?.type === "reading";
@@ -55,6 +58,8 @@ export default function Demo() {
         online={agent.status === "live"}
         onRun={() => post("/tick")}
         onInject={() => post(`/inject?on=${injected ? 0 : 1}`)}
+        anonOn={anonOn}
+        onTransport={() => post(`/transport?mode=${anonOn ? "leak" : "anon"}`)}
         agentAddress={status.agent}
       />
 
@@ -69,6 +74,7 @@ export default function Demo() {
           ) : (
             <div className="text-2xl font-semibold text-zinc-500">…</div>
           )}
+          <div className="font-mono text-xs text-zinc-400">{k.name ?? ""}</div>
           <div className="text-xs text-zinc-500">Vault holds {state ? `${state.vaultToken0.toFixed(2)} kUSD / ${state.vaultToken1.toFixed(3)} kETH` : "…"}</div>
         </Card>
         <Card title="Spent today">
@@ -84,7 +90,7 @@ export default function Demo() {
           <div className="text-sm text-zinc-300">
             {state ? `${state.maxPerSwap} kUSD per swap · ${state.dailyCap} / day · ${state.maxImpactBps / 100}% impact` : "…"}
           </div>
-          <div className="text-xs text-zinc-500">enforced by the Uniswap v4 hook</div>
+          <div className="text-xs text-zinc-500">read from ENS on every swap · enforced by the Uniswap v4 hook</div>
         </Card>
       </section>
 
@@ -93,9 +99,9 @@ export default function Demo() {
       </Card>
 
       <section className="grid gap-4 md:grid-cols-2">
-        <Card title="What a public RPC provider sees" right={<StatusDot status={proxy.status} />}>
+        <Card title="Anon-RPC OFF: the RPC provider's log" right={<StatusDot status={proxy.status} />}>
           <Feed
-            empty="No requests yet. Point the agent at :8547."
+            empty="Empty: with Anon-RPC on, the agent sends this provider nothing. Turn Anon-RPC OFF to see what a provider learns."
             rows={proxy.entries.map((e) => ({
               t: time(e.t),
               main: `${String(e.ip)}  ${String(e.method)}`,
@@ -104,12 +110,12 @@ export default function Demo() {
             }))}
           />
         </Card>
-        <Card title="With Anon-RPC (Nox mixnet)" right={<StatusDot status={bridge.status} />}>
+        <Card title="Anon-RPC ON: what leaves this machine (Nox mixnet only)" right={<StatusDot status={bridge.status} />}>
           <Feed
-            empty="No requests yet. Point the agent at :8546."
+            empty="No traffic yet. Press “Run agent once”."
             rows={bridge.entries.map((e) => ({
               t: time(e.t),
-              main: `mixnet exit  ${String(e.method)}`,
+              main: `→ mixnet  ${String(e.method)}`,
               sub: `${String(e.ms)} ms · ${String(e.transport)}`,
               tone: e.ok ? "safe" : "leak",
             }))}
@@ -126,6 +132,8 @@ function Controls(props: {
   online: boolean;
   onRun: () => void;
   onInject: () => void;
+  anonOn: boolean;
+  onTransport: () => void;
   agentAddress?: string;
 }) {
   const { isConnected } = useConnection();
@@ -149,6 +157,16 @@ function Controls(props: {
         }`}
       >
         {props.injected ? "Poisoned news: ON" : "Inject poisoned news"}
+      </button>
+      <button
+        onClick={props.onTransport}
+        disabled={!props.online || props.running}
+        title="Where the agent's reads and transactions go"
+        className={`rounded-lg px-4 py-2 text-sm font-medium disabled:opacity-40 ${
+          props.anonOn ? "bg-emerald-600 text-white" : "border border-amber-600 text-amber-300"
+        }`}
+      >
+        {props.anonOn ? "Anon-RPC: ON" : "Anon-RPC: OFF (leaking)"}
       </button>
       <span className="text-xs text-zinc-500">staged attack: the agent is deliberately gullible</span>
       <div className="ml-auto flex items-center gap-2">
@@ -191,7 +209,16 @@ function Activity({ entries }: { entries: Record<string, unknown>[] }) {
               <span>
                 <span className="text-zinc-500">{time(e.t)}</span>{" "}
                 {e.status === "success" ? `✅ swapped ${String(e.amountIn)} kUSD` : `🛡️ ${String(e.amountIn)} kUSD swap reverted on-chain`}
-                <span className="ml-2 font-mono text-xs text-zinc-500">{short(e.hash)}</span>
+                {typeof e.hash === "string" && (
+                  <a
+                    href={`https://sepolia.etherscan.io/tx/${e.hash}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="ml-2 font-mono text-xs text-zinc-500 underline"
+                  >
+                    {short(e.hash)}
+                  </a>
+                )}
               </span>
               <span className={e.status === "success" ? "text-emerald-400" : "font-medium text-red-300"}>
                 {e.status === "success" ? "within policy" : String(e.message)}
