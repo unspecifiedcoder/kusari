@@ -19,6 +19,11 @@ interface IENSv2Resolver {
     function text(bytes32 node, string calldata key) external view returns (string memory);
 }
 
+interface IENSv2Owned {
+    /// @notice IPermissionedRegistry.getOwner(anyId): accepts a raw labelhash.
+    function getOwner(uint256 anyId) external view returns (address);
+}
+
 interface IENSv2UniversalResolver {
     function ROOT_REGISTRY() external view returns (address);
 }
