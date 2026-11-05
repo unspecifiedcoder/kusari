@@ -1,0 +1,41 @@
+{
+  "11155111": {
+    "name": "sepolia",
+    "home": true,
+    "rpc": "https://ethereum-sepolia-rpc.publicnode.com",
+    "explorer": "https://sepolia.etherscan.io",
+    "uniswap": {
+      "poolManager": "0xE03A1074c86CFeDd5C142C4F04F1a1536e203543",
+      "positionManager": "0x429ba70129df741B2Ca2a85BC3A2a3328e5c09b4",
+      "stateView": "0xe1dd9c3fa50edb962e442f60dfbc432e24537e4c",
+      "quoter": "0x68aFa8b853cAa7a2D40B0F6AEE5C4DbC147C8244",
+      "permit2": "0x000000000022D473030F116dDEE9F6B43aC78BA3"
+    },
+    "ens": {
+      "rootRegistry": "0xb458d6a3a77919449d03e7a6903c26827c1ec43f",
+      "ethRegistry": "0xd4ebcbbdf463c9c45784603db0ddd499bc44a8b4",
+      "ethRegistrar": "0xf633e7fc17e2bbe0d0965d18ec1821dcb754a3d3",
+      "verifiableFactory": "0xda70306c98e97ece36f997a21368e53298572991",
+      "userRegistryImpl": "0x9bd8a88719068d09ecee662f36c0e3856708366a",
+      "permissionedResolverImpl": "0x115eb53f0c60696633855f90b138178fb40b2b2c",
+      "universalResolver": "0xeEeEEEeE14D718C2B47D9923Deab1335E144EeEe",
+      "mockUSDC": "0x240b0316df57887dbbe58b586508b19e633a14aa"
+    },
+    "anonRpc": { "noxSpecifier": "0x35133267A8F7EC35046a83DCA0f4Ca8A6e1b7A9A" }
+  },
+  "1301": {
+    "name": "unichain-sepolia",
+    "home": false,
+    "uniswap": { "poolManager": "0x00b036b58a818b1bc34d502d3fe730db729e62ac" }
+  },
+  "84532": {
+    "name": "base-sepolia",
+    "home": false,
+    "uniswap": { "poolManager": "0x05E73354cFDd6745C338b50BcFDfA3Aa6fA03408" }
+  },
+  "421614": {
+    "name": "arbitrum-sepolia",
+    "home": false,
+    "uniswap": { "poolManager": "0xFB3e0C6F74eB1a21CC1Da29aeC80D2Dfe6C9a317" }
+  }
+}
