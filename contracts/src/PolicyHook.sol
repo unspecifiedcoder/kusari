@@ -11,15 +11,18 @@ import {PoolId, PoolIdLibrary} from "@uniswap/v4-core/src/types/PoolId.sol";
 import {BalanceDelta} from "@uniswap/v4-core/src/types/BalanceDelta.sol";
 import {BeforeSwapDelta, BeforeSwapDeltaLibrary} from "@uniswap/v4-core/src/types/BeforeSwapDelta.sol";
 
+import {EIP712} from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
+import {SignatureChecker} from "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
+
 import {IPolicySource} from "./interfaces/IPolicySource.sol";
 import {IPolicyHook} from "./interfaces/IPolicyHook.sol";
-import {Policy, SwapIntent} from "./interfaces/PolicyTypes.sol";
+import {Policy, SwapIntent, PolicyTypes} from "./interfaces/PolicyTypes.sol";
 
 /// @title PolicyHook
 /// @notice Enforces an agent's on-chain policy on every swap it makes.
 /// Swaps with empty hookData are ordinary public swaps and pass through untouched.
 /// Agent funds can only reach the pool via an AgentVault, which always attaches a SwapIntent.
-contract PolicyHook is BaseHook {
+contract PolicyHook is BaseHook, EIP712, IPolicyHook {
     using PoolIdLibrary for PoolKey;
     using StateLibrary for IPoolManager;
 
@@ -28,12 +31,22 @@ contract PolicyHook is BaseHook {
     /// @notice agent => day (unix days) => amount spent
     mapping(address => mapping(uint256 => uint256)) public spentOn;
 
+    /// @notice agent => nonce => used
+    mapping(address => mapping(uint256 => bool)) public nonceUsed;
+
     // Carried from beforeSwap to afterSwap within the same swap (EIP-1153 transient storage).
     uint160 transient _sqrtPriceBefore;
     uint16 transient _maxImpactBps;
 
-    constructor(IPoolManager _poolManager, IPolicySource _policySource) BaseHook(_poolManager) {
+    constructor(IPoolManager _poolManager, IPolicySource _policySource)
+        BaseHook(_poolManager)
+        EIP712("Kusari", "1")
+    {
         policySource = _policySource;
+    }
+
+    function domainSeparator() external view returns (bytes32) {
+        return _domainSeparatorV4();
     }
 
     function getHookPermissions() public pure override returns (Hooks.Permissions memory) {
@@ -61,8 +74,9 @@ contract PolicyHook is BaseHook {
         returns (bytes4, BeforeSwapDelta, uint24)
     {
         if (hookData.length != 0) {
-            (SwapIntent memory intent,) = abi.decode(hookData, (SwapIntent, bytes));
+            (SwapIntent memory intent, bytes memory signature) = abi.decode(hookData, (SwapIntent, bytes));
             _checkIntentMatchesSwap(sender, key, params, intent);
+            _verifyAndConsume(intent, signature);
             uint16 maxImpactBps = _enforcePolicy(key, intent);
 
             // Remember the pre-swap price for the impact check in afterSwap.
@@ -109,6 +123,15 @@ contract PolicyHook is BaseHook {
             sender != intent.vault || PoolId.unwrap(intent.poolId) != PoolId.unwrap(key.toId())
                 || params.zeroForOne != intent.zeroForOne || uint256(-params.amountSpecified) != intent.amountIn
         ) revert IPolicyHook.IntentMismatch();
+    }
+
+    /// @dev Proves the agent signed this exact intent. Proves identity, not intent: the policy is what protects funds.
+    function _verifyAndConsume(SwapIntent memory intent, bytes memory signature) internal {
+        if (block.timestamp > intent.deadline) revert Expired();
+        if (nonceUsed[intent.agent][intent.nonce]) revert NonceUsed();
+        bytes32 digest = _hashTypedDataV4(PolicyTypes.hash(intent));
+        if (!SignatureChecker.isValidSignatureNow(intent.agent, digest, signature)) revert BadSignature();
+        nonceUsed[intent.agent][intent.nonce] = true;
     }
 
     function _enforcePolicy(PoolKey calldata key, SwapIntent memory intent) internal returns (uint16) {

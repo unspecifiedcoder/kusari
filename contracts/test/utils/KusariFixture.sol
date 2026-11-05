@@ -12,7 +12,7 @@ import {Constants} from "@uniswap/v4-core/test/utils/Constants.sol";
 import {IPositionManager} from "@uniswap/v4-periphery/src/interfaces/IPositionManager.sol";
 import {BalanceDelta} from "@uniswap/v4-core/src/types/BalanceDelta.sol";
 import {CustomRevert} from "@uniswap/v4-core/src/libraries/CustomRevert.sol";
-import {Policy, SwapIntent} from "../../src/interfaces/PolicyTypes.sol";
+import {Policy, SwapIntent, PolicyTypes} from "../../src/interfaces/PolicyTypes.sol";
 
 import {EasyPosm} from "./libraries/EasyPosm.sol";
 import {BaseTest} from "./BaseTest.sol";
@@ -35,7 +35,12 @@ abstract contract KusariFixture is BaseTest {
 
     uint128 constant LIQUIDITY = 100e18;
 
+    address agent;
+    uint256 agentPk;
+    bytes32 domainSep;
+
     function _setUpKusari() internal {
+        (agent, agentPk) = makeAddrAndKey("agent");
         deployArtifactsAndLabel();
         (currency0, currency1) = deployCurrencyPair();
 
@@ -45,6 +50,7 @@ abstract contract KusariFixture is BaseTest {
         deployCodeTo("PolicyHook.sol:PolicyHook", abi.encode(poolManager, source), flags);
         hook = PolicyHook(flags);
         vm.label(address(hook), "PolicyHook");
+        domainSep = hook.domainSeparator();
 
         poolKey = PoolKey(currency0, currency1, 3000, 60, IHooks(hook));
         poolId = poolKey.toId();
@@ -68,20 +74,32 @@ abstract contract KusariFixture is BaseTest {
         });
     }
 
-    function _intent(address agent, address vault, uint256 amountIn, uint256 nonce)
+    function _intent(address who, address via, uint256 amountIn, uint256 nonce)
         internal
         view
         returns (SwapIntent memory)
     {
         return SwapIntent({
-            agent: agent,
-            vault: vault,
+            agent: who,
+            vault: via,
             poolId: poolId,
             zeroForOne: true,
             amountIn: amountIn,
             nonce: nonce,
             deadline: block.timestamp + 1 hours
         });
+    }
+
+    function _sign(uint256 pk, SwapIntent memory intent) internal view returns (bytes memory) {
+        // uses the cached separator: an external call here would consume a pending vm.expectRevert
+        bytes32 digest = keccak256(abi.encodePacked("\x19\x01", domainSep, PolicyTypes.hash(intent)));
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(pk, digest);
+        return abi.encodePacked(r, s, v);
+    }
+
+    /// @dev Router swap with the intent signed by the agent's key.
+    function _swapSigned(SwapIntent memory intent) internal returns (BalanceDelta) {
+        return _routerSwap(intent, _sign(agentPk, intent));
     }
 
     /// @dev Swap via the test router, which then acts as the "vault" (it's the hook's sender).

@@ -12,7 +12,6 @@ import {IPolicyHook} from "../src/interfaces/IPolicyHook.sol";
 contract PolicyHookImpactTest is KusariFixture {
     using StateLibrary for IPoolManager;
 
-    address agent = makeAddr("agent");
     address vault;
 
     function setUp() public {
@@ -24,14 +23,14 @@ contract PolicyHookImpactTest is KusariFixture {
     }
 
     function test_smallSwap_underImpactLimit_passes() public {
-        _routerSwap(_intent(agent, vault, 0.1e18, 0), "");
+        _swapSigned(_intent(agent, vault, 0.1e18, 0));
         (uint160 sqrtP,,,) = poolManager.getSlot0(poolId);
         assertLe(hook.priceImpactBps(Constants.SQRT_PRICE_1_1, sqrtP), 100);
     }
 
     function test_largeSwap_overImpactLimit_revertsInAfterSwap() public {
         _expectHookRevert(IHooks.afterSwap.selector, abi.encodeWithSelector(IPolicyHook.PriceImpactTooHigh.selector));
-        _routerSwap(_intent(agent, vault, 1e18, 0), "");
+        _swapSigned(_intent(agent, vault, 1e18, 0));
     }
 
     function test_afterSwapRevert_rollsBackEverything() public {
@@ -55,6 +54,6 @@ contract PolicyHookImpactTest is KusariFixture {
     }
 
     function externalSwap(uint256 amountIn) external {
-        _routerSwap(_intent(agent, vault, amountIn, 0), "");
+        _swapSigned(_intent(agent, vault, amountIn, 0));
     }
 }
