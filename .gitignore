@@ -10,3 +10,7 @@ cache/
 broadcast/
 deployments/*-fork.json
 dist/
+AGENTS.md
+.next/
+next-env.d.ts
+app/src/generated/
