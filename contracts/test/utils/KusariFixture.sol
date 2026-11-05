@@ -10,6 +10,9 @@ import {Currency} from "@uniswap/v4-core/src/types/Currency.sol";
 import {LiquidityAmounts} from "@uniswap/v4-core/test/utils/LiquidityAmounts.sol";
 import {Constants} from "@uniswap/v4-core/test/utils/Constants.sol";
 import {IPositionManager} from "@uniswap/v4-periphery/src/interfaces/IPositionManager.sol";
+import {BalanceDelta} from "@uniswap/v4-core/src/types/BalanceDelta.sol";
+import {CustomRevert} from "@uniswap/v4-core/src/libraries/CustomRevert.sol";
+import {Policy, SwapIntent} from "../../src/interfaces/PolicyTypes.sol";
 
 import {EasyPosm} from "./libraries/EasyPosm.sol";
 import {BaseTest} from "./BaseTest.sol";
@@ -54,6 +57,56 @@ abstract contract KusariFixture is BaseTest {
         );
         positionManager.mint(
             poolKey, lower, upper, LIQUIDITY, a0 + 1, a1 + 1, address(this), block.timestamp, Constants.ZERO_BYTES
+        );
+    }
+
+    // ---------- helpers ----------
+
+    function _policy(uint128 maxPerSwap, uint128 dailyCap, uint16 maxImpactBps) internal view returns (Policy memory) {
+        return Policy({
+            maxPerSwap: maxPerSwap, dailyCap: dailyCap, maxImpactBps: maxImpactBps, allowedPool: poolId, active: true
+        });
+    }
+
+    function _intent(address agent, address vault, uint256 amountIn, uint256 nonce)
+        internal
+        view
+        returns (SwapIntent memory)
+    {
+        return SwapIntent({
+            agent: agent,
+            vault: vault,
+            poolId: poolId,
+            zeroForOne: true,
+            amountIn: amountIn,
+            nonce: nonce,
+            deadline: block.timestamp + 1 hours
+        });
+    }
+
+    /// @dev Swap via the test router, which then acts as the "vault" (it's the hook's sender).
+    function _routerSwap(SwapIntent memory intent, bytes memory sig) internal returns (BalanceDelta) {
+        return swapRouter.swapExactTokensForTokens({
+            amountIn: intent.amountIn,
+            amountOutMin: 0,
+            zeroForOne: intent.zeroForOne,
+            poolKey: poolKey,
+            hookData: abi.encode(intent, sig),
+            receiver: address(this),
+            deadline: block.timestamp + 1
+        });
+    }
+
+    /// @dev v4 wraps hook reverts: WrappedError(hook, hookSelector, reason, HookCallFailed).
+    function _expectHookRevert(bytes4 hookSelector, bytes memory reason) internal {
+        vm.expectRevert(
+            abi.encodeWithSelector(
+                CustomRevert.WrappedError.selector,
+                address(hook),
+                hookSelector,
+                reason,
+                abi.encodeWithSelector(Hooks.HookCallFailed.selector)
+            )
         );
     }
 }
