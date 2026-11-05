@@ -82,10 +82,11 @@ try {
 }
 check("agent can't re-bind its own policy", rebindBlocked && rebindReason === "NotNameOwner", `bind() as the agent -> ${rebindReason || "NOT reverted"}`);
 
-// restore
+// restore. Public RPCs are load-balanced: wait until the grant is visible before simulating the next swap.
 const gr = await ownerRole("grantRoles");
+for (let i = 0; i < 20 && !(await readState(agentAccount.address)).authorized; i++) await new Promise((r) => setTimeout(r, 3000));
 const r4 = await executeSwap(0.1);
-check("re-authorize", gr.ok && r4.status === "success", `grant ${link(gr.hash)} -> 0.1 swap: ${r4.status} ${link(r4.hash)}`);
+check("re-authorize", gr.ok && r4.status === "success", `grant ${link(gr.hash)} -> 0.1 swap: ${r4.status} ${r4.reason ?? ""} ${link(r4.hash)}`);
 
 const failed = results.filter((r) => !r.pass).length;
 console.log(`\n${results.length - failed}/${results.length} beats passed`);
