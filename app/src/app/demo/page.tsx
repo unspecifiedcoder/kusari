@@ -1,19 +1,13 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useWriteContract, useConnection } from "wagmi";
-import { parseAbi } from "viem";
+import { useConnection } from "wagmi";
 import { useEventStream, StatusDot } from "@/components/LiveFeed";
-import { deployment } from "@/generated/deployment";
+import { useKillSwitch } from "@/lib/killswitch";
 
 const PROXY_EVENTS = process.env.NEXT_PUBLIC_PROXY_EVENTS ?? "http://localhost:8547/events";
 const BRIDGE_EVENTS = process.env.NEXT_PUBLIC_BRIDGE_EVENTS ?? "http://localhost:8546/events";
 const AGENT = process.env.NEXT_PUBLIC_AGENT_URL ?? "http://localhost:8787";
-
-const policyAbi = parseAbi([
-  "function setAuthorized(address agent, bool ok)", // MockPolicySource (local fork)
-  "function freeze(address agent)", // PolicyMirror (Sepolia): owner-only
-]);
 
 type AgentState = {
   price: number;
@@ -135,14 +129,8 @@ function Controls(props: {
   agentAddress?: string;
 }) {
   const { isConnected } = useConnection();
-  const { writeContract, isPending, error, data: hash } = useWriteContract();
-  const revoke = () => {
-    if (!props.agentAddress || !deployment) return;
-    const agent = props.agentAddress as `0x${string}`;
-    const kind = (deployment as { policyKind?: string }).policyKind;
-    if (kind === "mirror") writeContract({ address: deployment.policySource, abi: policyAbi, functionName: "freeze", args: [agent] });
-    else writeContract({ address: deployment.policySource, abi: policyAbi, functionName: "setAuthorized", args: [agent, false] });
-  };
+  const k = useKillSwitch();
+  const frozen = k.authorized === false;
 
   return (
     <section className="flex flex-wrap items-center gap-3 rounded-xl border border-zinc-800 p-4">
@@ -164,15 +152,16 @@ function Controls(props: {
       </button>
       <span className="text-xs text-zinc-500">staged attack: the agent is deliberately gullible</span>
       <div className="ml-auto flex items-center gap-2">
-        {error && <span className="text-xs text-red-400">{error.message.split("\n")[0]}</span>}
-        {hash && <span className="font-mono text-xs text-zinc-400">revoke tx {short(hash)}</span>}
+        {k.error && <span className="text-xs text-red-400">{k.error.message.split("\n")[0]}</span>}
+        {k.hash && <span className="font-mono text-xs text-zinc-400">{k.confirmed ? "✓" : "…"} {short(k.hash)}</span>}
+        <a href="/freeze" className="text-xs text-zinc-500 underline">phone view</a>
         <button
-          onClick={revoke}
-          disabled={!isConnected || isPending || !props.agentAddress}
-          title={isConnected ? "Owner revokes the agent's role" : "Connect the owner wallet first"}
-          className="rounded-lg bg-red-500 px-4 py-2 text-sm font-semibold text-black disabled:opacity-40"
+          onClick={frozen ? k.unfreeze : k.freeze}
+          disabled={!isConnected || k.isPending || !k.agent}
+          title={isConnected ? `Owner ${frozen ? "re-grants" : "revokes"} the agent (${k.via})` : "Connect the owner wallet first"}
+          className={`rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-40 ${frozen ? "border border-zinc-600" : "bg-red-500 text-black"}`}
         >
-          {isPending ? "Revoking…" : "Revoke agent (owner)"}
+          {k.isPending ? "Confirming…" : frozen ? "Unfreeze agent" : "Revoke agent (owner)"}
         </button>
       </div>
     </section>

@@ -29,6 +29,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               <Link href="/demo" className="text-sm text-zinc-400 hover:text-white">
                 Live demo
               </Link>
+              <Link href="/freeze" className="text-sm text-red-400 hover:text-red-300">
+                Kill switch
+              </Link>
             </nav>
             <ConnectButton />
           </header>
