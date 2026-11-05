@@ -10,7 +10,10 @@ const PROXY_EVENTS = process.env.NEXT_PUBLIC_PROXY_EVENTS ?? "http://localhost:8
 const BRIDGE_EVENTS = process.env.NEXT_PUBLIC_BRIDGE_EVENTS ?? "http://localhost:8546/events";
 const AGENT = process.env.NEXT_PUBLIC_AGENT_URL ?? "http://localhost:8787";
 
-const mockPolicyAbi = parseAbi(["function setAuthorized(address agent, bool ok)"]);
+const policyAbi = parseAbi([
+  "function setAuthorized(address agent, bool ok)", // MockPolicySource (local fork)
+  "function freeze(address agent)", // PolicyMirror (Sepolia): owner-only
+]);
 
 type AgentState = {
   price: number;
@@ -131,9 +134,13 @@ function Controls(props: {
 }) {
   const { isConnected } = useConnection();
   const { writeContract, isPending, error, data: hash } = useWriteContract();
-  const revoke = () =>
-    props.agentAddress &&
-    writeContract({ address: deployment!.policySource, abi: mockPolicyAbi, functionName: "setAuthorized", args: [props.agentAddress as `0x${string}`, false] });
+  const revoke = () => {
+    if (!props.agentAddress || !deployment) return;
+    const agent = props.agentAddress as `0x${string}`;
+    const kind = (deployment as { policyKind?: string }).policyKind;
+    if (kind === "mirror") writeContract({ address: deployment.policySource, abi: policyAbi, functionName: "freeze", args: [agent] });
+    else writeContract({ address: deployment.policySource, abi: policyAbi, functionName: "setAuthorized", args: [agent, false] });
+  };
 
   return (
     <section className="flex flex-wrap items-center gap-3 rounded-xl border border-zinc-800 p-4">
