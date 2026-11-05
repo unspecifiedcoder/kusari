@@ -8,7 +8,9 @@ const page = await browser.newPage({ viewport: { width: 1280, height: 1300 } });
 await page.goto(url, { waitUntil: "networkidle" });
 
 const waitIdle = async () => {
-  await page.getByRole("button", { name: "Agent thinking…" }).waitFor({ state: "detached", timeout: 60_000 }).catch(() => {});
+  // live Sepolia cycles take ~20s (mixnet reads + tx confirmation)
+  await page.getByRole("button", { name: "Agent thinking…" }).waitFor({ state: "visible", timeout: 10_000 }).catch(() => {});
+  await page.getByRole("button", { name: "Agent thinking…" }).waitFor({ state: "detached", timeout: 120_000 }).catch(() => {});
   await page.waitForTimeout(1500);
 };
 
