@@ -12,6 +12,10 @@ out = "out"
 solc_version = "0.8.30"
 src = "src"
 via_ir = false
+# Sepolia charges ~1,500 gas per byte of deployed code and caps a tx at ~16.7M gas,
+# so contracts must be small: optimize for size (low runs).
+optimizer = true
+optimizer_runs = 200
 
 [lint]
 exclude_lints = ["screaming-snake-case-immutable", "screaming-snake-case-const"]
