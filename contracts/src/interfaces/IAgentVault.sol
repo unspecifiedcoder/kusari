@@ -11,6 +11,7 @@ interface IAgentVault {
     error OnlyOwner();
     error OnlyPoolManager();
     error WrongHook();
+    error IntentNotForVault();
 
     event Swapped(address indexed agent, uint256 amountIn, int128 amount0, int128 amount1);
     event Withdrawn(address indexed to, Currency indexed currency, uint256 amount);

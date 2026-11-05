@@ -50,4 +50,5 @@ export const revertReasons: Record<string, string> = {
   NonceUsed: "Blocked: replayed intent",
   OnlyAgent: "Blocked: only the agent can swap",
   WrongHook: "Blocked: pool doesn't use the Kusari hook",
+  IntentNotForVault: "Blocked: the signed intent is for a different vault or agent",
 };
