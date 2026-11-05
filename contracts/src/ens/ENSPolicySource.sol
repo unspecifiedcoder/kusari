@@ -3,14 +3,15 @@ pragma solidity ^0.8.28;
 
 import {IPolicySource} from "../interfaces/IPolicySource.sol";
 import {Policy} from "../interfaces/PolicyTypes.sol";
-import {IENSv2Registry, IENSv2AccessControl, IENSv2Resolver, IENSv2Owned} from "./IENSv2.sol";
+import {IENSv2Registry, IENSv2AccessControl, IENSv2Resolver, IENSv2ExtendedResolver, IENSv2Owned} from "./IENSv2.sol";
 
 /// @title ENSPolicySource
 /// @notice Reads an agent's policy and authorization from ENSv2, live, on every swap.
 ///
 /// - Authorization: the agent holds AUTH_ROLE on its label (e.g. "alpha") in the parent name's registry.
 ///   Revoking that role (EnhancedAccessControl.revokeRoles) freezes the agent on its very next swap.
-/// - Limits: an ABI-encoded Policy in the label's resolver, under data(node, "kusari.policy").
+/// - Limits: an ABI-encoded Policy in the label's resolver under the "kusari.policy" data record, read via
+///   ENSIP-10 resolve(dnsName, data(node, key)) — the only read path the live ENSv2 PermissionedResolver exposes.
 ///
 /// Least privilege: the marker role must not let the agent change its own policy. ROLE_RENEW only lets the
 /// holder extend the name's expiry. As a fail-safe, an agent that can change the label's resolver
@@ -24,7 +25,8 @@ contract ENSPolicySource is IPolicySource {
     struct Binding {
         address registry; // the parent name's registry, e.g. <name>.eth's subregistry
         string label; // e.g. "alpha"
-        bytes32 node; // namehash("alpha.<name>.eth"), used for resolver records
+        bytes dnsName; // DNS-encoded "alpha.<name>.eth", for resolve()
+        bytes32 node; // namehash("alpha.<name>.eth")
     }
 
     mapping(address agent => Binding) internal _bindings;
@@ -34,9 +36,10 @@ contract ENSPolicySource is IPolicySource {
     error NotNameOwner();
 
     /// @notice Link an agent to an ENS label. Only the label's current owner can do this.
-    function bind(address agent, address registry, string calldata label, bytes32 node) external {
+    /// dnsName/node describe the full name; a wrong value only breaks the binder's own policy (reads come back empty).
+    function bind(address agent, address registry, string calldata label, bytes calldata dnsName, bytes32 node) external {
         if (IENSv2Owned(registry).getOwner(_labelId(label)) != msg.sender) revert NotNameOwner();
-        _bindings[agent] = Binding(registry, label, node);
+        _bindings[agent] = Binding(registry, label, dnsName, node);
         emit AgentBound(agent, registry, label, node);
     }
 
@@ -52,15 +55,21 @@ contract ENSPolicySource is IPolicySource {
         return eac.hasRoles(id, AUTH_ROLE, agent) && !eac.hasRoles(id, ROLE_SET_RESOLVER, agent);
     }
 
-    /// @dev Unbound, no resolver or no record returns an inactive policy, which the hook rejects.
+    /// @dev Unbound, no resolver, no record or a failing resolver returns an inactive policy, which the hook rejects.
     function policyOf(address agent) external view returns (Policy memory p) {
         Binding storage b = _bindings[agent];
         if (b.registry == address(0)) return p;
         address resolver = IENSv2Registry(b.registry).getResolver(b.label);
         if (resolver == address(0)) return p;
-        bytes memory raw = IENSv2Resolver(resolver).data(b.node, POLICY_KEY);
-        if (raw.length == 0) return p;
-        p = abi.decode(raw, (Policy));
+        bytes memory call = abi.encodeCall(IENSv2Resolver.data, (b.node, POLICY_KEY));
+        try IENSv2ExtendedResolver(resolver).resolve(b.dnsName, call) returns (bytes memory out) {
+            if (out.length == 0) return p;
+            bytes memory raw = abi.decode(out, (bytes));
+            if (raw.length == 0) return p;
+            p = abi.decode(raw, (Policy));
+        } catch {
+            return p;
+        }
     }
 
     function _labelId(string memory label) internal pure returns (uint256) {

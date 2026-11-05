@@ -19,6 +19,12 @@ interface IENSv2Resolver {
     function text(bytes32 node, string calldata key) external view returns (string memory);
 }
 
+/// @notice ENSIP-10 extended resolver. The live ENSv2 PermissionedResolver exposes records ONLY through
+/// resolve(dnsName, call), e.g. resolve(name, abi.encodeCall(IENSv2Resolver.data, (node, key))).
+interface IENSv2ExtendedResolver {
+    function resolve(bytes calldata name, bytes calldata data) external view returns (bytes memory);
+}
+
 interface IENSv2Owned {
     /// @notice IPermissionedRegistry.getOwner(anyId): accepts a raw labelhash.
     function getOwner(uint256 anyId) external view returns (address);
