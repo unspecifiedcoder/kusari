@@ -118,6 +118,8 @@ The existing shared workspace also exposes **ENS policy demonstration** below th
 
 Say: **“The request stayed at 2 kUSD. I changed only the ENS record from 5 to 1. The hook read the new policy and rejected the next swap.”** This is a deterministic policy demonstration, not an LLM decision. Use the normal scenario separately to show Gemini. The public normal scenario and shared trade API retain their 1 kUSD ceiling throughout.
 
+The [completed canonical-HTTPS/CLI rehearsal](evidence/owner-policy-check.json) contains the four real receipts and independent calldata checks. It left cap 5 restored and the agent authorized. The owner signed locally for that rehearsal; it is separate from recording the new browser controls with MetaMask.
+
 The standard ENS app can show the name, owner and agent address; the ENS explorer can show indexed text/address records. The encoded `kusari.policy` data and its owner editor are implemented here. Do not promise an ordinary text-record editor changes these enforced limits. Two-owner isolation is separately evidenced by the CLI receipts; the shared workspace does not provide a reusable literal `beta.kusari-demo.eth` browser account.
 
 ## Ninety-second ENS explanation

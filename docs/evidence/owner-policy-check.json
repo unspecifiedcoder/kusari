@@ -1,0 +1,115 @@
+{
+  "status": "passed",
+  "startedAt": "2026-11-06T22:27:33.538Z",
+  "chainId": 11155111,
+  "origin": "https://kusari.outcomeseal.com",
+  "owner": "0xc815eDb747e34DA879AFE1a0EF3DF641B4921000",
+  "agent": "0x72db032c0dFB6E7502e16A73fabdab31712dc706",
+  "vault": "0x209c26182c40F6B34Ef5fe11b21709496dc6a2ed",
+  "checks": {
+    "wrongOwner": {
+      "httpStatus": 403
+    },
+    "publicAPIAmountTwo": {
+      "httpStatus": 400,
+      "requestAccepted": false
+    }
+  },
+  "trades": [
+    {
+      "case": "2 kUSD under cap5",
+      "status": "success",
+      "nonce": "0x4849f960aed1e65ca81a073336b5c02a29d3e61c53a7547b8448febff2150985",
+      "requestId": "2de366cc-edc8-48c4-9fb1-44ed18b312dd",
+      "result": {
+        "requestId": "2de366cc-edc8-48c4-9fb1-44ed18b312dd",
+        "status": "success",
+        "requested": "2",
+        "limit": "5",
+        "limitObservedAt": 1794004064982,
+        "outcome": "Swap confirmed on Sepolia",
+        "reason": "The Sepolia receipt confirms a completed swap.",
+        "hash": "0xc5da019bafdb85e3d889dbf54386c807b85e12b181b1ab8d251505c343c81770",
+        "source": "owner-policy-check",
+        "deterministic": true,
+        "chainId": 11155111,
+        "route": "Anon-RPC / Nox"
+      },
+      "hash": "0xc5da019bafdb85e3d889dbf54386c807b85e12b181b1ab8d251505c343c81770",
+      "independentReceipt": {
+        "status": "success",
+        "hash": "0xc5da019bafdb85e3d889dbf54386c807b85e12b181b1ab8d251505c343c81770",
+        "blockNumber": "12079514",
+        "amountInWei": "2000000000000000000",
+        "from": "0x72db032c0dfb6e7502e16a73fabdab31712dc706",
+        "to": "0x209c26182c40f6b34ef5fe11b21709496dc6a2ed"
+      }
+    },
+    {
+      "case": "2 kUSD under cap1",
+      "status": "reverted",
+      "nonce": "0x40519d6392c1b5e49ff7949a4f6a006ed61562605b2488762e7b75b51f011919",
+      "requestId": "f6949ed0-627f-47d3-a6f1-925cbb967030",
+      "result": {
+        "requestId": "f6949ed0-627f-47d3-a6f1-925cbb967030",
+        "status": "reverted",
+        "requested": "2",
+        "limit": "1",
+        "limitObservedAt": 1794004100334,
+        "outcome": "Reverted on Sepolia",
+        "reason": "The receipt confirms a revert; it does not contain a decoded failure reason.",
+        "hash": "0x76125d7da1d86d7f0b15ddfcad30d78eeae442dc234a761488b898fda1b476f7",
+        "preflightReason": "ExceedsPerSwap",
+        "source": "owner-policy-check",
+        "deterministic": true,
+        "chainId": 11155111,
+        "route": "Anon-RPC / Nox"
+      },
+      "hash": "0x76125d7da1d86d7f0b15ddfcad30d78eeae442dc234a761488b898fda1b476f7",
+      "independentReceipt": {
+        "status": "reverted",
+        "hash": "0x76125d7da1d86d7f0b15ddfcad30d78eeae442dc234a761488b898fda1b476f7",
+        "blockNumber": "12079516",
+        "amountInWei": "2000000000000000000",
+        "from": "0x72db032c0dfb6e7502e16a73fabdab31712dc706",
+        "to": "0x209c26182c40f6b34ef5fe11b21709496dc6a2ed"
+      }
+    }
+  ],
+  "policyTransactions": [
+    {
+      "capKUSD": "1",
+      "hash": "0xf290c965e038403aaad87394739fdd2d02d0638f0f947f75ac26ebcae93ea864",
+      "status": "success",
+      "blockNumber": "12079515"
+    },
+    {
+      "capKUSD": "5",
+      "hash": "0xc51298b4522492469183d9104548be6255d4634d7c09bc4fdf17dd6cdeafedd3",
+      "status": "success",
+      "blockNumber": "12079517"
+    }
+  ],
+  "notes": [
+    "Fixed deterministic owner check; Gemini is not called.",
+    "Onchain receipt status is separate from preflight rejection prediction.",
+    "The owner key remains local; owner policy transactions use direct RPC. Agent execution uses hosted Anon-RPC/Nox."
+  ],
+  "originalPolicy": {
+    "maxPerSwap": "5000000000000000000",
+    "dailyCap": "100000000000000000000",
+    "maxImpactBps": 200,
+    "allowedPool": "0xa5919e6e4fdea32ead5822ec741ac0dd9e6155c32ec37c9d417452849eb5fc93",
+    "active": true
+  },
+  "restoredPolicy": {
+    "maxPerSwap": "5000000000000000000",
+    "dailyCap": "100000000000000000000",
+    "maxImpactBps": 200,
+    "allowedPool": "0xa5919e6e4fdea32ead5822ec741ac0dd9e6155c32ec37c9d417452849eb5fc93",
+    "active": true
+  },
+  "restoreConfirmed": true,
+  "agentAuthorizedAfter": true,
+  "completedAt": "2026-11-06T22:28:42.374Z"
+}
