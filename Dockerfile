@@ -32,5 +32,5 @@ COPY scripts/demo-gateway.mjs scripts/start-hosted-demo.mjs scripts/present-host
 
 USER node
 EXPOSE 8788
-ENTRYPOINT ["/usr/bin/tini", "--"]
+ENTRYPOINT ["/usr/bin/tini", "-s", "--"]
 CMD ["node", "scripts/start-hosted-demo.mjs"]

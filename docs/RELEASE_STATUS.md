@@ -21,8 +21,9 @@ Deadline supplied by the team: 7 November 2026, 07:00 IST. Submission target: 05
 
 ## Remaining release gates
 
-- Fly CLI account authorization and existing demo agent/Gemini configuration.
-- Remote Docker build and Chromium/Nox startup; increase RAM only if runtime evidence requires it.
+- Fly account authorization is complete; app `kusari-demo-backend` was created in the authorized account.
+- Remote Docker build passed. A temporary one-shared-CPU, 1GB iad Machine booted Chromium/Nox and completed two out of two anonymous Sepolia block reads before exiting successfully. No wallet key was used for this infrastructure check.
+- Existing demo agent/Gemini configuration is still required. Full-stack steady-state memory remains to be verified; increase RAM only if runtime evidence requires it.
 - Connect Fly gateway to Vercel through server-only environment variables.
 - Verify a fresh matching-agent snapshot with actual anonymous bridge mode through the public URL.
 - Rehearse normal trade, injected over-cap rejection, owner role revocation, blocked next trade, and reauthorization; restore initial state and retain gas/daily-cap headroom.
