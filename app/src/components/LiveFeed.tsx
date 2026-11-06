@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Dot } from "@/components/ui";
 
 type Entry = Record<string, unknown> & { t?: number };
 
@@ -25,11 +26,12 @@ export function useEventStream(url: string, max = 25) {
 }
 
 export function StatusDot({ status }: { status: string }) {
-  const color = status === "live" ? "bg-emerald-400" : status === "offline" ? "bg-red-500" : "bg-amber-400";
+  const tone = status === "live" ? "safe" : status === "offline" ? "danger" : "warn";
+  const label = status === "live" ? "Live" : status === "offline" ? "Offline" : "Connecting";
   return (
-    <span className="inline-flex items-center gap-1.5 text-xs text-zinc-400">
-      <span className={`h-2 w-2 rounded-full ${color}`} />
-      {status}
+    <span className="inline-flex items-center gap-2 text-xs text-muted">
+      <Dot tone={tone} live={status === "live"} />
+      {label}
     </span>
   );
 }
