@@ -6,8 +6,8 @@ export default function Home() {
   return (
     <div className="overview-content space-y-10 sm:space-y-12">
       <section className="overview-heading" aria-labelledby="kusari-title">
-        <div><h1 id="kusari-title">Agent overview</h1><p>Inspect the policy and funded vault, then try a real Gemini trade request.</p></div>
-        <Link href="/demo#try-sandbox" className="product-primary-link">Open agent workspace <span aria-hidden="true">↗</span></Link>
+        <div><h1 id="kusari-title">Control your AI trading agent</h1><p>Try the funded demo: a real Gemini decision, ENS policy and guarded Uniswap trade. Personal agent onboarding is available separately in beta.</p></div>
+        <div className="flex flex-wrap items-center gap-4"><Link href="/demo#try-sandbox" className="product-primary-link">Try the demo <span aria-hidden="true">↗</span></Link><Link href="/agents" className="owned-text-link">Personal agents · Beta <span aria-hidden="true">↗</span></Link></div>
       </section>
       <JudgeOverview />
       <section aria-labelledby="how-it-works" className="space-y-5">

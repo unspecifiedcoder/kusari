@@ -22,3 +22,4 @@ app/src/generated/
 !.impeccable/design.json
 !.impeccable/config.json
 !.impeccable/surfaces/
+!.impeccable/surfaces/agents.md

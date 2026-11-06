@@ -5,7 +5,8 @@ import { usePathname } from "next/navigation";
 import { ConnectButton } from "./ConnectButton";
 
 const destinations = [
-  { href: "/demo", label: "Agent workspace", icon: "workspace" },
+  { href: "/demo", label: "Try the demo", icon: "workspace" },
+  { href: "/agents", label: "Your agents · Beta", icon: "workspace" },
   { href: "/", label: "Overview & proof", icon: "overview" },
   { href: "/freeze", label: "Owner controls", icon: "shield" },
 ] as const;
@@ -24,12 +25,12 @@ export function ProductNavigation() {
     <nav aria-label="Main navigation" className="app-navigation">
       {destinations.map((item) => <Link key={item.href} href={item.href} aria-current={pathname === item.href ? "page" : undefined} className="app-nav-link"><NavIcon kind={item.icon} /><span>{item.label}</span></Link>)}
     </nav>
-    <div className="app-sidebar-footer"><div className="environment-note"><span className="environment-dot" />Sepolia testnet</div><p>Shared vault. Test tokens.</p><a href="https://github.com/unspecifiedcoder/kusari/tree/codex/judge-ready" target="_blank" rel="noreferrer">View source <span aria-hidden="true">↗</span></a></div>
+    <div className="app-sidebar-footer"><div className="environment-note"><span className="environment-dot" />Sepolia testnet</div><p>Owner-controlled agents. Test tokens.</p><a href="https://github.com/unspecifiedcoder/kusari/tree/codex/judge-ready" target="_blank" rel="noreferrer">View source <span aria-hidden="true">↗</span></a></div>
   </aside>;
 }
 
 export function ProductHeader() {
   const pathname = usePathname();
-  const title = pathname === "/demo" ? "Agent workspace" : pathname === "/freeze" ? "Owner controls" : pathname === "/setup" ? "Advanced vault tools" : "Overview & proof";
+  const title = pathname === "/agents" ? "Your agents · Beta" : pathname === "/demo" ? "Shared demo" : pathname === "/freeze" ? "Shared demo owner controls" : pathname === "/setup" ? "Advanced vault tools" : "Overview & proof";
   return <header className="app-topbar"><div className="app-breadcrumb"><span>Kusari</span><span aria-hidden="true">/</span><strong>{title}</strong></div><ConnectButton /></header>;
 }
