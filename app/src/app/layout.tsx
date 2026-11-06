@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
 import { ConnectButton } from "@/components/ConnectButton";
+import { ReadRouteBadge } from "@/components/ReadRouteBadge";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
@@ -33,7 +34,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                 Kill switch
               </Link>
             </nav>
-            <ConnectButton />
+            <div className="flex items-center gap-4">
+              <ReadRouteBadge />
+              <ConnectButton />
+            </div>
           </header>
           <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-8">{children}</main>
         </Providers>

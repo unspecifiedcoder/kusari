@@ -182,6 +182,15 @@ cd ../agent && node src/ens-policy.ts set 5 100 200                            #
 
 On Windows, `. .\env.ps1` activates the project-local toolchain (node, git, foundry) first. To serve the phone kill switch over Wi-Fi, start the bridge with `ANON_BRIDGE_HOST=0.0.0.0`.
 
+**One-click demo (Windows):** `.\scripts\demo.ps1` starts the bridge, proxy, agent and app (each in its own window), waits until they're healthy, runs a pre-flight check (keys, ENS policy, bridge), and opens `/demo`. Add `-Lan` to serve the phone kill switch over Wi-Fi; `-Stop` stops everything.
+
+### Hosting the app (e.g. Vercel)
+
+The Next.js app in `app/` deploys as-is (Root Directory `app`, with files outside the root directory included, since the build reads `../deployments` and `../shared`). On a public host:
+- `/` (vaults) and `/freeze` (kill switch) work with any wallet on Sepolia.
+- Reads use a public RPC, because there's no Anon-RPC bridge on the host; the header badge says so.
+- `/demo` shows the on-chain evidence instead of live panels, because the agent, the Anon-RPC bridge (headless Chromium + Nox worker) and the leak proxy are long-running local processes. The live demo runs on the team's machine.
+
 ---
 
 ## Addresses (Sepolia)

@@ -4,10 +4,12 @@ import { useEffect, useMemo, useState } from "react";
 import { useConnection } from "wagmi";
 import { useEventStream, StatusDot } from "@/components/LiveFeed";
 import { useKillSwitch } from "@/lib/killswitch";
+import { AGENT_URL, ANON_BRIDGE, PROXY_URL } from "@/lib/endpoints";
+import { HostedNotice } from "@/components/HostedNotice";
 
-const PROXY_EVENTS = process.env.NEXT_PUBLIC_PROXY_EVENTS ?? "http://localhost:8547/events";
-const BRIDGE_EVENTS = process.env.NEXT_PUBLIC_BRIDGE_EVENTS ?? "http://localhost:8546/events";
-const AGENT = process.env.NEXT_PUBLIC_AGENT_URL ?? "http://localhost:8787";
+const PROXY_EVENTS = `${PROXY_URL}/events`;
+const BRIDGE_EVENTS = `${ANON_BRIDGE}/events`;
+const AGENT = AGENT_URL;
 
 type AgentState = {
   price: number;
@@ -24,7 +26,16 @@ type AgentState = {
 const time = (t?: unknown) => (typeof t === "number" ? new Date(t).toLocaleTimeString() : "");
 const short = (h?: unknown) => (typeof h === "string" ? `${h.slice(0, 10)}…${h.slice(-6)}` : "");
 
+// Live panels need the agent, bridge and proxy, which run on the demo machine. Decide after mount so the
+// server render (which has no window) and the first client render agree.
 export default function Demo() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  if (!mounted) return null;
+  return AGENT ? <LiveDemo /> : <HostedNotice />;
+}
+
+function LiveDemo() {
   const proxy = useEventStream(PROXY_EVENTS);
   const bridge = useEventStream(BRIDGE_EVENTS);
   const agent = useEventStream(`${AGENT}/events`, 40);
