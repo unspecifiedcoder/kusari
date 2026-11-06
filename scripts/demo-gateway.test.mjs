@@ -190,3 +190,48 @@ test("HTTP sandbox accepts a signed fixed scenario once, rejects oversized/malfo
   scriptedOnly = true;
   assert.equal((await post("/sandbox/challenge", { address: wallet.address, scenario: "attack" })).status, 503, "scripted-only backend must fail before requesting a signature");
 });
+
+test("owned workspace gateway fixes routes, requires auth and bounds raw transaction requests", async (t) => {
+  const source = createServer(async (req, res) => {
+    let body=''; for await (const part of req) body+=part;
+    res.writeHead(req.url === '/workspace/prepare' ? 202 : 200, {'content-type':'application/json'});
+    res.end(JSON.stringify({path:req.url, input:JSON.parse(body)}));
+  });
+  const sourceUrl=await listen(source);
+  const gateway=createDemoGateway({token:TOKEN,upstreams:{agent:sourceUrl,bridge:sourceUrl,proxy:sourceUrl}});
+  const base=await listen(gateway);t.after(async()=>{await close(gateway);await close(source);});
+  const options={method:'POST',headers:{authorization:`Bearer ${TOKEN}`,'content-type':'application/json'},body:JSON.stringify({runId:'id'})};
+  assert.equal((await fetch(`${base}/workspace/prepare`,options)).status,202);
+  const relay=await fetch(`${base}/workspace/relay`,{...options,body:JSON.stringify({rawTransaction:'0x'+'ab'.repeat(6000)})});
+  assert.equal(relay.status,200);assert.equal((await relay.json()).path,'/workspace/relay');
+  assert.equal((await fetch(`${base}/workspace/relay`,{...options,headers:{'content-type':'application/json'}})).status,401);
+  assert.equal((await fetch(`${base}/workspace/anything`,options)).status,405);
+  assert.equal((await fetch(`${base}/workspace/relay`,{...options,body:JSON.stringify({rawTransaction:'a'.repeat(17000)})})).status,413);
+});
+
+test("dedicated external-agent key admits only bounded trade API and shares browser quotas", async(t)=>{
+ let upstreamCalls=0;let acceptedId;
+ const source=createServer(async(req,res)=>{upstreamCalls++;let input='';for await(const part of req)input+=part;res.setHeader('content-type','application/json');if(req.method==='POST'){const body=JSON.parse(input);acceptedId=body.requestId;res.writeHead(202);res.end(JSON.stringify({requestId:body.requestId,status:'accepted'}));}else{res.end(JSON.stringify({requestId:acceptedId,status:'success',hash:'0x'+'a'.repeat(64)}));}});
+ const sourceUrl=await listen(source);const apiKey='D'.repeat(40);
+ const sandbox=createSandboxAccess({maxDaily:1,maxHourly:1,globalCooldownMs:0,walletCooldownMs:0});
+ const gateway=createDemoGateway({token:TOKEN,demoApiKey:apiKey,sandboxAccess:sandbox,upstreams:{agent:sourceUrl,bridge:sourceUrl,proxy:sourceUrl}});const base=await listen(gateway);t.after(async()=>{await close(gateway);await close(source);});
+ const options={method:'POST',headers:{authorization:`Bearer ${apiKey}`,'content-type':'application/json'},body:JSON.stringify({amountIn:'0.5',minAmountOut:'1'})};
+ assert.equal((await fetch(`${base}/v1/trade`,{...options,headers:{...options.headers,authorization:`Bearer ${TOKEN}`}})).status,401);
+ assert.equal((await fetch(`${base}/v1/trade`,{...options,body:JSON.stringify({amountIn:'2'})})).status,400);
+ assert.equal((await fetch(`${base}/v1/trade`,{...options,body:JSON.stringify({amountIn:'1',reason:'a'.repeat(3000)})})).status,413);
+ assert.equal(upstreamCalls,0);
+ const response=await fetch(`${base}/v1/trade`,options);assert.equal(response.status,202);const result=await response.json();assert.equal(result.requestId,acceptedId);assert.equal(upstreamCalls,1);
+ assert.equal((await fetch(`${base}/v1/trade`,options)).status,429);assert.equal(upstreamCalls,1);
+ assert.throws(()=>sandbox.challenge({address:'0x1111111111111111111111111111111111111111',scenario:'normal'}),{status:429});
+ const status=await fetch(`${base}/v1/trade/${acceptedId}`,{headers:{authorization:`Bearer ${apiKey}`}});assert.equal(status.status,200);assert.equal((await status.json()).status,'success');
+ assert.equal((await fetch(`${base}/agent/status`,{headers:{authorization:`Bearer ${apiKey}`}})).status,401);
+ assert.equal((await fetch(`${base}/v1/trade/${acceptedId}/withdraw`,{headers:{authorization:`Bearer ${apiKey}`}})).status,400);
+});
+
+test("external trade API reports shared runtime busy without claiming acceptance",async(t)=>{
+ let attempts=0;
+ const source=createServer((req,res)=>{attempts++;res.writeHead(409,{'content-type':'application/json'});res.end(JSON.stringify({error:'busy'}));});const sourceUrl=await listen(source);
+ const apiKey='B'.repeat(40);const gateway=createDemoGateway({token:TOKEN,demoApiKey:apiKey,upstreams:{agent:sourceUrl,bridge:sourceUrl,proxy:sourceUrl}});const base=await listen(gateway);t.after(async()=>{await close(gateway);await close(source);});
+ const response=await fetch(`${base}/v1/trade`,{method:'POST',headers:{authorization:`Bearer ${apiKey}`,'content-type':'application/json'},body:JSON.stringify({amountIn:'0.1'})});
+ assert.equal(response.status,409);const result=await response.json();assert.match(result.error,/busy/);assert.equal(result.requestId,undefined);assert.equal(attempts,1);
+});

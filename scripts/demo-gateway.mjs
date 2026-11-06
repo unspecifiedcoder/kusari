@@ -3,6 +3,7 @@ import { createServer } from "node:http";
 import { timingSafeEqual } from "node:crypto";
 import { pathToFileURL, fileURLToPath } from "node:url";
 import { existsSync } from "node:fs";
+import { validateTradeInput, tradeRequestId, TradeApiError } from "./api-trade.mjs";
 import { createSandboxAccess, readSandboxJson, SandboxError } from "./sandbox-access.mjs";
 
 const ROUTES = new Map([
@@ -48,6 +49,7 @@ const send = (res, status, value) => {
 /** Exported so the auth/routing/streaming boundary can be tested without wallets or real RPC calls. */
 export function createDemoGateway({
   token,
+  demoApiKey = process.env.KUSARI_DEMO_API_KEY,
   upstreams = { agent: "http://127.0.0.1:8787", bridge: "http://127.0.0.1:8546", proxy: "http://127.0.0.1:8547" },
   requestTimeoutMs = 10_000,
   streamDurationMs = 25_000,
@@ -72,10 +74,53 @@ export function createDemoGateway({
   });
   let streams = 0;
   const server = createServer(async (req, res) => {
+    const apiUrl = new URL(req.url ?? "/", "http://gateway.local");
+    if (apiUrl.pathname === "/v1/trade" || apiUrl.pathname.startsWith("/v1/trade/")) {
+      if (typeof demoApiKey !== "string" || demoApiKey.length < 32 || !sameSecret(req.headers.authorization, demoApiKey)) return send(res, 401, { error: "A valid demo API bearer key is required" });
+      if (apiUrl.search) return send(res, 400, { error: "Query parameters are not supported" });
+      try {
+        if (apiUrl.pathname === "/v1/trade") {
+          if (req.method !== "POST") return send(res, 405, { error: "Use POST to request a trade" });
+          if (String(req.headers["content-type"] ?? "").toLowerCase().split(";")[0].trim() !== "application/json") return send(res, 415, { error: "Trade requests require application/json" });
+          const input = validateTradeInput(await readSandboxJson(req, 2048));
+          const accepted = await sandbox.apiRun(async ({ runId }) => {
+            const response = await fetch(new URL("/api-trade/run", upstreams.agent), { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ requestId: runId, ...input }), redirect: "error", signal: AbortSignal.timeout(requestTimeoutMs) });
+            const body = await response.json();
+            if (response.status !== 202 || body.requestId !== runId || body.status !== "accepted") throw new TradeApiError(response.status === 409 ? 409 : 503, response.status === 409 ? "Shared agent is busy; wait for its current run" : "Shared trade runner is unavailable");
+          });
+          return send(res, 202, accepted);
+        }
+        const id = apiUrl.pathname.slice("/v1/trade/".length);
+        if (req.method !== "GET") return send(res, 405, { error: "Use GET to inspect a trade request" });
+        if (!tradeRequestId(id)) return send(res, 400, { error: "Invalid trade request ID" });
+        const response = await fetch(new URL(`/api-trade/${id}`, upstreams.agent), { redirect: "error", signal: AbortSignal.timeout(15_000) });
+        const body = await response.text();
+        if (body.length > 16_384) throw new Error("Trade status too large");
+        return send(res, [200,400,404,410,503].includes(response.status) ? response.status : 503, JSON.parse(body));
+      } catch (error) {
+        if (error instanceof SandboxError || error instanceof TradeApiError) {
+          if (error.retryAfterSeconds) res.setHeader("retry-after", String(error.retryAfterSeconds));
+          return send(res, error.status, { error: error.message, ...(error.retryAfterSeconds ? { retryAfterSeconds: error.retryAfterSeconds } : {}) });
+        }
+        return send(res, 503, { error: "Demo trade API is unavailable; no completed swap is confirmed" });
+      }
+    }
     if (!sameSecret(req.headers.authorization, token)) return send(res, 401, { error: "Unauthorized" });
     const url = new URL(req.url ?? "/", "http://gateway.local");
     if (url.search) return send(res, 400, { error: "Query parameters are not supported" });
 
+    if (["/workspace/challenge", "/workspace/prepare", "/workspace/relay", "/workspace/result", "/workspace/status", "/workspace/state"].includes(url.pathname)) {
+      if (req.method !== "POST") return send(res, 405, { error: "Workspace requests require POST" });
+      if (String(req.headers["content-type"] ?? "").toLowerCase().split(";")[0].trim() !== "application/json") return send(res, 415, { error: "Workspace requests require application/json" });
+      try {
+        const input = await readSandboxJson(req, 16_384);
+        const r = await fetch(new URL(url.pathname, upstreams.agent), { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(input), redirect: "error", signal: AbortSignal.timeout(75_000) });
+        const raw = await r.text();
+        if (raw.length > 65_536) throw new Error("Workspace response too large");
+        const status = [200,202,400,403,408,409,410,413,429,503].includes(r.status) ? r.status : 503;
+        return send(res, status, JSON.parse(raw));
+      } catch (e) { return send(res, e instanceof SandboxError ? e.status : 503, { error: e instanceof SandboxError ? e.message : "Owned workspace runner is unavailable" }); }
+    }
     if (["/sandbox/challenge", "/sandbox/run"].includes(url.pathname)) {
       if (req.method !== "POST") return send(res, 405, { error: "Sandbox requests require POST" });
       if (String(req.headers["content-type"] ?? "").toLowerCase().split(";")[0].trim() !== "application/json") return send(res, 415, { error: "Sandbox requests require application/json" });

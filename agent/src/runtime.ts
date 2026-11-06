@@ -8,12 +8,14 @@
 //   AGENT_LOOP_SECONDS=N  also run a cycle every N seconds (default: manual only)
 //   AGENT_SCRIPTED=1      skip the LLM; scripted decisions (demo fallback, labelled as such)
 import { createServer, type ServerResponse } from "node:http";
-import { formatEther } from "viem";
+import { formatEther, parseEther } from "viem";
 import { config, deployment, ANON_RPC, LEAK_RPC } from "./config.ts";
 import { readState, setReadRpc, readRpc, reader, type AgentState } from "./state.ts";
 import { decide, type Decision } from "./llm.ts";
 import { newsFeed } from "./news.ts";
-import { executeSwap, agentAccount, setWriteRpc } from "./swap.ts";
+import { executeSwap, agentAccount, setWriteRpc, writeRpc } from "./swap.ts";
+import { createSharedTradeJobs, TradeApiError, tradeRequestId } from "../../scripts/api-trade.mjs";
+import { createWorkspaceService, WorkspaceError } from "./workspace.ts";
 import { createSnapshotCache } from "./snapshot-cache.mjs";
 import { readSandboxJson, runRealSandboxCycle } from "../../scripts/sandbox-access.mjs";
 
@@ -162,6 +164,36 @@ const cors = {
   "access-control-allow-headers": "content-type",
 };
 
+const apiTradeJobs = createSharedTradeJobs({
+  execute: async (input: { amountIn: string; reason?: string; minAmountOut?: string }, onSubmitted: (hash: `0x${string}`) => void) => {
+    activeRunId = null; activeScenario = null;
+    try {
+      if (deployment.chainId !== 11155111 || readRpc !== ANON_RPC || writeRpc !== ANON_RPC) throw new Error("External-agent API requires Sepolia and pinned Anon-RPC");
+      await readBridgeMode();
+      if (bridgeMode !== "anon" || await reader.getChainId() !== 11155111) throw new Error("External-agent API requires an observed Nox anonymous route on Sepolia");
+      if (await reader.getBalance({ address: agentAccount.address }) < 500_000_000_000_000n) throw new Error("Shared agent gas reserve is low");
+      emit("reading", { transport: "anon", api: true });
+      const state = await readState(agentAccount.address);
+      emit("state", summarizeState(state));
+      emit("decision", { action: "swap", amountIn: Number(input.amountIn), reason: input.reason ?? "Requested by an external agent through the bounded demo API", source: "external-agent", injected: false, api: true });
+      emit("swapping", { amountIn: Number(input.amountIn), api: true });
+      const result = await executeSwap(Number(input.amountIn), { sendEvenIfBlocked: true, sqrtPriceX96: state.sqrtPriceX96, amountInWei: parseEther(input.amountIn), ...(input.minAmountOut === undefined ? {} : { minAmountOut: BigInt(input.minAmountOut) }), onSubmitted });
+      emit("swap", { ...result, api: true });
+      return result;
+    } finally {
+      busy = false; snapshots.invalidate(); void snapshots.refresh(); emit("idle");
+    }
+  },
+  readReceipt: async (hash: `0x${string}`) => {
+    if (readRpc !== ANON_RPC) throw new Error("API receipt reads require Anon-RPC");
+    await readBridgeMode();
+    if (bridgeMode !== "anon" || await reader.getChainId() !== 11155111) throw new Error("API receipt route is unavailable");
+    return reader.getTransactionReceipt({ hash });
+  },
+});
+
+const workspaceService = createWorkspaceService();
+
 const server = createServer(async (req, res) => {
   const url = new URL(req.url ?? "/", "http://x");
   if (req.method === "OPTIONS") return res.writeHead(204, cors).end();
@@ -178,6 +210,33 @@ const server = createServer(async (req, res) => {
   };
   if (url.pathname === "/status") {
     return json(200, { agent: agentAccount.address, vault: deployment.demoVault, readRpc, transport, readTransport: actualReadTransport(), bridgeMode, injected: activeScenario ? activeScenario === "attack" : injected, scriptedOnly, busy, activeRunId, canControl: true, recentEvents, ...snapshots.get() });
+  }
+  if (req.method === "POST" && url.pathname === "/api-trade/run") {
+    if (busy) return json(409, { error: "Shared agent is busy; retry after its current run" });
+    busy = true;
+    try {
+      const input = await readSandboxJson(req, 2048);
+      return json(202, apiTradeJobs.accept(input));
+    } catch (error) {
+      busy = false;
+      return json(error instanceof TradeApiError ? error.status : 400, { error: error instanceof TradeApiError ? error.message : "Invalid external-agent trade request" });
+    }
+  }
+  if (req.method === "GET" && url.pathname.startsWith("/api-trade/")) {
+    const id = url.pathname.slice("/api-trade/".length);
+    if (!tradeRequestId(id)) return json(400, { error: "Invalid trade request ID" });
+    try { return json(200, await apiTradeJobs.status(id)); }
+    catch (error) { return json(error instanceof TradeApiError ? error.status : 503, { error: error instanceof TradeApiError ? error.message : "Trade status is unavailable" }); }
+  }
+  if (req.method === "POST" && url.pathname.startsWith("/workspace/")) {
+    try {
+      const input = await readSandboxJson(req, 16_384);
+      const action = url.pathname.slice("/workspace/".length);
+      const result = await workspaceService.handle(action, input);
+      return json(action === "prepare" ? 202 : 200, result);
+    } catch (error) {
+      return json(error instanceof WorkspaceError ? error.status : 503, { error: error instanceof WorkspaceError ? error.message : "Owned workspace service is unavailable; no completed trade is confirmed." });
+    }
   }
   if (req.method === "POST" && url.pathname === "/sandbox/run") {
     if (busy) return json(409, { error: "a cycle is already running" });

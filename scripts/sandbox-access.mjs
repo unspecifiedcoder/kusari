@@ -123,6 +123,18 @@ export function createSandboxAccess({
       nonces.set(nonce, entry);
       return entry;
     },
+    // Same reservations and counters as browser sandbox runs; the API cannot add a second spending budget.
+    async apiRun(start) {
+      const address = "external-agent-api";
+      admit(address); reserved = true;
+      try {
+        const acceptedAt = now(); prune(); walletLastRun.set(address, acceptedAt); globalLastRun = acceptedAt;
+        hourlyRuns.push(acceptedAt); dailyRuns++;
+        const runId = randomUUID();
+        await start({ runId });
+        return { requestId: runId, status: "accepted" };
+      } finally { reserved = false; }
+    },
     async run(input, start) {
       if (!exactObject(input, ["nonce", "address", "signature"])) throw new SandboxError(400, "Expected nonce, address and signature only");
       const address = addressOf(input.address);

@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "origin": "https://kusari.outcomeseal.com",
+  "chainId": 11155111,
+  "startedAt": "2026-11-06T19:01:48.990Z",
+  "status": "passed",
+  "checks": {
+    "wrongKey": {
+      "httpStatus": 401,
+      "requestAccepted": false
+    },
+    "overOneCap": {
+      "httpStatus": 400,
+      "requestAccepted": false
+    },
+    "unknownField": {
+      "httpStatus": 400,
+      "requestAccepted": false
+    },
+    "accepted": {
+      "httpStatus": 202,
+      "requestId": "3154c484-b2a9-40b3-8751-0fe903804b11",
+      "amountIn": "1",
+      "status": "accepted"
+    },
+    "cooldown": {
+      "httpStatus": 429,
+      "requestAccepted": false,
+      "retryAfterSeconds": 30
+    },
+    "trade": {
+      "requestId": "3154c484-b2a9-40b3-8751-0fe903804b11",
+      "status": "success",
+      "amountIn": "1",
+      "hash": "0x736d1bbdcc78ae9d2e26105f15f760b5b02a5a35eb67d56811127f5a6c68556e",
+      "route": "Anon-RPC / Nox",
+      "source": "external-agent",
+      "chainId": 11155111
+    },
+    "independentReceipt": {
+      "status": "success",
+      "hash": "0x736d1bbdcc78ae9d2e26105f15f760b5b02a5a35eb67d56811127f5a6c68556e",
+      "blockNumber": "12078500",
+      "from": "0x72db032c0dfb6e7502e16a73fabdab31712dc706",
+      "to": "0x209c26182c40f6b34ef5fe11b21709496dc6a2ed",
+      "amountInWei": "1000000000000000000",
+      "minAmountOutWei": "920360163713606499",
+      "explorer": "https://sepolia.etherscan.io/tx/0x736d1bbdcc78ae9d2e26105f15f760b5b02a5a35eb67d56811127f5a6c68556e"
+    },
+    "sharedDemo": {
+      "stateStatus": "fresh",
+      "busy": false,
+      "readTransport": "anon",
+      "bridgeMode": "anon",
+      "agent": "0x72db032c0dFB6E7502e16A73fabdab31712dc706",
+      "vault": "0x209c26182c40F6B34Ef5fe11b21709496dc6a2ed",
+      "lastStateAt": 1793991724069,
+      "authorized": true,
+      "active": true
+    }
+  },
+  "privacyNote": "Route/source values are service observations, not cryptographic anonymity proof. The independent receipt check uses a public RPC only in this CLI rehearsal; product trade routing must remain Anon-RPC/Nox.",
+  "completedAt": "2026-11-06T19:02:06.728Z"
+}
