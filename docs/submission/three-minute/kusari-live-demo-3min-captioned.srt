@@ -1,0 +1,87 @@
+1
+00:00:00,000 --> 00:00:04,000
+Kusari puts owner-controlled limits around AI trading agents.
+
+2
+00:00:04,000 --> 00:00:10,000
+The vault holds test funds. The policy sets the agent's limits.
+
+3
+00:00:10,000 --> 00:00:16,000
+For this repeatable test, request exactly 2 kUSD under a 5 kUSD cap.
+
+4
+00:00:16,000 --> 00:00:23,000
+The swap succeeds. The transaction link opens its public Sepolia receipt.
+
+5
+00:00:23,000 --> 00:00:34,000
+The owner changes the ENS per-trade cap from 5 to 1 kUSD in one transaction.
+
+6
+00:00:34,000 --> 00:00:41,000
+The ENS update is confirmed. No application or contract was redeployed.
+
+7
+00:00:41,000 --> 00:00:51,000
+Repeat the same 2 kUSD request. The hook reads the new 1 kUSD limit.
+
+8
+00:00:51,000 --> 00:01:01,000
+The receipt confirms a revert. Simulation reported ExceedsPerSwap. The request stayed the same; ENS
+changed.
+
+9
+00:01:01,000 --> 00:01:09,000
+Restore the ENS cap to 5 kUSD before testing authorization separately.
+
+10
+00:01:09,000 --> 00:01:15,000
+Cap 5 is restored. The owner can also revoke the agent's authority.
+
+11
+00:01:15,000 --> 00:01:24,000
+Freeze agent revokes its ENS role in one owner-approved Sepolia transaction.
+
+12
+00:01:24,000 --> 00:01:32,000
+Revocation is confirmed. Trading is blocked even though funds and the spending cap remain.
+
+13
+00:01:32,000 --> 00:01:44,000
+Request 2 kUSD again. That amount is within cap 5, but the agent is no longer authorized.
+
+14
+00:01:44,000 --> 00:01:54,000
+The receipt confirms another revert. Simulation reported NotAuthorized. A valid agent signature cannot
+override revocation.
+
+15
+00:01:54,000 --> 00:02:04,000
+The owner restores the ENS role. The agent cannot give itself that permission.
+
+16
+00:02:04,000 --> 00:02:12,000
+Authorization is restored. The same vault and Uniswap hook remain in place.
+
+17
+00:02:12,000 --> 00:02:21,000
+The previous requests were fixed policy tests. Now run the real Gemini agent.
+
+18
+00:02:21,000 --> 00:02:30,000
+Gemini reads news and chain state, then chooses a 1 kUSD trade within the public demo's ceiling.
+
+19
+00:02:30,000 --> 00:02:40,000
+Gemini's trade succeeds after restoration. The result shows the requested amount, owner limit, outcome and
+receipt.
+
+20
+00:02:40,000 --> 00:02:52,000
+The hook checks actual swap output and pool-price movement. Anon-RPC with Nox carries agent RPC traffic;
+transactions remain public.
+
+21
+00:02:52,000 --> 00:02:59,000
+AI proposes. ENS supplies authority. Uniswap enforces the boundary. Verify the code and receipts.
