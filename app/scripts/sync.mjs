@@ -8,13 +8,18 @@ const out = new URL("../src/generated/", import.meta.url);
 await mkdir(out, { recursive: true });
 
 await copyFile(new URL("shared/types.ts", root), new URL("types.ts", out));
+await copyFile(new URL("shared/owner-policy-message.mjs", root), new URL("owner-policy-message.mjs", out));
 
-const file = process.env.DEPLOYMENT_FILE ?? "deployments/11155111.json";
+const file = (process.env.DEPLOYMENT_FILE ?? "deployments/11155111.json").trim();
 const src = new URL(file, root);
 const deployment = existsSync(src) ? JSON.parse(await readFile(src, "utf8")) : null;
 const chains = JSON.parse(await readFile(new URL("config/chains.json", root), "utf8"));
-const ensFile = new URL(process.env.ENS_OUT ?? "deployments/11155111-ens.json", root);
+const ensFile = new URL((process.env.ENS_OUT ?? "deployments/11155111-ens.json").trim(), root);
 const ensDeployment = existsSync(ensFile) ? JSON.parse(await readFile(ensFile, "utf8")) : null;
+const ownedFile = new URL("deployments/11155111-owned.json", root);
+const ownAgentDeployment = existsSync(ownedFile) ? JSON.parse(await readFile(ownedFile, "utf8")) : null;
+const sessionFile = new URL("deployments/11155111-session.json", root);
+const sessionDeployment = existsSync(sessionFile) ? JSON.parse(await readFile(sessionFile, "utf8")) : null;
 
 await writeFile(
   new URL("deployment.ts", out),
@@ -22,6 +27,8 @@ await writeFile(
     `export const deploymentFile = ${JSON.stringify(file)};\n` +
     `export const deployment = ${JSON.stringify(deployment, null, 2)} as const;\n` +
     `export const sepoliaConfig = ${JSON.stringify(chains["11155111"], null, 2)} as const;\n` +
-    `export const ensDeployment = ${JSON.stringify(ensDeployment, null, 2)} as const;\n`,
+    `export const ensDeployment = ${JSON.stringify(ensDeployment, null, 2)} as const;\n` +
+    `export const ownAgentDeployment = ${JSON.stringify(ownAgentDeployment, null, 2)} as const;\n` +
+    `export const sessionDeployment = ${sessionDeployment ? `${JSON.stringify(sessionDeployment, null, 2)} as const` : "null"};\n`,
 );
 console.log(`synced ${file}${deployment ? "" : " (missing: UI will show 'not deployed')"}`);

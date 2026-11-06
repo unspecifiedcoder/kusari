@@ -1,54 +1,27 @@
-"use client";
-
-import { useConnection } from "wagmi";
-import { deployment, deploymentFile } from "@/generated/deployment";
-import { walletConnectEnabled } from "@/lib/wagmi";
-import { VaultSetup } from "@/components/VaultSetup";
-
-// F1/F2/F5: connect, create a vault, fund it. Limits live in ENS (see /demo and agent/src/ens-policy.ts).
-const STEPS = [
-  { id: "F2", title: "Create your vault", body: "Funds live in a vault, never in the agent's wallet." },
-  { id: "F3", title: "Set the limits", body: "Per-swap cap, daily cap and max price impact, written to your ENS name." },
-  { id: "F4", title: "Connect your agent", body: "Give the agent a key that can only ask the vault to swap." },
-  { id: "F5", title: "Fund it", body: "Deposit tokens. Only you can ever withdraw." },
-];
+import Link from "next/link";
+import { JudgeOverview } from "@/components/JudgeOverview";
+import { Evidence } from "@/components/HostedNotice";
 
 export default function Home() {
-  const { isConnected } = useConnection();
-
   return (
-    <div className="space-y-10">
-      <section className="space-y-3">
-        <h1 className="text-4xl font-bold tracking-tight">Your agent can be fooled. Your money can&apos;t.</h1>
-        <p className="max-w-2xl text-zinc-400">
-          Kusari keeps an AI trading agent on a leash: its funds sit in a vault, every swap is checked on-chain by a
-          Uniswap v4 hook against limits you set in ENS, and you can freeze it from your phone in one tap.
-        </p>
+    <div className="overview-content space-y-10 sm:space-y-12">
+      <section className="overview-heading" aria-labelledby="kusari-title">
+        <div><h1 id="kusari-title">Control your AI trading agent</h1><p>Try the funded demo: a real Gemini decision, ENS policy and guarded Uniswap trade. Personal agent onboarding is available separately in beta.</p></div>
+        <div className="flex flex-wrap items-center gap-4"><Link href="/demo#try-sandbox" className="product-primary-link">Try the demo <span aria-hidden="true">↗</span></Link><Link href="/agents" className="owned-text-link">Personal agents · Beta <span aria-hidden="true">↗</span></Link></div>
       </section>
-
-      {!isConnected ? (
-        <div className="rounded-xl border border-zinc-800 p-6 text-zinc-300">
-          Connect a wallet to set up a protected agent.
-          {!walletConnectEnabled && (
-            <span className="block pt-2 text-xs text-zinc-500">
-              Browser wallets work now. Mobile QR (WalletConnect) turns on when NEXT_PUBLIC_REOWN_PROJECT_ID is set.
-            </span>
-          )}
-        </div>
-      ) : (
-        <VaultSetup />
-      )}
-
-      <footer className="text-xs text-zinc-600">
-        {deployment ? (
-          <>
-            Contracts from <span className="font-mono">{deploymentFile}</span>: hook{" "}
-            <span className="font-mono">{deployment.policyHook}</span>
-          </>
-        ) : (
-          "Not deployed yet."
-        )}
-      </footer>
+      <JudgeOverview />
+      <section aria-labelledby="how-it-works" className="space-y-5">
+        <h2 id="how-it-works" className="max-w-[34ch] text-2xl font-semibold leading-snug tracking-tight">How a trade request works</h2>
+        <ol className="grid gap-6 sm:grid-cols-3">
+          {[
+            ["01", "The agent decides", "A model reads pool state and news, then signs a swap intent. Anon-RPC routes the agent’s chain requests through the Nox mixnet."],
+            ["02", "The contract checks", "The vault routes into a guarded pool. The hook reads authorization and limits from ENS and checks the actual swap result."],
+            ["03", "The owner stays in control", "Oversized trades revert. Revoking the agent’s ENS role blocks its next swap, even when that swap was signed earlier."],
+          ].map(([number, title, body]) => <li key={number} className="min-w-0 border-t border-zinc-700/70 pt-4"><span className="font-mono text-xs text-zinc-500">{number}</span><h3 className="mt-3 font-medium text-zinc-100">{title}</h3><p className="mt-2 text-sm leading-6 text-zinc-400">{body}</p></li>)}
+        </ol>
+      </section>
+      <Evidence />
+      <aside className="rounded-2xl border border-zinc-800 bg-zinc-900/30 p-5 text-sm leading-6 text-zinc-400"><p><strong className="font-medium text-zinc-200">What the protection covers.</strong> Spending caps, an allowed pool, direction, signed output bounds and owner revocation. Transactions remain public onchain; RPC anonymity does not hide a trade. An allowed trade can still lose value. The injection demonstration is staged, and these contracts are unaudited.</p></aside>
     </div>
   );
 }

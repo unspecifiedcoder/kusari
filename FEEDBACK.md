@@ -24,6 +24,10 @@ Code: [`contracts/src/PolicyHook.sol`](contracts/src/PolicyHook.sol), [`contract
 
 5. **Deployments page.** It now says v4 addresses differ per chain, which is correct and helpful; a machine-readable JSON (chainId → addresses) linked from that page would make multi-chain deploy scripts much less error-prone.
 
+## Latest deployment check — 6 November 2026
+
+With Foundry 1.5.1, the new hook's simulated broadcast limit (including the default 130% multiplier) was about 2.49M gas, while the node estimated 12.77M. Its successful receipt used 12,571,402 gas. For this release we kept simulation enabled, checked the node estimate for every contract creation, and used an 800% multiplier on the unscaled simulation. All 14 deployment transactions succeeded. This gives another reproducible example of the deployment-estimation friction above; blindly trusting the default simulated limit would have failed.
+
 ## Ideas
 
 - An official example "**policy / guardrail hook**" (caps + allowlists + signed intents) would be a useful reference: there's growing demand for agent-safe swapping, and the pattern of *vault → direct unlock → hook-enforced policy* closes the "just use another router" bypass.

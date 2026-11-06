@@ -16,6 +16,16 @@ export const vaultAbi = parseAbi([
 export const tokenAbi = parseAbi([
   "function balanceOf(address) view returns (uint256)",
   "function symbol() view returns (string)",
+  "function decimals() view returns (uint8)",
   "function transfer(address to, uint256 amount) returns (bool)",
   "function mint(address to, uint256 amount)", // test tokens only
+]);
+
+export const policySourceAbi = parseAbi([
+  "function isAuthorized(address agent) view returns (bool)",
+  "function policyOf(address agent) view returns ((uint128 maxPerSwap, uint128 dailyCap, uint16 maxImpactBps, bytes32 allowedPool, bool active))",
+]);
+
+export const policyHookReadAbi = parseAbi([
+  "function spentOn(address agent, uint256 day) view returns (uint256)",
 ]);

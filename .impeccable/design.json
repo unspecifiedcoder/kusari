@@ -1,0 +1,413 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-06T17:35:04.628024+00:00",
+  "title": "Design System: Kusari",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Soft Mint",
+        "canonical": "#a6e3c2",
+        "tonalRamp": [
+          "oklch(18% .02 155)",
+          "oklch(28% .04 155)",
+          "oklch(39% .06 155)",
+          "oklch(50% .08 155)",
+          "oklch(61% .09 155)",
+          "oklch(73% .08 155)",
+          "oklch(85% .06 155)",
+          "oklch(95% .02 155)"
+        ]
+      },
+      "primary-hover": {
+        "role": "primary",
+        "displayName": "Mint Hover",
+        "canonical": "#bdf2d5",
+        "tonalRamp": [
+          "oklch(18% .02 155)",
+          "oklch(28% .04 155)",
+          "oklch(39% .06 155)",
+          "oklch(50% .08 155)",
+          "oklch(61% .09 155)",
+          "oklch(73% .08 155)",
+          "oklch(85% .06 155)",
+          "oklch(95% .02 155)"
+        ]
+      },
+      "primary-active": {
+        "role": "primary",
+        "displayName": "Mint Pressed",
+        "canonical": "#89cba7",
+        "tonalRamp": [
+          "oklch(18% .02 155)",
+          "oklch(28% .04 155)",
+          "oklch(39% .06 155)",
+          "oklch(50% .08 155)",
+          "oklch(61% .09 155)",
+          "oklch(73% .08 155)",
+          "oklch(85% .06 155)",
+          "oklch(95% .02 155)"
+        ]
+      },
+      "primary-ink": {
+        "role": "neutral",
+        "displayName": "Deep Mint Ink",
+        "canonical": "#102219",
+        "tonalRamp": [
+          "#101216",
+          "#14171c",
+          "#171a20",
+          "#20242c",
+          "#303640",
+          "#535d6b",
+          "#acb4c3",
+          "#f0f2f6"
+        ]
+      },
+      "canvas": {
+        "role": "neutral",
+        "displayName": "Charcoal Canvas",
+        "canonical": "#101216",
+        "tonalRamp": [
+          "#101216",
+          "#14171c",
+          "#171a20",
+          "#20242c",
+          "#303640",
+          "#535d6b",
+          "#acb4c3",
+          "#f0f2f6"
+        ]
+      },
+      "navigation": {
+        "role": "neutral",
+        "displayName": "Navigation Charcoal",
+        "canonical": "#14171c",
+        "tonalRamp": [
+          "#101216",
+          "#14171c",
+          "#171a20",
+          "#20242c",
+          "#303640",
+          "#535d6b",
+          "#acb4c3",
+          "#f0f2f6"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Workspace Surface",
+        "canonical": "#171a20",
+        "tonalRamp": [
+          "#101216",
+          "#14171c",
+          "#171a20",
+          "#20242c",
+          "#303640",
+          "#535d6b",
+          "#acb4c3",
+          "#f0f2f6"
+        ]
+      },
+      "surface-raised": {
+        "role": "neutral",
+        "displayName": "Raised Charcoal",
+        "canonical": "#20242c",
+        "tonalRamp": [
+          "#101216",
+          "#14171c",
+          "#171a20",
+          "#20242c",
+          "#303640",
+          "#535d6b",
+          "#acb4c3",
+          "#f0f2f6"
+        ]
+      },
+      "option-ground": {
+        "role": "neutral",
+        "displayName": "Request Option Ground",
+        "canonical": "#1b1f26",
+        "tonalRamp": [
+          "#101216",
+          "#14171c",
+          "#171a20",
+          "#20242c",
+          "#303640",
+          "#535d6b",
+          "#acb4c3",
+          "#f0f2f6"
+        ]
+      },
+      "rule": {
+        "role": "neutral",
+        "displayName": "Slate Rule",
+        "canonical": "#303640",
+        "tonalRamp": [
+          "#101216",
+          "#14171c",
+          "#171a20",
+          "#20242c",
+          "#303640",
+          "#535d6b",
+          "#acb4c3",
+          "#f0f2f6"
+        ]
+      },
+      "foreground": {
+        "role": "neutral",
+        "displayName": "Cool White",
+        "canonical": "#f0f2f6",
+        "tonalRamp": [
+          "#101216",
+          "#14171c",
+          "#171a20",
+          "#20242c",
+          "#303640",
+          "#535d6b",
+          "#acb4c3",
+          "#f0f2f6"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Slate Copy",
+        "canonical": "#acb4c3",
+        "tonalRamp": [
+          "#101216",
+          "#14171c",
+          "#171a20",
+          "#20242c",
+          "#303640",
+          "#535d6b",
+          "#acb4c3",
+          "#f0f2f6"
+        ]
+      },
+      "selected-ground": {
+        "role": "primary",
+        "displayName": "Selected Mint Ground",
+        "canonical": "#21342c",
+        "tonalRamp": [
+          "oklch(18% .02 155)",
+          "oklch(28% .04 155)",
+          "oklch(39% .06 155)",
+          "oklch(50% .08 155)",
+          "oklch(61% .09 155)",
+          "oklch(73% .08 155)",
+          "oklch(85% .06 155)",
+          "oklch(95% .02 155)"
+        ]
+      },
+      "selected-rule": {
+        "role": "primary",
+        "displayName": "Selected Mint Rule",
+        "canonical": "#8ccda9",
+        "tonalRamp": [
+          "oklch(18% .02 155)",
+          "oklch(28% .04 155)",
+          "oklch(39% .06 155)",
+          "oklch(50% .08 155)",
+          "oklch(61% .09 155)",
+          "oklch(73% .08 155)",
+          "oklch(85% .06 155)",
+          "oklch(95% .02 155)"
+        ]
+      },
+      "warning": {
+        "role": "tertiary",
+        "displayName": "Amber Warning",
+        "canonical": "#f0d49a",
+        "tonalRamp": [
+          "oklch(18% .02 80)",
+          "oklch(28% .04 80)",
+          "oklch(39% .07 80)",
+          "oklch(50% .10 80)",
+          "oklch(61% .12 80)",
+          "oklch(73% .11 80)",
+          "oklch(85% .08 80)",
+          "oklch(95% .025 80)"
+        ]
+      },
+      "owner-action": {
+        "role": "secondary",
+        "displayName": "Muted Rose Owner Action",
+        "canonical": "#f1bdc6",
+        "tonalRamp": [
+          "oklch(18% .02 15)",
+          "oklch(28% .04 15)",
+          "oklch(39% .07 15)",
+          "oklch(50% .09 15)",
+          "oklch(61% .10 15)",
+          "oklch(73% .09 15)",
+          "oklch(85% .06 15)",
+          "oklch(95% .02 15)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "The page identity; 27px at the narrowest breakpoint."
+      },
+      "title": {
+        "displayName": "Task Title",
+        "purpose": "The main request composer heading."
+      },
+      "body": {
+        "displayName": "Product Body",
+        "purpose": "Product explanations and readable operational copy."
+      },
+      "label": {
+        "displayName": "Control Label",
+        "purpose": "Actions, compact labels and navigation."
+      },
+      "data": {
+        "displayName": "Exact Data",
+        "purpose": "Hashes, pool IDs and protocol identifiers."
+      }
+    },
+    "shadows": [],
+    "motion": [
+      {
+        "name": "color-state",
+        "value": "150ms ease-out",
+        "purpose": "Color, background and border changes on controls."
+      },
+      {
+        "name": "disclosure-chevron",
+        "value": "160ms ease-out",
+        "purpose": "Reflect the native disclosure state."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "0.01ms",
+        "purpose": "Suppress transitions and animation when the user requests reduced motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "narrow-phone",
+        "value": "420px"
+      },
+      {
+        "name": "supporting-columns",
+        "value": "700px"
+      },
+      {
+        "name": "desktop-shell",
+        "value": "1100px"
+      },
+      {
+        "name": "wide-policy",
+        "value": "1500px"
+      },
+      {
+        "name": "composer-container",
+        "value": "480px"
+      },
+      {
+        "name": "architecture-container",
+        "value": "640px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary request action",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "One clear message-signing action for a bounded request.",
+      "html": "<button class=\"ds-primary\">Sign request &amp; run agent</button>",
+      "css": ".ds-primary{font-family:var(--font-geist-sans,\"Instrument Sans\",sans-serif);min-height:46px;padding:12px 21px;background:var(--accent,#a6e3c2);color:#102219;border:1px solid transparent;border-radius:9px;font-size:14px;font-weight:650;line-height:1.4;cursor:pointer;transition:background-color 150ms ease-out}.ds-primary:hover:not(:disabled){background:#bdf2d5}.ds-primary:active:not(:disabled){background:#89cba7}.ds-primary:focus-visible{outline:2px solid var(--accent,#a6e3c2);outline-offset:4px;}.ds-primary:disabled{background:#30363e;color:#a5adba;border-color:#3c444f;cursor:not-allowed}"
+    },
+    {
+      "name": "Owner revocation action",
+      "kind": "button",
+      "refersTo": "button-owner",
+      "description": "A subordinate management action, styled differently from the visitor request.",
+      "html": "<button class=\"ds-owner\">Freeze agent</button>",
+      "css": ".ds-owner{font-family:var(--font-geist-sans,\"Instrument Sans\",sans-serif);min-height:44px;padding:10px 14px;background:transparent;border:1px solid #81565e;border-radius:8px;color:#f1bdc6;font-size:14px;font-weight:500;cursor:pointer;transition:background-color 150ms ease-out}.ds-owner:hover:not(:disabled){background:#38252b}.ds-owner:active:not(:disabled){background:#38252b}.ds-owner:focus-visible{outline:2px solid var(--accent,#a6e3c2);outline-offset:4px;}.ds-owner:disabled{opacity:.5;cursor:not-allowed}"
+    },
+    {
+      "name": "Current navigation destination",
+      "kind": "nav",
+      "refersTo": "navigation-item",
+      "description": "The active destination retains a familiar text-and-icon structure.",
+      "html": "<a class=\"ds-nav\" href=\"/demo\" aria-current=\"page\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" aria-hidden=\"true\"><rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"3\"/><path d=\"M3 9h18M9 9v11\"/></svg><span>Agent workspace</span></a>",
+      "css": ".ds-nav{font-family:var(--font-geist-sans,\"Instrument Sans\",sans-serif);display:flex;align-items:center;gap:9px;min-height:44px;padding:11px 13px;border-radius:8px;color:var(--muted,#acb4c3);font-size:14px;font-weight:500;text-decoration:none;transition:background-color 150ms ease-out,color 150ms ease-out}.ds-nav svg{width:19px;height:19px;flex:0 0 auto}.ds-nav[aria-current=\"page\"]{background:#29312e;color:#d5f5e3}.ds-nav:hover{background:#20252c;color:#f0f2f6}.ds-nav:focus-visible{outline:2px solid var(--accent,#a6e3c2);outline-offset:4px;}"
+    },
+    {
+      "name": "Native request option",
+      "kind": "input",
+      "refersTo": "request-option-selected",
+      "description": "A radio with a real label, selected surface and explanatory copy.",
+      "html": "<label class=\"ds-option\"><input type=\"radio\" name=\"ds-request\" checked/><span><strong>Trade within limits</strong><span class=\"ds-option-detail\">Gemini may buy within the policy or choose to hold.</span></span></label>",
+      "css": ".ds-option{font-family:var(--font-geist-sans,\"Instrument Sans\",sans-serif);display:flex;align-items:flex-start;gap:12px;padding:18px;background:#21342c;border:1px solid #8ccda9;border-radius:10px;color:#f0f2f6;cursor:pointer}.ds-option input{accent-color:var(--accent,#a6e3c2);margin-top:5px;flex:0 0 auto}.ds-option strong{font-size:15px;font-weight:600;line-height:1.4}.ds-option-detail{display:block;color:#b7c1cb;font-size:14px;line-height:1.6;margin-top:7px}.ds-option:hover{background:#21342c}.ds-option:focus-within{outline:2px solid var(--accent,#a6e3c2);outline-offset:4px;}"
+    },
+    {
+      "name": "Request composer surface",
+      "kind": "card",
+      "refersTo": "request-composer",
+      "description": "A single task container; deeper evidence is not another competing task.",
+      "html": "<section class=\"ds-composer\"><h2>Request a trade</h2><p>Choose what Gemini reads. The owner’s policy still applies.</p></section>",
+      "css": ".ds-composer{font-family:var(--font-geist-sans,\"Instrument Sans\",sans-serif);padding:26px;background:var(--surface,#171a20);color:var(--foreground,#f0f2f6);border:1px solid var(--rule,#303640);border-radius:16px}.ds-composer h2{font-size:21px;line-height:1.3;font-weight:600;letter-spacing:-.02em;margin:0}.ds-composer p{font-size:15px;line-height:1.7;max-width:65ch;color:#b6becb;margin:9px 0 0}"
+    },
+    {
+      "name": "Native evidence disclosure",
+      "kind": "custom",
+      "description": "Technical information stays accessible in a familiar disclosure.",
+      "html": "<details class=\"ds-details\"><summary>Integration details<svg viewBox=\"0 0 20 20\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" aria-hidden=\"true\"><path d=\"m6 8 4 4 4-4\"/></svg></summary><p>ENSv2 policy, Uniswap v4 enforcement and observed Anon-RPC/Nox routing.</p></details>",
+      "css": ".ds-details{font-family:var(--font-geist-sans,\"Instrument Sans\",sans-serif);border-top:1px solid var(--rule,#303640);padding-top:22px;color:#dce2ec}.ds-details summary{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:3px 0 18px;cursor:pointer;font-size:16px;font-weight:500}.ds-details svg{width:20px;height:20px;transition:transform 160ms ease-out}.ds-details[open] svg{transform:rotate(180deg)}.ds-details summary:hover{color:#f0f2f6}.ds-details summary:focus-visible{outline:2px solid var(--accent,#a6e3c2);outline-offset:4px;}.ds-details p{color:var(--muted,#acb4c3);font-size:14px;line-height:1.7;max-width:70ch}"
+    },
+    {
+      "name": "Observed state label",
+      "kind": "chip",
+      "description": "State is written in words and color is secondary.",
+      "html": "<span class=\"ds-state\">Authorized</span>",
+      "css": ".ds-state{font-family:var(--font-geist-sans,\"Instrument Sans\",sans-serif);display:inline-flex;align-items:center;gap:7px;color:var(--accent,#a6e3c2);font-size:13px;font-weight:500}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Dark Product Workspace",
+    "overview": "The user selected persistent navigation, a spacious agent workspace and compact policy controls. The system is restrained and task-first: charcoal surfaces, a self-hosted sans, quiet dividers and a soft mint primary action. It presents an operating product rather than a marketing page or a terminal imitation.\n\nThe agent's request and the observed result carry the attention. Policy, permissions and data freshness provide context; shared activity and technical evidence are available through disclosures. These are factual distinctions, so text and semantic structure carry them alongside color.",
+    "keyCharacteristics": [
+      "Persistent, familiar navigation.",
+      "One clear primary request action.",
+      "Readable labels and explicit state language.",
+      "Flat tonal layering and restrained semantic color.",
+      "Real model, policy and transaction evidence."
+    ],
+    "rules": [
+      {
+        "name": "The Evidence Color Rule",
+        "body": "Color supports explicit state text; it never establishes success, authorization or privacy by itself.",
+        "section": "colors"
+      },
+      {
+        "name": "The Product Voice Rule",
+        "body": "Labels name an action, object or observed state in sentence case. The interface does not rely on slogans to explain its task.",
+        "section": "typography"
+      },
+      {
+        "name": "The Request Summary Rule",
+        "body": "A run exposes Agent requested, Owner's limit, Result, Reason and Tx from its own events. Missing or unconfirmed evidence is stated plainly.",
+        "section": "components"
+      }
+    ],
+    "dos": [
+      "Do retain the selected dark workspace, persistent navigation and clear task hierarchy.",
+      "Do use the local Instrument Sans for product copy and reserve monospace for exact data.",
+      "Do pair semantic color with explicit state text and visible keyboard focus.",
+      "Do keep actual model decisions and transaction evidence separate from shared or recorded history.",
+      "Do adapt to the available container width and let long identifiers wrap."
+    ],
+    "donts": [
+      "Don't add decorative metrics, fabricated charts, balances or transaction outcomes.",
+      "Don't use a marketing hero, glowing panels or terminal decoration as the workspace's main structure.",
+      "Don't imply that a routing observation hides public transactions or the visitor wallet's RPC.",
+      "Don't turn every explanation into another nested card or badge.",
+      "Don't hide a hold, unknown revert, timeout or stale reading behind a positive color."
+    ]
+  }
+}

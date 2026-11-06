@@ -14,3 +14,12 @@ AGENTS.md
 .next/
 next-env.d.ts
 app/src/generated/
+
+.vercel
+
+# Design source is shared; local skill sessions and generated captures are not.
+.impeccable/*
+!.impeccable/design.json
+!.impeccable/config.json
+!.impeccable/surfaces/
+!.impeccable/surfaces/agents.md

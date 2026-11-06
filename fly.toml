@@ -1,0 +1,55 @@
+# Replace/override this name only after choosing the Fly app in the authenticated account.
+app = "kusari-demo-backend"
+primary_region = "iad"
+kill_signal = "SIGTERM"
+kill_timeout = 20
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  NODE_ENV = "production"
+  ANON_BRIDGE_HOST = "127.0.0.1"
+  ANON_MODE = "anon"
+  ANON_RPC_URL = "http://127.0.0.1:8546"
+  AGENT_READ_RPC_URL = "http://127.0.0.1:8546"
+  AGENT_WRITE_RPC_URL = "http://127.0.0.1:8546"
+  AGENT_LOOP_SECONDS = "0"
+  DEPLOYMENT_FILE = "deployments/11155111-next.json"
+  ENS_OUT = "deployments/11155111-ens-next.json"
+  KUSARI_DEMO_GATEWAY_HOST = "0.0.0.0"
+  KUSARI_DEMO_GATEWAY_PORT = "8788"
+  KUSARI_DEMO_PUBLIC_ORIGIN = "https://kusari.outcomeseal.com"
+
+# Only the bearer-protected gateway is internet-facing; sandbox runs also require a wallet challenge.
+# Agent, RPC bridge and logging proxy stay on loopback.
+[[services]]
+  protocol = "tcp"
+  internal_port = 8788
+  auto_stop_machines = "off"
+  auto_start_machines = true
+  min_machines_running = 1
+
+  [services.concurrency]
+    type = "requests"
+    soft_limit = 32
+    hard_limit = 64
+
+  [[services.ports]]
+    port = 80
+    handlers = ["http"]
+    force_https = true
+
+  [[services.ports]]
+    port = 443
+    handlers = ["tls", "http"]
+
+  [[services.tcp_checks]]
+    grace_period = "180s"
+    interval = "15s"
+    timeout = "2s"
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory = "1gb"

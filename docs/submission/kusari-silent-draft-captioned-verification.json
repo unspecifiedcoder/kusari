@@ -1,0 +1,26 @@
+{
+  "artifact": "kusari-silent-draft-captioned.mp4",
+  "verifiedAt": "2026-11-06T21:58:12.939165+00:00",
+  "durationSeconds": 164.0,
+  "width": 1920,
+  "height": 1200,
+  "originalFrameUncropped": true,
+  "captionBandPixels": 120,
+  "captionFont": "Segoe UI 40",
+  "maximumCaptionLines": 2,
+  "captionCueCount": 21,
+  "videoCodec": "h264",
+  "fps": 30,
+  "decodedFrames": 4920,
+  "audioStreamCount": 0,
+  "completeDecodePassed": true,
+  "bytes": 2833491,
+  "sha256": "fc9b24f4ffc38d3cdacc380e65fefb3ed7810a7dbaca9fd94eff6e9922f04503",
+  "content": "Real existing screenshots and earlier recorded Sepolia receipts; no new live screen interaction or new transaction is depicted.",
+  "uploaded": false,
+  "subtitleFiles": [
+    "kusari-silent-draft.srt",
+    "kusari-silent-draft.vtt"
+  ],
+  "narrationScript": "kusari-narration-script.txt"
+}

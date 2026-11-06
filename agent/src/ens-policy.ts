@@ -2,13 +2,14 @@
 //   node src/ens-policy.ts set [maxPerSwap] [dailyCap] [maxImpactBps]   write limits into ENS (resolver data record)
 //   node src/ens-policy.ts revoke                                       kill switch: revoke the agent's ENS role
 //   node src/ens-policy.ts grant                                        re-authorize the agent
+//   node src/ens-policy.ts set-vault                                    publish the deployed demo vault as kusari.vault text
 //   node src/ens-policy.ts show                                         what the hook will read
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { createPublicClient, createWalletClient, http, parseAbi, encodeAbiParameters, parseEther, formatEther, keccak256, toHex, type Address, type Hex } from "viem";
 import { privateKeyToAccount, nonceManager } from "viem/accounts";
 import { sepolia } from "viem/chains";
-import { deployment, ANON_RPC } from "./config.ts";
+import { config, deployment, ANON_RPC } from "./config.ts";
 
 const root = fileURLToPath(new URL("../../", import.meta.url));
 const ens = JSON.parse(readFileSync(root + (process.env.ENS_OUT ?? "deployments/11155111-ens.json"), "utf8"));
@@ -21,7 +22,7 @@ const POLICY = [{ type: "tuple", components: [
   { name: "maxPerSwap", type: "uint128" }, { name: "dailyCap", type: "uint128" }, { name: "maxImpactBps", type: "uint16" },
   { name: "allowedPool", type: "bytes32" }, { name: "active", type: "bool" },
 ] }] as const;
-const resolverAbi = parseAbi(["function setData(bytes name, string key, bytes value)"]);
+const resolverAbi = parseAbi(["function setData(bytes name, string key, bytes value)", "function setText(bytes name, string key, string value)"]);
 const registryAbi = parseAbi(["function grantRoles(uint256 anyId, uint256 roleBitmap, address account) returns (bool)", "function revokeRoles(uint256 anyId, uint256 roleBitmap, address account) returns (bool)"]);
 const sourceAbi = parseAbi([
   "function isAuthorized(address agent) view returns (bool)",
@@ -31,9 +32,25 @@ const ROLE_RENEW = 1n << 16n;
 const labelId = BigInt(keccak256(toHex(ens.name.split(".")[0])));
 
 async function tx(label: string, req: Parameters<typeof wallet.writeContract>[0]) {
+  if (!ens.policySource || deployment.policySource.toLowerCase() !== ens.policySource.toLowerCase()) {
+    throw new Error("Deployment and ENS checkpoint use different policy sources; choose matching DEPLOYMENT_FILE and ENS_OUT");
+  }
+  if (!ens.owner || ens.owner.toLowerCase() !== owner.address.toLowerCase()) {
+    throw new Error("Owner wallet does not match the ENS checkpoint; choose the correct ENS_OUT and owner identity");
+  }
+  if (!ens.agent || !config.agentAddress || ens.agent.toLowerCase() !== config.agentAddress.toLowerCase()) {
+    throw new Error("Configured agent does not match the ENS checkpoint; check ENS_OUT and AGENT_ADDRESS/AGENT_PRIVATE_KEY");
+  }
+  if (config.agentKey && privateKeyToAccount(config.agentKey).address.toLowerCase() !== ens.agent.toLowerCase()) {
+    throw new Error("Agent signing identity does not match the ENS checkpoint");
+  }
+  if (deployment.chainId !== sepolia.id || await pub.getChainId() !== sepolia.id) {
+    throw new Error("Owner writes require the Sepolia deployment and a Sepolia RPC (chain ID 11155111)");
+  }
   const hash = await wallet.writeContract(req);
   const r = await pub.waitForTransactionReceipt({ hash });
-  console.log(`${r.status === "success" ? "✓" : "✗"} ${label}  https://sepolia.etherscan.io/tx/${hash}`);
+  if (r.status !== "success") throw new Error(`${label} reverted: https://sepolia.etherscan.io/tx/${hash}`);
+  console.log(`✓ ${label}  https://sepolia.etherscan.io/tx/${hash}`);
 }
 
 async function show() {
@@ -53,6 +70,9 @@ if (cmd === "set") {
   await tx("revoke agent role", { address: ens.userRegistry as Address, abi: registryAbi, functionName: "revokeRoles", args: [labelId, ROLE_RENEW, ens.agent] } as never);
 } else if (cmd === "grant") {
   await tx("grant agent role", { address: ens.userRegistry as Address, abi: registryAbi, functionName: "grantRoles", args: [labelId, ROLE_RENEW, ens.agent] } as never);
+} else if (cmd === "set-vault") {
+  if (args.length) throw new Error("set-vault takes no arguments; it publishes deployment.demoVault");
+  await tx("set kusari.vault text record", { address: ens.resolver as Address, abi: resolverAbi, functionName: "setText", args: [ens.dnsName, "kusari.vault", deployment.demoVault] } as never);
 } else if (cmd !== "show") {
   throw new Error(`unknown command ${cmd}`);
 }

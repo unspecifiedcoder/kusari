@@ -12,9 +12,9 @@ import { privateKeyToAccount } from "viem/accounts";
 import { sepolia } from "viem/chains";
 import { config, deployment } from "./config.ts";
 import { agentVaultAbi, policyHookAbi, stateViewAbi } from "./abi.ts";
+import { sharedTradeMinimum } from "../../scripts/api-trade.mjs";
 import { reader } from "./state.ts";
 
-const Q96 = 2n ** 96n;
 import { swapIntentTypes, kusariDomain, revertReasons } from "../../shared/types.ts";
 
 if (!config.agentKey) throw new Error("AGENT_PRIVATE_KEY not set");
@@ -75,13 +75,12 @@ export function explainRevert(err: unknown): { reason: string; message: string }
  */
 export async function executeSwap(
   amountIn: number,
-  { sendEvenIfBlocked = false, sqrtPriceX96 }: { sendEvenIfBlocked?: boolean; sqrtPriceX96?: bigint } = {},
+  { sendEvenIfBlocked = false, sqrtPriceX96, amountInWei: exactAmount, minAmountOut: requestedMinimum, onSubmitted }: { sendEvenIfBlocked?: boolean; sqrtPriceX96?: bigint; amountInWei?: bigint; minAmountOut?: bigint; onSubmitted?: (hash: Hex) => void } = {},
 ): Promise<SwapResult> {
-  const amountInWei = parseEther(String(amountIn));
+  const amountInWei = exactAmount ?? parseEther(String(amountIn));
   // Signed minimum output, enforced by the hook against the real BalanceDelta (bounds sandwich loss).
   const sqrtP = sqrtPriceX96 ?? (await reader.readContract({ address: config.stateView, abi: stateViewAbi, functionName: "getSlot0", args: [deployment.poolId] }))[0];
-  const quote = (((amountInWei * sqrtP) / Q96) * sqrtP) / Q96; // token1 out at the pre-swap price
-  const minAmountOut = (quote * (10_000n - 30n - SLIPPAGE_BPS)) / 10_000n;
+  const minAmountOut = sharedTradeMinimum(amountInWei, sqrtP, SLIPPAGE_BPS, requestedMinimum);
   const intent = {
     agent: agentAccount.address,
     vault: deployment.demoVault,
@@ -114,12 +113,15 @@ export async function executeSwap(
     if (!sendEvenIfBlocked) return { status: "blocked", amountIn, ...blocked };
   }
 
+  let submittedHash: Hex | undefined;
   try {
     const hash = await wallet.writeContract({ ...call, gas: blocked ? 600_000n : undefined });
+    submittedHash = hash;
+    onSubmitted?.(hash);
     const receipt = await reader.waitForTransactionReceipt({ hash });
     if (receipt.status === "success") return { status: "success", amountIn, hash };
     return { status: "blocked", amountIn, hash, ...(blocked ?? { reason: "Reverted", message: "Reverted on-chain" }) };
   } catch (e) {
-    return { status: "error", amountIn, ...explainRevert(e) };
+    return { status: "error", amountIn, ...(submittedHash ? { hash: submittedHash } : {}), ...explainRevert(e) };
   }
 }

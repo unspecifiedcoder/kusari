@@ -1,10 +1,15 @@
-// Checks .env without ever printing a full secret.
-// Shows first 3 + last 3 characters, length, and a format check.
+// Checks .env without printing secret material, including key prefixes/suffixes.
 // For wallet keys it also shows the address the key controls (public info, safe to share).
-//   node scripts/check-env.mjs
+//   node scripts/check-env.mjs [--rehearsal] [--deploy]
 import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { createRequire } from "node:module";
+
+const args = new Set(process.argv.slice(2));
+if ([...args].some((arg) => !["--rehearsal", "--deploy"].includes(arg))) {
+  console.error("Usage: node scripts/check-env.mjs [--rehearsal] [--deploy]");
+  process.exit(2);
+}
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 if (!existsSync(root + ".env")) {
@@ -22,15 +27,14 @@ try {
   privateKeyToAccount = null;
 }
 
-const mask = (v) => (v.length <= 8 ? "*".repeat(v.length) : `${v.slice(0, 3)}…${v.slice(-3)}`);
 const isPk = (v) => /^0x[0-9a-fA-F]{64}$/.test(v);
+const scripted = process.env.AGENT_SCRIPTED === "1";
 
 const CHECKS = [
   ["OWNER_PRIVATE_KEY", "wallet", isPk, "0x + 64 hex chars"],
   ["AGENT_PRIVATE_KEY", "wallet", isPk, "0x + 64 hex chars"],
-  ["DEPLOYER_PRIVATE_KEY", "wallet", isPk, "0x + 64 hex chars"],
-  ["ANTHROPIC_API_KEY", "llm", (v) => v.startsWith("sk-ant-") && v.length > 40, 'starts with "sk-ant-"'],
-  ["GEMINI_API_KEY", "llm", (v) => /^AIza[0-9A-Za-z_-]{35}$/.test(v), 'starts with "AIza", 39 chars'],
+  ["DEPLOYER_PRIVATE_KEY", args.has("--deploy") ? "wallet" : "optional-wallet", isPk, "0x + 64 hex chars"],
+  ["GEMINI_API_KEY", scripted && !args.has("--rehearsal") ? "optional" : "llm", (v) => /^AIza[0-9A-Za-z_-]{35}$/.test(v), "Google Gemini API key format"],
   ["NEXT_PUBLIC_REOWN_PROJECT_ID", "optional", (v) => /^[0-9a-f]{32}$/.test(v), "32 hex chars"],
   ["ETHERSCAN_API_KEY", "optional", (v) => /^[A-Z0-9]{34}$/.test(v), "34 chars, A-Z 0-9"],
   ["SEPOLIA_RPC_URL", "optional", (v) => /^https?:\/\//.test(v), "starts with https://"],
@@ -38,39 +42,50 @@ const CHECKS = [
 
 const addresses = {};
 let problems = 0;
-const llmSet = CHECKS.some(([n, k]) => k === "llm" && (process.env[n] ?? "").trim());
+if (scripted) console.log(args.has("--rehearsal") ? "Rehearsal requires real Gemini decisions; a scripted setting does not satisfy it." : "Mode: explicitly SCRIPTED demo (not live LLM decisions).");
+if (scripted && args.has("--rehearsal")) problems++;
 for (const [name, kind, valid, hint] of CHECKS) {
   const v = (process.env[name] ?? "").trim();
   if (!v) {
-    // one LLM key is enough
-    const optional = kind === "optional" || (kind === "llm" && llmSet);
+    const optional = kind.startsWith("optional");
     console.log(`${optional ? "·" : "✗"} ${name.padEnd(29)} empty${optional ? " (optional)" : ""}`);
     if (!optional) problems++;
     continue;
   }
-  const ok = valid(v);
-  if (!ok) problems++;
+  let ok = valid(v);
   let extra = "";
-  if (kind === "wallet" && ok && privateKeyToAccount) {
-    addresses[name] = privateKeyToAccount(v).address;
-    extra = `  -> address ${addresses[name]}`;
+  if (kind.includes("wallet") && ok && privateKeyToAccount) {
+    try {
+      addresses[name] = privateKeyToAccount(v).address;
+      extra = `  -> address ${addresses[name]}`;
+    } catch { ok = false; }
   }
-  const shown = name === "SEPOLIA_RPC_URL" ? v.replace(/\/[^/]{12,}$/, "/…") : mask(v);
-  console.log(`${ok ? "✓" : "✗"} ${name.padEnd(29)} ${shown.padEnd(10)} len ${String(v.length).padEnd(4)}${ok ? "" : ` expected ${hint}`}${extra}`);
+  if (!ok) problems++;
+  console.log(`${ok ? "✓" : "✗"} ${name.padEnd(29)} present, format ${ok ? "valid" : "invalid"}${ok ? "" : `; expected ${hint}`}${extra}`);
 }
 
-// Any other variables in .env: names + masked values only, so typos in names show up.
+// Unknown variable names can reveal typos; never show their values.
 const { parseEnv } = await import("node:util");
 const { readFileSync } = await import("node:fs");
-const known = new Set([...CHECKS.map((c) => c[0]), "AGENT_MODEL", "ENS_PARENT_NAME", "ENS_PARENT_LABEL", "ENS_AGENT_LABEL", "AGENT_READ_RPC_URL", "AGENT_WRITE_RPC_URL"]);
+const known = new Set([...CHECKS.map((c) => c[0]), "AGENT_MODEL", "AGENT_SCRIPTED", "AGENT_SLIPPAGE_BPS", "AGENT_LOOP_SECONDS", "AGENT_EVENTS_PORT", "AGENT_ADDRESS", "ENS_PARENT_NAME", "ENS_PARENT_LABEL", "ENS_AGENT_LABEL", "ENS_OUT", "DEPLOYMENT_FILE", "AGENT_READ_RPC_URL", "AGENT_WRITE_RPC_URL", "ANON_RPC_URL", "LEAK_RPC_URL", "ANON_MODE", "ANON_BRIDGE_HOST", "ANON_BRIDGE_PORT", "ANON_REQUEST_TIMEOUT_MS", "AGENT_UPSTREAM_RPC", "LOGGING_PROXY_PORT", "PROXY_UPSTREAM_RPC", "KUSARI_DEMO_GATEWAY_TOKEN", "KUSARI_DEMO_GATEWAY_URL", "KUSARI_DEMO_GATEWAY_HOST", "KUSARI_DEMO_GATEWAY_PORT", "NEXT_PUBLIC_RPC_URL", "NEXT_PUBLIC_BRIDGE_URL", "NEXT_PUBLIC_AGENT_URL", "NEXT_PUBLIC_PROXY_URL"]);
 for (const [name, value] of Object.entries(parseEnv(readFileSync(root + ".env", "utf8")))) {
   if (known.has(name)) continue;
-  console.log(`? ${name.padEnd(29)} ${value ? mask(value) : "empty"}  (not a variable Kusari reads; typo?)`);
+  console.log(`? ${name.padEnd(29)} ${value ? "present" : "empty"}  (not a variable Kusari reads; typo?)`);
 }
 
-const uniq = new Set(Object.values(addresses));
-if (uniq.size < Object.keys(addresses).length) {
-  console.log("✗ Two wallet keys are the same. Owner, agent and deployer should be different wallets.");
+if (addresses.OWNER_PRIVATE_KEY && addresses.OWNER_PRIVATE_KEY === addresses.AGENT_PRIVATE_KEY) {
+  console.log("✗ Owner and agent wallets must be different for the delegated-access demo.");
   problems++;
 }
+const ensFile = root + (process.env.ENS_OUT ?? "deployments/11155111-ens.json");
+if (existsSync(ensFile)) {
+  const expected = JSON.parse(readFileSync(ensFile, "utf8"));
+  for (const [key, address] of [["AGENT_PRIVATE_KEY", expected.agent], ["OWNER_PRIVATE_KEY", expected.owner]]) {
+    if (addresses[key] && addresses[key].toLowerCase() !== address?.toLowerCase()) {
+      console.log(`✗ ${key} does not control the configured demo wallet.`);
+      problems++;
+    }
+  }
+}
 console.log(problems ? `\n${problems} thing(s) to fix.` : "\nAll set.");
+process.exitCode = problems ? 1 : 0;
