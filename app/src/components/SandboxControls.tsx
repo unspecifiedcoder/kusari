@@ -2,17 +2,18 @@
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useConnection, useSignMessage } from "wagmi";
-import { assertSepoliaWallet, WALLET_CHAIN_ID } from "@/lib/wallet-safety";
+import { assertSepoliaWallet, WALLET_CHAIN_ID, DEFAULT_APP_ORIGIN } from "@/lib/wallet-safety";
+import { deployment, ensDeployment } from "@/generated/deployment";
 
 type Scenario = "normal" | "attack";
 type Phase = "ready" | "challenge" | "signing" | "submitting" | "running" | "complete" | "timeout" | "error";
 type RunEvent = Record<string, unknown> & { id?: number | string; t?: number; type?: string; runId?: string };
-type Run = { id: string; scenario: Scenario; startedAt: number; events: RunEvent[] };
+type Run = { id: string; scenario: Scenario; startedAt: number; events: RunEvent[]; readRoute?: { readTransport: string; bridgeMode: string; observedAt: number } };
 type Challenge = { nonce: string; message: string; expiresAt: number; address: string; scenario: Scenario; origin: string };
 type ApiFailure = { error?: string; retryAfterSeconds?: number };
 
 const runWindowMs = 180_000;
-const configuredOrigin = process.env.NEXT_PUBLIC_APP_ORIGIN?.trim();
+const configuredOrigin = process.env.NEXT_PUBLIC_APP_ORIGIN?.trim() || DEFAULT_APP_ORIGIN;
 const canonicalOrigin = (() => {
   if (!configuredOrigin) return null;
   try { const url = new URL(configuredOrigin); return url.protocol === "https:" && (configuredOrigin === url.origin || configuredOrigin === `${url.origin}/`) ? url.origin : null; }
@@ -71,11 +72,12 @@ export function SandboxControls() {
         const events: RunEvent[] = status.recentEvents.filter((event: unknown): event is RunEvent => typeof event === "object" && event !== null && (event as RunEvent).runId === runId);
         if (disposed) return;
         setPollError(null);
+        const readRoute = typeof status.readTransport === "string" && typeof status.bridgeMode === "string" ? { readTransport: status.readTransport, bridgeMode: status.bridgeMode, observedAt: Date.now() } : undefined;
         setRun((previous) => {
           if (!previous || previous.id !== runId) return previous;
           const merged = new Map(previous.events.map((event) => [String(event.id ?? `${event.t}:${event.type}`), event]));
           for (const event of events) merged.set(String(event.id ?? `${event.t}:${event.type}`), event);
-          return { ...previous, events: [...merged.values()].sort((left, right) => (left.t ?? 0) - (right.t ?? 0)) };
+          return { ...previous, readRoute, events: [...merged.values()].sort((left, right) => (left.t ?? 0) - (right.t ?? 0)) };
         });
         if (events.some((event) => event.type === "idle")) {
           operationBusy.current = false;
@@ -169,6 +171,7 @@ export function SandboxControls() {
         {challenge && phase === "signing" && <details className="rounded-xl border border-zinc-800 p-4 text-xs text-zinc-400"><summary className="cursor-pointer text-zinc-300">Exact message requested by the sandbox</summary><pre className="mt-3 whitespace-pre-wrap break-words font-mono text-xs leading-5">{challenge.message}</pre></details>}
         {error && <p role="alert" className="rounded-xl border border-amber-800/60 bg-amber-950/30 p-4 text-sm leading-6 text-amber-200">{error}</p>}
         {run && <div aria-live="polite" className="space-y-4 rounded-xl border border-zinc-800 bg-zinc-950/60 p-4 sm:p-5"><div className="flex flex-wrap items-center justify-between gap-2"><p className="text-sm font-medium text-zinc-200">Your {run.scenario === "attack" ? "poisoned-news" : "normal"} run</p><span className="font-mono text-xs text-zinc-500">{run.id.slice(0, 12)} · {phase === "running" ? `${elapsed}s elapsed` : phase === "timeout" ? "Status timed out" : "Finished"}</span></div><div className="grid gap-3 sm:grid-cols-3"><Step number="01" label="Chain read" value={run.events.some((event) => event.type === "reading") ? "Started" : "Waiting"} /><Step number="02" label="Model decision" value={decision ? realGemini ? "Gemini responded" : "Source unverified" : "Waiting"} /><Step number="03" label="Guarded execution" value={swap ? swap.status === "success" ? "Executed" : swap.status === "blocked" ? "Policy blocked" : "Not confirmed" : decision?.action === "hold" ? "Model held" : "Waiting"} /></div>{decision && <div className="border-t border-zinc-800 pt-4"><p className="text-xs font-medium text-zinc-500">{source}</p><p className="mt-2 text-sm text-zinc-200">{String(decision.action)}{typeof decision.amountIn === "number" ? ` · ${decision.amountIn} kUSD requested` : ""}</p><p className="mt-2 text-sm leading-6 text-zinc-400">{String(decision.reason ?? "No rationale was returned.")}</p></div>}{outcome && <div className="border-t border-zinc-800 pt-4"><p className={`text-sm font-semibold ${outcome.tone}`}>{outcome.title}</p><p className="mt-2 text-sm leading-6 text-zinc-400">{outcome.detail}</p>{txHash(swap?.hash) && <a href={`https://sepolia.etherscan.io/tx/${swap.hash}`} target="_blank" rel="noreferrer" className="mt-3 inline-block break-all font-mono text-xs text-emerald-300 underline underline-offset-4">Verify transaction {swap.hash.slice(0, 12)}…{swap.hash.slice(-8)} ↗</a>}</div>}{phase === "running" && !decision && <p className="text-sm leading-6 text-zinc-500">The agent is reading the chain and requesting a real Gemini response. Network and model latency can take a few minutes.</p>}{pollError && phase === "running" && <p className="text-xs leading-5 text-amber-200">{pollError}</p>}{phase === "timeout" && <p role="status" className="text-sm leading-6 text-amber-200">A final run status was not received within three minutes. This does not prove that the trade failed. Inspect any transaction link and the shared activity below before requesting another run.</p>}{runError && !outcome && <p className="text-sm leading-6 text-amber-200">{String(runError.message ?? "The runner reported an error.")}</p>}</div>}
+        {run && <RunEvidence run={run} />}
         <p className="text-xs leading-5 text-zinc-500">This is a shared, rate-limited testnet sandbox, not a personal trading account. Only the ENS owner can freeze or change policy. If your wallet shows a site-security warning, stop. You can inspect the recorded onchain evidence without connecting.</p>
       </div>
     </section>
@@ -177,4 +180,27 @@ export function SandboxControls() {
 
 function Step({ number, label, value }: { number: string; label: string; value: string }) {
   return <div className="rounded-lg border border-zinc-800 p-3"><p className="text-xs text-zinc-500"><span className="mr-2 font-mono text-emerald-400">{number}</span>{label}</p><p className="mt-2 text-xs font-medium text-zinc-300">{value}</p></div>;
+}
+
+function RunEvidence({ run }: { run: Run }) {
+  const state = run.events.find((event) => event.type === "state");
+  const swap = run.events.find((event) => event.type === "swap");
+  const maxPerSwap = typeof state?.maxPerSwap === "number" && Number.isFinite(state.maxPerSwap) ? state.maxPerSwap : null;
+  const dailyCap = typeof state?.dailyCap === "number" && Number.isFinite(state.dailyCap) ? state.dailyCap : null;
+  const hasReceipt = txHash(swap?.hash);
+  const verifiedNox = run.readRoute?.readTransport === "anon" && run.readRoute.bridgeMode === "anon";
+  const directRoute = run.readRoute?.readTransport === "direct" || run.readRoute?.bridgeMode === "direct";
+  const routeLabel = verifiedNox ? "Anon-RPC via Nox observed" : directRoute ? "Direct route · not anonymous" : run.readRoute?.readTransport === "leak" ? "Public logging route · not anonymous" : "Read route not verified";
+  const execution = swap?.status === "success" && hasReceipt ? "Swap confirmed through the hook" : swap?.status === "blocked" && hasReceipt ? `Onchain revert: ${String(swap.reason ?? "reason not reported")}` : swap?.status === "blocked" ? `Simulation block: ${String(swap.reason ?? "reason not reported")}` : swap ? "No confirmed execution" : "Awaiting this run’s execution";
+  return (
+    <section aria-label="Integration evidence for this run" className="border-t border-zinc-800 pt-4">
+      <p className="mb-3 text-xs font-medium text-zinc-300">What this run actually used</p>
+      <div className="grid gap-4 text-xs leading-5 sm:grid-cols-3">
+        <div className="min-w-0"><p className="font-medium text-zinc-200">ENS policy</p><a href={`https://sepolia.etherscan.io/address/${deployment.policySource}`} target="_blank" rel="noreferrer" className="mt-1 block break-all text-emerald-300 underline underline-offset-4">{ensDeployment.name} · policy source ↗</a><p className="mt-1 text-zinc-400">{maxPerSwap === null ? "Waiting for this run’s policy read." : `${maxPerSwap} kUSD per swap${dailyCap === null ? "" : ` · ${dailyCap} per day`}`}</p>{typeof state?.authorized === "boolean" && <p className="text-zinc-500">{state.authorized ? "Authorized at the policy read" : "Authorization revoked at the policy read"}</p>}</div>
+        <div className="min-w-0"><p className="font-medium text-zinc-200">Uniswap v4 enforcement</p><p className="mt-1 text-zinc-400">{execution}</p><a href={`https://sepolia.etherscan.io/address/${deployment.policyHook}`} target="_blank" rel="noreferrer" className="mt-1 inline-block text-zinc-300 underline underline-offset-4">Inspect the PolicyHook ↗</a>{hasReceipt && <a href={`https://sepolia.etherscan.io/tx/${String(swap?.hash)}`} target="_blank" rel="noreferrer" className="ml-3 inline-block text-emerald-300 underline underline-offset-4">Run receipt ↗</a>}</div>
+        <div className="min-w-0"><p className="font-medium text-zinc-200">Anon-RPC / Nox</p><p className={`mt-1 ${verifiedNox ? "text-emerald-300" : directRoute ? "text-amber-200" : "text-zinc-400"}`}>{routeLabel}</p><p className="mt-1 text-zinc-500">{run.readRoute ? `Runner route observed at ${new Date(run.readRoute.observedAt).toLocaleTimeString()}.` : "No routing observation received for this run yet."} Routing metadata is reported by the running bridge, not an anonymity proof.</p></div>
+      </div>
+      <p className="mt-3 text-xs leading-5 text-zinc-500">The wallet’s own RPC is separate from the agent’s read route. The message signature requests a cycle; it does not make the eventual onchain trade private.</p>
+    </section>
+  );
 }

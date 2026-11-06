@@ -119,3 +119,20 @@ test("wallet guard validates chain and account before invoking its send callback
   assert.equal(sends, 1);
   assert.equal(transactionCalls(calls).length, 0);
 });
+
+test("an unconfigured deployment alias cannot reach the wallet provider or signing callback", async () => {
+  const oldWindow = globalThis.window;
+  const oldOrigin = process.env.NEXT_PUBLIC_APP_ORIGIN;
+  const { connector, calls } = stubWallet();
+  let sends = 0;
+  try {
+    delete process.env.NEXT_PUBLIC_APP_ORIGIN;
+    globalThis.window = { location: { origin: "https://kusari-demo.vercel.app" } };
+    await assert.rejects(withSepoliaWallet(connector, OWNER, () => { sends++; }), /official Kusari/);
+    assert.equal(calls.length, 0);
+    assert.equal(sends, 0);
+  } finally {
+    if (oldWindow === undefined) delete globalThis.window; else globalThis.window = oldWindow;
+    if (oldOrigin === undefined) delete process.env.NEXT_PUBLIC_APP_ORIGIN; else process.env.NEXT_PUBLIC_APP_ORIGIN = oldOrigin;
+  }
+});

@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { createSandboxProxy } from "./sandbox-http.mjs";
 
-const origin = "https://kusari-demo.vercel.app";
+const origin = "https://kusari.outcomeseal.com";
 const request = (body = { address: "demo", scenario: "normal" }, headers = {}) => new Request(`${origin}/api/sandbox/challenge`, {
   method: "POST", headers: { origin, "content-type": "application/json", ...headers }, body: JSON.stringify(body),
 });
@@ -31,6 +31,9 @@ test("sandbox proxy rejects cross-origin, unknown origin, non-JSON and oversized
   assert.equal((await proxy(request({}, { origin: "null" }), "challenge")).status, 403);
   assert.equal((await proxy(request({}, { "content-type": "text/plain" }), "challenge")).status, 400);
   assert.equal((await proxy(request({ value: "x".repeat(5000) }), "challenge")).status, 413);
+  assert.equal(calls, 0);
+  const alias = new Request("https://kusari-demo.vercel.app/api/sandbox/challenge", { method: "POST", headers: { origin: "https://kusari-demo.vercel.app", "content-type": "application/json" }, body: "{}" });
+  assert.equal((await proxy(alias, "challenge")).status, 403);
   assert.equal(calls, 0);
 });
 

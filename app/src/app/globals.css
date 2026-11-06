@@ -4,6 +4,10 @@
 :root {
   --background: #09090b;
   --foreground: #f4f4f5;
+  --kusari-surface: #101713;
+  --kusari-rule: #2a3832;
+  --kusari-muted: #a6b6ad;
+  --kusari-authority: #34d399;
   color-scheme: dark;
   --font-geist-sans: "Segoe UI", Arial, Helvetica, sans-serif;
   --font-geist-mono: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
@@ -26,4 +30,52 @@
   button:not(:disabled), a { cursor: pointer; }
   :focus-visible { outline: 2px solid #34d399; outline-offset: 4px; }
   ::selection { background: #065f46; color: #ecfdf5; }
+}
+
+@layer components {
+  .kusari-home :where(p) { max-width: 72ch; }
+  .kusari-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2rem;
+    border: 1px solid var(--kusari-rule);
+    border-left: 3px solid var(--kusari-authority);
+    border-radius: 0.75rem;
+    background: var(--kusari-surface);
+    padding: clamp(1.25rem, 4vw, 2.75rem);
+  }
+  .kusari-hero-title {
+    max-width: 24ch;
+    color: var(--foreground);
+    font-size: clamp(2rem, 5.5vw, 3.375rem);
+    font-weight: 600;
+    line-height: 1.12;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+  }
+  .kusari-hero-mark { display: none; }
+  .kusari-primary-action { min-height: 2.875rem; }
+  @media (min-width: 900px) {
+    .kusari-hero { grid-template-columns: minmax(0, 1fr) auto; align-items: start; }
+    .kusari-hero-mark {
+      display: block;
+      align-self: start;
+      border: 1px solid var(--kusari-rule);
+      border-radius: 0.75rem;
+      padding: 0.65rem 0.9rem 0.9rem;
+      color: var(--kusari-muted);
+      font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+      font-size: clamp(4.5rem, 8vw, 6rem);
+      line-height: 1;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

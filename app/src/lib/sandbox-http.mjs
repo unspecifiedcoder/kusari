@@ -31,7 +31,7 @@ async function boundedJson(request) {
  * Stateless serverless proxy. All nonce/admission state lives in the persistent Fly gateway.
  * @param {{ gatewayUrl?: string, token?: string, publicOrigin?: string, fetchImpl?: typeof fetch }} [options]
  */
-export function createSandboxProxy({ gatewayUrl, token, publicOrigin = "https://kusari-demo.vercel.app", fetchImpl = fetch } = {}) {
+export function createSandboxProxy({ gatewayUrl, token, publicOrigin = "https://kusari.outcomeseal.com", fetchImpl = fetch } = {}) {
   return async function proxy(request, action) {
     if (!["challenge", "run"].includes(action)) return reply(404, { error: "Unknown sandbox action" });
     if (request.method !== "POST") return reply(405, { error: "Use POST" });

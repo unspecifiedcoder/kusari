@@ -6,7 +6,7 @@ AI trading with ENSv2 owner controls, Uniswap v4 enforcement and Ethereum Founda
 
 **[Judge demo / Sandbox →](https://kusari.outcomeseal.com/demo#try-sandbox)** · [Source](https://github.com/unspecifiedcoder/kusari/tree/codex/judge-ready) · [Uniswap feedback](FEEDBACK.md)
 
-**Release status:** the new domain is configured in Vercel and awaits DNS activation. The interactive Sandbox is implemented; deployment and live visitor validation are pending. `kusari-demo.vercel.app` currently triggers MetaMask's site-security block; a [review is submitted](https://github.com/MetaMask/eth-phishing-detect/issues/309873), not cleared. Do not bypass a wallet security warning. The verified transaction evidence below remains available without a wallet.
+**Release status:** the custom domain has verified DNS and working HTTPS. The interactive Sandbox is implemented and its signed backend protocol has passed real Gemini success and over-limit rejection runs; the latest UI publication and browser-wallet validation are pending. `kusari-demo.vercel.app` currently triggers MetaMask's site-security block; a [review is submitted](https://github.com/MetaMask/eth-phishing-detect/issues/309873), not cleared. Do not bypass a wallet security warning. The verified transaction evidence below remains available without a wallet.
 
 ## For judges
 

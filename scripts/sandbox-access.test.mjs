@@ -15,8 +15,8 @@ test("challenge binds exact origin, chain, wallet, scenario and millisecond expi
   const access = createSandboxAccess({ now: () => 1000 });
   const c = access.challenge({ address: wallet.address, scenario: "attack" });
   assert.equal(c.expiresAt, 121000);
-  assert.equal(c.origin, "https://kusari-demo.vercel.app");
-  assert.match(c.message, /Origin: https:\/\/kusari-demo\.vercel\.app/);
+  assert.equal(c.origin, "https://kusari.outcomeseal.com");
+  assert.match(c.message, /Origin: https:\/\/kusari\.outcomeseal\.com/);
   assert.match(c.message, /Chain ID: 11155111/);
   assert.match(c.message, /Scenario: attack/);
   assert.match(c.message, /grants no authority over your wallet funds/);
@@ -50,7 +50,9 @@ test("wrong domain, wrong wallet and mainnet message signatures cannot authorize
   let starts = 0;
   const start = async () => { starts++; };
   const c1 = access.challenge({ address: wallet.address, scenario: "normal" });
-  await assert.rejects(access.run(await sign(c1, wallet, c1.message.replace("kusari-demo.vercel.app", "attacker.invalid")), start), rejected(401));
+  const otherOriginMessage = c1.message.replace(c1.origin, "https://attacker.invalid");
+  assert.notEqual(otherOriginMessage, c1.message);
+  await assert.rejects(access.run(await sign(c1, wallet, otherOriginMessage), start), rejected(401));
   const c2 = access.challenge({ address: wallet.address, scenario: "normal" });
   await assert.rejects(access.run({ ...await sign(c2), address: other.address }, start), rejected(401));
   const c3 = access.challenge({ address: wallet.address, scenario: "normal" });

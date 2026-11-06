@@ -4,7 +4,7 @@ import { createRequire } from "node:module";
 const require = createRequire(new URL("../agent/package.json", import.meta.url));
 const { getAddress, isAddress, verifyMessage } = require("viem");
 export const SANDBOX_CHAIN_ID = 11155111;
-export const DEFAULT_SANDBOX_ORIGIN = "https://kusari-demo.vercel.app";
+export const DEFAULT_SANDBOX_ORIGIN = "https://kusari.outcomeseal.com";
 
 export class SandboxError extends Error {
   constructor(status, message, retryAfterSeconds) {
