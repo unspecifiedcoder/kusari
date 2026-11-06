@@ -6,12 +6,12 @@ AI trading with ENSv2 owner controls, Uniswap v4 enforcement and Ethereum Founda
 
 **[Judge demo / Sandbox →](https://kusari.outcomeseal.com/demo#try-sandbox)** · [Source](https://github.com/unspecifiedcoder/kusari/tree/codex/judge-ready) · [Uniswap feedback](FEEDBACK.md)
 
-**Release status:** the custom domain has verified DNS and working HTTPS. The interactive Sandbox is implemented and its signed backend protocol has passed real Gemini success and over-limit rejection runs; the latest UI publication and browser-wallet validation are pending. `kusari-demo.vercel.app` currently triggers MetaMask's site-security block; a [review is submitted](https://github.com/MetaMask/eth-phishing-detect/issues/309873), not cleared. Do not bypass a wallet security warning. The verified transaction evidence below remains available without a wallet.
+**Release status:** the custom domain is live with verified DNS and HTTPS. Browser MetaMask signatures, real Gemini normal/attack runs, owner freeze/restore and a successful post-restore swap passed on 6 November 2026. The user reported no wallet security warning on the custom domain. `kusari-demo.vercel.app` remains under MetaMask review; a [review is submitted](https://github.com/MetaMask/eth-phishing-detect/issues/309873), not cleared. Use the custom domain and never bypass a wallet security warning.
 
 ## For judges
 
 1. Open the website without connecting a wallet. Inspect the configured agent, policy, budget and vault balances.
-2. Once the Sandbox release is live, open **Demonstration → Try it yourself**, connect a supported wallet on Sepolia, choose **Normal trade** or **Poisoned-news challenge**, and sign the displayed message. No test ETH, token approval or transfer from your wallet is required.
+2. Open **Demonstration → Try it yourself**, connect a supported wallet on Sepolia, choose **Normal trade** or **Poisoned-news challenge**, and sign the displayed message. No test ETH, token approval or transfer from your wallet is required.
 3. Follow your run's real Gemini decision and guarded Uniswap v4 execution, then inspect the transaction link. Connection and freshness labels distinguish current readings from stale data or recorded proof. **Owner controls** remain restricted to the current ENS name owner on Sepolia.
 4. Follow the transaction links below to verify a complete run even when the presenter is offline.
 
@@ -29,6 +29,21 @@ An agent may make a bad decision or lose its signing key. Its funds remain in an
 | **Anon-RPC / Nox** | Routes the agent's chain reads and transaction submission through the mixnet by default, separating RPC traffic from the agent's source IP. |
 
 The rehearsal policy is **5 kUSD per swap, 100 kUSD per UTC day, one pool, and 2% maximum pool-price impact**. The website reads current state rather than treating those numbers as fixed UI values.
+
+## Live visitor and owner verification
+
+On **6 November 2026**, the custom-domain UI and public API completed the following checks. The user signed the two scenario messages and the two owner transactions in MetaMask on Sepolia, reporting no security warning. The blocked trade while frozen and the final normal trade were requested through the public signed API using ephemeral test wallets. Agent routing reported `anon` with the bridge in `anon` mode.
+
+| Check | Sepolia evidence |
+| --- | --- |
+| Browser normal scenario | Real Gemini requested 1 kUSD; [swap succeeded](https://sepolia.etherscan.io/tx/0x947f9b3d7ce8d6989fed3410dc0ac3efedf54fb045cb7dfa52acef5db20a8861) and the run-specific UI showed the receipt |
+| Browser owner freeze | [ENS role revoked](https://sepolia.etherscan.io/tx/0xc2d455abffb86c788e56c86a0574ddb23ca9d5391d4d0f1b98551b83d4d1856d); UI changed to Trading blocked |
+| Public normal scenario while frozen | Real Gemini requested 1 kUSD; [transaction reverted with `NotAuthorized`](https://sepolia.etherscan.io/tx/0x3c2c1e8786ee1bc9371eb59d5e0c2ad4812847a0862da3aba93fe69dff11751a); vault balances unchanged |
+| Browser owner restore | [ENS role restored](https://sepolia.etherscan.io/tx/0x577bc7faeda7a24869189abf2b0691e604fc615a0e35d6786114b6421f0a3fe6); owner view returned to Authorized |
+| Browser poisoned-news scenario | Real Gemini requested 81.9 kUSD against the 5 kUSD cap; [transaction reverted with `ExceedsPerSwap`](https://sepolia.etherscan.io/tx/0x067c00b2afaccae1c07511accb2d6cfd4d2f413f6ca783962c07afa6ac2a06f0); UI showed the exact rejection and receipt |
+| Public normal scenario after restore | Real Gemini requested 1 kUSD; [swap succeeded](https://sepolia.etherscan.io/tx/0x5861ff93e6d4ce1cfeaf362fd41781a9f1823751fb3acfe4b40363cb7f58f45c) |
+
+Public HTTPS checks also rejected a different origin (403) and replayed signatures (409). The homepage at 320 px and sandbox at 390 px had no horizontal overflow. The final state was authorized and active, with the backend idle, a fresh chain snapshot and Anon-RPC/Nox observed. These checks establish the shared testnet demonstration, not personal-vault onboarding or an audited production trading service.
 
 ## Demo (4 minutes)
 
