@@ -86,7 +86,7 @@ The canonical manifests [`deployments/11155111.json`](deployments/11155111.json)
 Use the Node version in [`.nvmrc`](.nvmrc). See [build instructions](docs/BUILD.md) for the supported toolchain. Keep wallet and model keys in a local, ignored `.env`; the owner and agent must match the selected deployment metadata. A random new key has no authority over an existing vault or ENS name.
 
 ```sh
-cp .env.example .env
+# Preserve an existing .env. Create one from .env.example only for a new checkout.
 # Configure the selected deployment, its local keys and GEMINI_API_KEY.
 cd contracts
 forge install
