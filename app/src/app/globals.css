@@ -5,6 +5,8 @@
   --background: #09090b;
   --foreground: #f4f4f5;
   color-scheme: dark;
+  --font-geist-sans: "Segoe UI", Arial, Helvetica, sans-serif;
+  --font-geist-mono: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
 }
 
 @theme inline {
@@ -20,4 +22,8 @@
     color: var(--foreground);
     font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   }
+  button, a, input { -webkit-tap-highlight-color: transparent; }
+  button:not(:disabled), a { cursor: pointer; }
+  :focus-visible { outline: 2px solid #34d399; outline-offset: 4px; }
+  ::selection { background: #065f46; color: #ecfdf5; }
 }

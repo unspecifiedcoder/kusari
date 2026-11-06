@@ -23,7 +23,7 @@ export function ConnectButton() {
               disabled={isPending}
               className="rounded-lg bg-white px-3 py-1.5 text-sm font-medium text-black hover:bg-zinc-200 disabled:opacity-50"
             >
-              {isPending ? "Connecting…" : c.name === "Injected" ? "Connect wallet" : c.name}
+              {isPending ? "Connecting…" : c.name === "Injected" ? "Owner wallet" : c.name}
             </button>
           ))}
         </div>

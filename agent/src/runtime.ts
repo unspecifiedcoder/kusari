@@ -10,20 +10,62 @@
 import { createServer, type ServerResponse } from "node:http";
 import { formatEther } from "viem";
 import { config, deployment, ANON_RPC, LEAK_RPC } from "./config.ts";
-import { readState, setReadRpc, readRpc } from "./state.ts";
+import { readState, setReadRpc, readRpc, type AgentState } from "./state.ts";
 import { decide, type Decision } from "./llm.ts";
 import { newsFeed } from "./news.ts";
 import { executeSwap, agentAccount, setWriteRpc } from "./swap.ts";
+import { createSnapshotCache } from "./snapshot-cache.mjs";
 
 let injected = false;
-let transport: "anon" | "leak" = config.readRpc === LEAK_RPC ? "leak" : "anon";
+let transport: "anon" | "leak" | "direct" = config.readRpc === ANON_RPC ? "anon" : config.readRpc === LEAK_RPC ? "leak" : "direct";
 let busy = false;
-let lastState: Record<string, unknown> | null = null;
 const clients = new Set<ServerResponse>();
 const scriptedOnly = process.env.AGENT_SCRIPTED === "1";
+const recentEvents: Record<string, unknown>[] = [];
+let eventSequence = 0;
+let bridgeMode: "anon" | "direct" | "unknown" = "unknown";
+
+async function readBridgeMode() {
+  if (readRpc !== ANON_RPC) return;
+  try {
+    const r = await fetch(new URL("/metrics", ANON_RPC), { signal: AbortSignal.timeout(2500) });
+    const m = await r.json() as { mode?: string };
+    bridgeMode = m.mode === "anon" ? "anon" : m.mode === "direct" ? "direct" : "unknown";
+  } catch { bridgeMode = "unknown"; }
+}
+
+const actualReadTransport = () => transport === "anon" ? bridgeMode : transport === "leak" ? "leak" : "direct";
+
+function summarizeState(s: AgentState) {
+  return {
+    blockNumber: s.blockNumber.toString(),
+    price: s.price,
+    vaultToken0: Number(formatEther(s.vaultToken0)),
+    vaultToken1: Number(formatEther(s.vaultToken1)),
+    maxPerSwap: Number(formatEther(s.policy.maxPerSwap)),
+    dailyCap: Number(formatEther(s.policy.dailyCap)),
+    spentToday: Number(formatEther(s.spentToday)),
+    remainingToday: Number(formatEther(s.remainingToday)),
+    allowedPool: s.policy.allowedPool,
+    maxImpactBps: s.policy.maxImpactBps,
+    authorized: s.authorized,
+    active: s.policy.active,
+    readMs: s.readMs,
+    transport: actualReadTransport(),
+  };
+}
+
+// GET /status reads the chain in the background; it never asks the LLM, signs, or submits a swap.
+// A timestamp and freshness state prevent a disconnected bridge being mistaken for live data.
+const snapshots = createSnapshotCache({ load: async () => {
+  const [state] = await Promise.all([readState(agentAccount.address), readBridgeMode()]);
+  return summarizeState(state);
+} });
 
 function emit(type: string, data: Record<string, unknown> = {}) {
-  const e = { type, t: Date.now(), ...data };
+  const e = { type, t: Date.now(), id: ++eventSequence, ...data };
+  recentEvents.unshift(e);
+  recentEvents.length = Math.min(recentEvents.length, 40);
   console.log(type, JSON.stringify(data));
   const line = `data: ${JSON.stringify(e)}\n\n`;
   for (const c of clients) c.write(line);
@@ -41,23 +83,13 @@ async function cycle() {
   busy = true;
   try {
     emit("reading", { via: readRpc, transport });
-    const s = await readState(agentAccount.address);
+    const [s] = await Promise.all([readState(agentAccount.address), readBridgeMode()]);
     const vault = Number(formatEther(s.vaultToken0));
     const maxPerSwap = Number(formatEther(s.policy.maxPerSwap));
     const remaining = Number(formatEther(s.remainingToday));
-    lastState = {
-      price: s.price,
-      vaultToken0: vault,
-      vaultToken1: Number(formatEther(s.vaultToken1)),
-      maxPerSwap,
-      dailyCap: Number(formatEther(s.policy.dailyCap)),
-      spentToday: Number(formatEther(s.spentToday)),
-      maxImpactBps: s.policy.maxImpactBps,
-      authorized: s.authorized,
-      active: s.policy.active,
-      readMs: s.readMs,
-    };
-    emit("state", lastState);
+    const state = summarizeState(s);
+    snapshots.record(state);
+    emit("state", state);
 
     const news = newsFeed(injected);
     let d: Decision & { source: string };
@@ -83,6 +115,7 @@ async function cycle() {
     emit("error", { message: (e as Error).message.split("\n")[0] });
   } finally {
     busy = false;
+    snapshots.invalidate(); // trade or revoke may have changed chain state since the pre-trade read
     emit("idle"); // the dashboard treats the agent as busy from "reading" until "idle"
   }
 }
@@ -108,9 +141,10 @@ createServer(async (req, res) => {
     res.end(JSON.stringify(body));
   };
   if (url.pathname === "/status") {
-    return json(200, { agent: agentAccount.address, vault: deployment.demoVault, readRpc, transport, injected, scriptedOnly, busy, lastState });
+    return json(200, { agent: agentAccount.address, vault: deployment.demoVault, readRpc, transport, readTransport: actualReadTransport(), bridgeMode, injected, scriptedOnly, busy, canControl: true, recentEvents, ...snapshots.get() });
   }
   if (req.method === "POST" && url.pathname === "/tick") {
+    if (busy) return json(409, { error: "a cycle is already running" });
     void cycle();
     return json(202, { started: true });
   }
@@ -120,10 +154,12 @@ createServer(async (req, res) => {
     const target = transport === "leak" ? LEAK_RPC : ANON_RPC;
     setReadRpc(target);
     setWriteRpc(target);
+    snapshots.invalidate();
     emit("transport", { transport, via: target });
     return json(200, { transport, via: target });
   }
   if (req.method === "POST" && url.pathname === "/inject") {
+    if (busy) return json(409, { error: "wait for the current cycle to finish" });
     injected = url.searchParams.get("on") === "1";
     emit("inject", { injected });
     return json(200, { injected });

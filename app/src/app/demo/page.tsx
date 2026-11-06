@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useConnection } from "wagmi";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import Link from "next/link";
 import { useEventStream, StatusDot } from "@/components/LiveFeed";
 import { useKillSwitch } from "@/lib/killswitch";
-import { AGENT_URL, ANON_BRIDGE, PROXY_URL } from "@/lib/endpoints";
+import { AGENT_URL, ANON_BRIDGE, PROXY_URL, allowDemoControls } from "@/lib/endpoints";
 import { HostedNotice } from "@/components/HostedNotice";
 
 const PROXY_EVENTS = `${PROXY_URL}/events`;
@@ -29,40 +29,56 @@ const short = (h?: unknown) => (typeof h === "string" ? `${h.slice(0, 10)}…${h
 // Live panels need the agent, bridge and proxy, which run on the demo machine. Decide after mount so the
 // server render (which has no window) and the first client render agree.
 export default function Demo() {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-  if (!mounted) return null;
+  const mounted = useSyncExternalStore(subscribe, () => true, () => false);
+  if (!mounted) return <p className="text-sm text-zinc-500">Connecting to the demonstration…</p>;
   return AGENT ? <LiveDemo /> : <HostedNotice />;
 }
+const subscribe = () => () => {};
 
 function LiveDemo() {
   const proxy = useEventStream(PROXY_EVENTS);
   const bridge = useEventStream(BRIDGE_EVENTS);
   const agent = useEventStream(`${AGENT}/events`, 40);
-  const [status, setStatus] = useState<{ agent?: string; injected?: boolean; transport?: string; lastState?: AgentState | null }>({});
+  const [status, setStatus] = useState<{ agent?: string; injected?: boolean; transport?: string; busy?: boolean; lastState?: AgentState | null; lastStateAt?: number; stateStatus?: string; stateError?: string }>({});
+  const [bridgeMode, setBridgeMode] = useState<string | null>(null);
+  const [controlError, setControlError] = useState<string | null>(null);
   const k = useKillSwitch();
 
   useEffect(() => {
-    fetch(`${AGENT}/status`)
-      .then((r) => r.json())
-      .then(setStatus)
-      .catch(() => {});
+    const controller = new AbortController();
+    const refresh = () => {
+      void fetch(`${AGENT}/status`, { cache: "no-store", signal: controller.signal }).then((r) => { if (!r.ok) throw new Error("Runner unavailable"); return r.json(); }).then(setStatus).catch(() => {});
+      void fetch(`${ANON_BRIDGE}/metrics`, { cache: "no-store", signal: controller.signal }).then((r) => { if (!r.ok) throw new Error("Bridge unavailable"); return r.json(); }).then((metrics) => setBridgeMode(metrics.mode ?? null)).catch(() => setBridgeMode(null));
+    };
+    void refresh();
+    const interval = setInterval(refresh, 5_000);
+    return () => { controller.abort(); clearInterval(interval); };
   }, []);
 
   const latest = useMemo(() => agent.entries.find((e) => e.type === "state") as unknown as AgentState | undefined, [agent.entries]);
-  const state = latest ?? status.lastState ?? undefined;
+  const state = status.lastState ?? latest ?? undefined;
   const injectEvent = agent.entries.find((e) => e.type === "inject");
   const injected = injectEvent ? Boolean(injectEvent.injected) : Boolean(status.injected);
   const transportEvent = agent.entries.find((e) => e.type === "transport");
   const anonOn = (transportEvent ? String(transportEvent.transport) : (status.transport ?? "anon")) === "anon";
   // Busy from "reading" until "idle". Live Sepolia cycles take ~20s (mixnet reads + tx confirmation).
   const lastCycleEvent = agent.entries.find((e) => e.type === "reading" || e.type === "idle");
-  const running = lastCycleEvent?.type === "reading";
+  const running = lastCycleEvent ? lastCycleEvent.type === "reading" : Boolean(status.busy);
 
-  const post = (path: string) => fetch(`${AGENT}${path}`, { method: "POST" }).catch(() => {});
+  const post = async (path: string) => {
+    if (!allowDemoControls) return;
+    setControlError(null);
+    try { const r = await fetch(`${AGENT}${path}`, { method: "POST" }); if (!r.ok) throw new Error(r.status === 409 ? "A cycle is already running. Wait for it to finish." : "The runner did not accept this action."); }
+    catch (error) { setControlError(error instanceof Error ? error.message : "Action failed"); }
+  };
 
   return (
     <div className="space-y-8">
+      <section className="space-y-3"><p className="text-xs font-semibold uppercase tracking-widest text-emerald-400">Live demonstration · Sepolia</p><h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Watch the boundary hold.</h1><p className="max-w-3xl text-sm leading-6 text-zinc-400">Follow a normal trade, an intentionally poisoned news feed, and owner revocation. The attack is staged: the agent prompt is deliberately gullible. Contract enforcement is real.</p></section>
+      {agent.status === "offline" && <div role="status" className="rounded-xl border border-amber-800/60 bg-amber-950/30 p-4 text-sm leading-6 text-amber-200">The live runner is disconnected. Panels retain the last received state; they are not current readings. <Link href="/#onchain-evidence" className="underline underline-offset-4">Verify the recorded run</Link> or <Link href="/" className="underline underline-offset-4">inspect the contracts</Link>.</div>}
+      {!allowDemoControls && <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 text-sm leading-6 text-zinc-400"><span className="font-medium text-zinc-200">Public observation mode.</span> The presenter operates the shared testnet agent. Its live state and event streams appear below; trading and transport controls are restricted to the presenter’s local machine.</div>}
+      {status.stateStatus === "stale" && <p role="status" className="rounded-xl border border-amber-800/60 p-4 text-sm text-amber-200">The runner’s last successful chain snapshot is stale. {status.lastStateAt ? `Received ${new Date(status.lastStateAt).toLocaleTimeString()}.` : ""} Current chain values remain available on the overview.</p>}
+      {bridgeMode === "direct" && <p role="status" className="rounded-xl border border-amber-800/60 p-4 text-sm font-medium text-amber-200">The bridge is in direct fallback mode. Its current traffic is not anonymized.</p>}
       <Controls
         injected={injected}
         running={running}
@@ -73,6 +89,7 @@ function LiveDemo() {
         onTransport={() => post(`/transport?mode=${anonOn ? "leak" : "anon"}`)}
         agentAddress={status.agent}
       />
+      {controlError && <p role="alert" className="rounded-lg border border-red-900 bg-red-950/40 p-3 text-sm text-red-300">{controlError}</p>}
 
       <section className="grid gap-4 sm:grid-cols-3">
         <Card title="Agent">
@@ -93,7 +110,7 @@ function LiveDemo() {
           <div className="mt-2 h-2 rounded bg-zinc-800">
             <div
               className="h-2 rounded bg-emerald-500 transition-all"
-              style={{ width: state ? `${Math.min(100, (state.spentToday / state.dailyCap) * 100)}%` : "0%" }}
+              style={{ width: state && state.dailyCap > 0 ? `${Math.min(100, (state.spentToday / state.dailyCap) * 100)}%` : "0%" }}
             />
           </div>
         </Card>
@@ -121,12 +138,12 @@ function LiveDemo() {
             }))}
           />
         </Card>
-        <Card title="Anon-RPC ON: what leaves this machine (Nox mixnet only)" right={<StatusDot status={bridge.status} />}>
+        <Card title={bridgeMode === "anon" ? "Anon-RPC bridge: Nox mixnet" : bridgeMode === "direct" ? "Bridge: direct fallback (not anonymous)" : "Bridge traffic · verifying route"} right={<StatusDot status={bridge.status} />}>
           <Feed
             empty="No traffic yet. Press “Run agent once”."
             rows={bridge.entries.map((e) => ({
               t: time(e.t),
-              main: `→ mixnet  ${String(e.method)}`,
+              main: `→ ${String(e.transport ?? "route unknown")}  ${String(e.method)}`,
               sub: `${String(e.ms)} ms · ${String(e.transport)}`,
               tone: e.ok ? "safe" : "leak",
             }))}
@@ -147,13 +164,12 @@ function Controls(props: {
   onTransport: () => void;
   agentAddress?: string;
 }) {
-  const { isConnected } = useConnection();
   const k = useKillSwitch();
   const frozen = k.authorized === false;
 
   return (
     <section className="flex flex-wrap items-center gap-3 rounded-xl border border-zinc-800 p-4">
-      <button
+      {allowDemoControls && <><button
         onClick={props.onRun}
         disabled={!props.online || props.running}
         className="rounded-lg bg-white px-4 py-2 text-sm font-medium text-black disabled:opacity-40"
@@ -180,14 +196,15 @@ function Controls(props: {
         {props.anonOn ? "Anon-RPC: ON" : "Anon-RPC: OFF (leaking)"}
       </button>
       <span className="text-xs text-zinc-500">staged attack: the agent is deliberately gullible</span>
+      </>}
       <div className="ml-auto flex items-center gap-2">
         {k.error && <span className="text-xs text-red-400">{k.error.message.split("\n")[0]}</span>}
         {k.hash && <span className="font-mono text-xs text-zinc-400">{k.confirmed ? "✓" : "…"} {short(k.hash)}</span>}
-        <a href="/freeze" className="text-xs text-zinc-500 underline">phone view</a>
+        <Link href="/freeze" className="text-xs text-zinc-500 underline">owner view</Link>
         <button
           onClick={frozen ? k.unfreeze : k.freeze}
-          disabled={!isConnected || k.isPending || !k.agent}
-          title={isConnected ? `Owner ${frozen ? "re-grants" : "revokes"} the agent (${k.via})` : "Connect the owner wallet first"}
+          disabled={!k.canManage || k.isPending || k.authorized === undefined}
+          title={k.canManage ? `Owner ${frozen ? "re-grants" : "revokes"} the agent (${k.via})` : "Only the verified ENS owner on Sepolia can change authority"}
           className={`rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-40 ${frozen ? "border border-zinc-600" : "bg-red-500 text-black"}`}
         >
           {k.isPending ? "Confirming…" : frozen ? "Unfreeze agent" : "Revoke agent (owner)"}
@@ -219,7 +236,7 @@ function Activity({ entries }: { entries: Record<string, unknown>[] }) {
             >
               <span>
                 <span className="text-zinc-500">{time(e.t)}</span>{" "}
-                {e.status === "success" ? `✅ swapped ${String(e.amountIn)} kUSD` : `🛡️ ${String(e.amountIn)} kUSD swap reverted on-chain`}
+                {e.status === "success" ? `✅ swapped ${String(e.amountIn)} kUSD` : e.status === "blocked" && typeof e.hash === "string" ? `🛡️ ${String(e.amountIn)} kUSD swap reverted on-chain` : e.status === "blocked" ? `🛡️ ${String(e.amountIn)} kUSD swap blocked in simulation` : `Swap could not be submitted`}
                 {typeof e.hash === "string" && (
                   <a
                     href={`https://sepolia.etherscan.io/tx/${e.hash}`}
