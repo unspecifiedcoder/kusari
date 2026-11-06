@@ -68,6 +68,8 @@ Limits are an **ABI-encoded `Policy` in the `kusari.policy` data record**, read 
 
 **Uniswap v4 checks the actual execution.** [`AgentVault`](contracts/src/AgentVault.sol) accepts swaps only from its immutable agent, requires the configured hook and attaches the signed intent. [`PolicyHook.beforeSwap`](contracts/src/PolicyHook.sol) verifies identity, pool, direction, nonce, expiry, authorization and input caps. `afterSwap` checks the **actual BalanceDelta output** against the signed minimum and the pool's **actual before/after price movement**. Failure rolls back settlement, nonce use and spending accounting. The EIP-712 domain is `Kusari / 1 / 11155111 / PolicyHook`; its verifying contract is the hook, not the vault.
 
+Direct integration pointers at the verified source revision: [vault swap entry, line 34](https://github.com/unspecifiedcoder/kusari/blob/67fd59f5fab87aebccd837f0925508b4eedaf27b/contracts/src/AgentVault.sol#L34), [PoolManager unlock callback, line 47](https://github.com/unspecifiedcoder/kusari/blob/67fd59f5fab87aebccd837f0925508b4eedaf27b/contracts/src/AgentVault.sol#L47), [before-swap checks, line 71](https://github.com/unspecifiedcoder/kusari/blob/67fd59f5fab87aebccd837f0925508b4eedaf27b/contracts/src/PolicyHook.sol#L71), [after-swap output/impact checks, line 93](https://github.com/unspecifiedcoder/kusari/blob/67fd59f5fab87aebccd837f0925508b4eedaf27b/contracts/src/PolicyHook.sol#L93), and [live ENS authorization/policy reads, line 147](https://github.com/unspecifiedcoder/kusari/blob/67fd59f5fab87aebccd837f0925508b4eedaf27b/contracts/src/PolicyHook.sol#L147).
+
 **Anon-RPC/Nox carries agent traffic.** The persistent [`reader` bridge](reader/src/bridge.mjs) routes agent reads, simulations, submissions and receipt queries through Nox by default. The shared trade API requires the anonymous route; personal workspaces use a dedicated Nox client. Counters show observed requests/submissions, including retries, **not cryptographic anonymity proof**. RPC payloads, transactions, addresses and ENS state remain public. Wallet-provider RPC, web/Gemini requests and deployment/bootstrap traffic are separate boundaries.
 
 ## Claims you can check
@@ -221,12 +223,16 @@ node --test scripts/*.test.mjs app/src/lib/*.test.mjs agent/src/*.test.mjs agent
 
 These cover admission/authentication, replay, fixed owner checks, proxy/transport boundaries, key handling and signing helpers. Product/design context: [PRODUCT.md](PRODUCT.md), [DESIGN.md](DESIGN.md), [UI brief](docs/UI_BRIEF.md).
 
-## Security, availability and CROPS
+## CROPS
 
-- **Censorship resistance:** domain, Fly host, relay, model service and ENS parent administrator are dependencies. Hosting can stop shared execution. The owner can still call deployed withdrawal/revocation functions; a personal agent holding its key can use the direct client independently of the relay.
-- **Open source:** MIT-licensed source, tests, dependency pins, manifests and receipt reports are in this branch. [Uniswap feedback](FEEDBACK.md) documents the builder experience. Protocol components include [Uniswap v4](https://github.com/Uniswap/v4-core), [ENSv2](https://github.com/ensdomains/contracts-v2), [Anon-RPC](https://github.com/ethereum/anon-rpc) and [Nox](https://github.com/hisoka-io/nox).
-- **Privacy:** the service sees caller/run metadata; Gemini receives market/news context. Routing counters do not establish anonymity. Public calldata/state, wallet RPC and labelled independent UI public-RPC fallback are not hidden. Deployment/bootstrap and CLI owner/setup verification can use public RPC.
-- **Security:** owner/deployer keys are excluded from Fly; the shared agent key is hosted there. Personal beta keys are encrypted locally, but compromised browser code or an unlocked browser can use them. Parent authority and unaudited contracts remain trust assumptions.
+- **C — Censorship resistance:** domain, Fly, relay, Gemini and the ENS parent are dependencies; losing hosting stops shared execution. The owner can still call deployed withdrawal/revocation functions independently, and a personal agent with its key can use the direct client.
+- **O — Open source:** [MIT](LICENSE); the repo contains source, dependency pins, manifests, tests and build/run instructions. UI/contracts can be built from the checkout; live hosted runs additionally need model credentials, an authorized agent and a working Nox bridge.
+- **P — Privacy:** hosting/gateway services can observe IP, wallet and run metadata; Gemini receives news/chain context, and the final RPC provider receives RPC payloads. Public transactions and wallet RPC are not hidden; the client source includes no third-party analytics integration, and routing counters are not anonymity proof.
+- **S — Security:** owner/deployer keys stay local; the shared agent key is held by the Fly runner, explicitly custodial for that restricted key. Personal beta keys are encrypted on-device; browser compromise, parent ENS authority and unaudited contracts remain trust assumptions.
+
+Protocol components include [Uniswap v4](https://github.com/Uniswap/v4-core), [ENSv2](https://github.com/ensdomains/contracts-v2), [Anon-RPC](https://github.com/ethereum/anon-rpc) and [Nox](https://github.com/hisoka-io/nox). [Uniswap feedback](FEEDBACK.md) documents the builder experience. Deployment/bootstrap and independent CLI verification can use public RPC; the UI labels its independent public-reader fallback.
+
+## Security and availability limits
 
 An allowed trade can lose value. In the **original shared vault**, a compromised agent can choose a weak signed output minimum and repeatedly trade within its remaining ENS daily allowance. Price impact compares this pool immediately before/after the swap, not an independent fair-price oracle. UTC reset permits spending across adjacent daily windows. Only the **new session vault** adds the independent owner floor and finite session budget; that chosen floor is also not a market oracle.
 
@@ -235,6 +241,8 @@ Browser, shared-API and fixed owner-policy runs share operating capacity: **20 a
 ## AI assistance and team contributions
 
 Codex assisted implementation, review, UI design, tests, deployment/rehearsal tooling and documentation in this branch, including changes under `app/src/`, `agent/src/`, ENS/onboarding/session contracts, `contracts/test/` and `scripts/`. The product/design documents record requirements used during that work. Third-party libraries and fixtures retain their attribution/licenses.
+
+Representative assisted files include [the sandbox UI](app/src/components/SandboxControls.tsx), [ENS owner controls](app/src/components/OwnerPolicyControls.tsx), [runner](agent/src/runtime.ts), [ENS policy source](contracts/src/ens/ENSPolicySource.sol), [session vault](contracts/src/SessionAgentVault.sol) and [receipt verification](scripts/verify-live-browser-demo.mjs). Codex also assisted caption/narration text and editing the real browser captures; the published live video has no narration audio. Product requirements and planning artifacts are preserved in [PRODUCT.md](PRODUCT.md), [DESIGN.md](DESIGN.md), [UI_BRIEF.md](docs/UI_BRIEF.md) and the [workspace](.impeccable/surfaces/demo.md), [personal onboarding](.impeccable/surfaces/agents.md) and [session](.impeccable/surfaces/sessions.md) briefs.
 
 The team supplied product requirements, chose the workspace UX, configured service access and performed the recorded MetaMask owner confirmations. Automated/CLI evidence is distinguished from human browser actions. Individual contributions and required AI/specification disclosures must also be listed accurately in the ETHGlobal submission.
 
