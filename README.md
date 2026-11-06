@@ -33,6 +33,39 @@ This is a **deterministic policy check, not a Gemini decision**. Its exact-messa
 
 The controls are deployed and visible on the canonical site. **The live canonical-HTTPS/CLI rehearsal passed:** [2 kUSD succeeded at cap 5](https://sepolia.etherscan.io/tx/0xc5da019bafdb85e3d889dbf54386c807b85e12b181b1ab8d251505c343c81770), the owner [changed the ENS cap to 1](https://sepolia.etherscan.io/tx/0xf290c965e038403aaad87394739fdd2d02d0638f0f947f75ac26ebcae93ea864), the [same 2 kUSD request reverted](https://sepolia.etherscan.io/tx/0x76125d7da1d86d7f0b15ddfcad30d78eeae442dc234a761488b898fda1b476f7), and the owner [restored cap 5](https://sepolia.etherscan.io/tx/0xc51298b4522492469183d9104548be6255d4634d7c09bc4fdf17dd6cdeafedd3). [The evidence report](docs/evidence/owner-policy-check.json) independently checks receipt status and exact calldata, unchanged other policy fields and final authorization. Owner signing was local; agent execution used the hosted Nox route. This verifies the deployed service/contract sequence, separately from a complete MetaMask walkthrough of these new controls.
 
+## Prize tracks
+
+Kusari is submitted to three ETHGlobal Mumbai 2026 sponsor tracks. For each, this table lists what we built and where its qualification requirements can be verified.
+
+| Track | What we built for it | Requirements and where to verify them |
+| --- | --- | --- |
+| **Uniswap Foundation: Build with Uniswap** | A Uniswap v4 hook, `PolicyHook`, and a vault that calls `PoolManager.unlock` directly. The hook verifies a signed intent and enforces the pool, direction and spending caps, then checks the swap's **actual output and price impact** in `afterSwap`; a failed check reverts the whole swap. | Public repository with open-source code ([MIT](LICENSE)) · [`FEEDBACK.md`](FEEDBACK.md) · exact contracts and lines in the [code map](#uniswap-v4-code-map) below · [Solidity tests](contracts/test) |
+| **ENS: Best Use of ENSv2** | The agent's authority and limits live in ENSv2. Its authorization is a revocable Enhanced Access Control role on its subname, and its policy is a `kusari.policy` data record in a `PermissionedResolver`, read with ENSIP-10 `resolve`. Each agent is its own subname with its own role, policy record and spending accounting: `alpha.kusari-pramod.eth`, plus two more in the [isolation proof](#two-owner-isolation-proof). | ENSv2 is central: the hook reads the role and record on every swap ([`ENSPolicySource`](#uniswap-v4-code-map)) · functional, not hard-coded: the owner edits the cap and revokes the role on Sepolia and the next trade changes ([receipts](#recorded-shared-demo-receipts)) · [live demo](https://kusari.outcomeseal.com/demo) · open source |
+| **Ethereum Foundation: Best Use of Anon-RPC** | The agent's reads, simulations, signed-transaction submissions and receipt queries go through Anon-RPC to the Nox worker by default. The shared trade API requires that route. | Default route: [`reader/src/bridge.mjs`](reader/src/bridge.mjs) and [`agent/src/runtime.ts`](agent/src/runtime.ts) · observed: the shared API run reports the route `Anon-RPC / Nox` ([report](docs/evidence/trade-api.json)), and each hosted execution in the [two-owner proof](#two-owner-isolation-proof) observed 16 Nox RPC requests and one submission · excluded traffic (owner wallet RPC, browser fallback, deployment/bootstrap) is listed in [CROPS](#crops). Routing counters are observations, **not an anonymity proof**. |
+
+### Uniswap v4 code map
+
+Links are pinned to commit [`67fd59f`](https://github.com/unspecifiedcoder/kusari/tree/67fd59f5fab87aebccd837f0925508b4eedaf27b) so the line numbers stay stable. `PolicyHook.sol`, `AgentVault.sol` and `ENSPolicySource.sol` have not changed since before the shared deployment commit (`e260b45`).
+
+| What happens | Code |
+| --- | --- |
+| The hook declares `beforeSwap` and `afterSwap` | [`PolicyHook.sol` L52-L69](https://github.com/unspecifiedcoder/kusari/blob/67fd59f5fab87aebccd837f0925508b4eedaf27b/contracts/src/PolicyHook.sol#L52-L69) |
+| `beforeSwap` decodes the signed intent, verifies it, applies the policy and records the pre-swap price | [`PolicyHook.sol` L71-L88](https://github.com/unspecifiedcoder/kusari/blob/67fd59f5fab87aebccd837f0925508b4eedaf27b/contracts/src/PolicyHook.sol#L71-L88) |
+| The executed swap must equal the signed intent (vault, pool, direction, exact input) | [`PolicyHook.sol` L121-L135](https://github.com/unspecifiedcoder/kusari/blob/67fd59f5fab87aebccd837f0925508b4eedaf27b/contracts/src/PolicyHook.sol#L121-L135) |
+| EIP-712 signature, nonce and deadline | [`PolicyHook.sol` L138-L144](https://github.com/unspecifiedcoder/kusari/blob/67fd59f5fab87aebccd837f0925508b4eedaf27b/contracts/src/PolicyHook.sol#L138-L144) |
+| Authorization, allowed pool, per-swap and daily caps, all read from ENS | [`PolicyHook.sol` L146-L160](https://github.com/unspecifiedcoder/kusari/blob/67fd59f5fab87aebccd837f0925508b4eedaf27b/contracts/src/PolicyHook.sol#L146-L160) |
+| `afterSwap` checks the actual output against the signed minimum, and the actual price impact; a revert rolls back the whole swap | [`PolicyHook.sol` L93-L112](https://github.com/unspecifiedcoder/kusari/blob/67fd59f5fab87aebccd837f0925508b4eedaf27b/contracts/src/PolicyHook.sol#L93-L112) |
+| The vault accepts swaps only from its agent and only into pools using the hook | [`AgentVault.sol` L34-L44](https://github.com/unspecifiedcoder/kusari/blob/67fd59f5fab87aebccd837f0925508b4eedaf27b/contracts/src/AgentVault.sol#L34-L44) |
+| The vault calls `PoolManager.unlock` directly, swaps with the signed `hookData`, then settles | [`AgentVault.sol` L47-L65](https://github.com/unspecifiedcoder/kusari/blob/67fd59f5fab87aebccd837f0925508b4eedaf27b/contracts/src/AgentVault.sol#L47-L65) and [L74-L87](https://github.com/unspecifiedcoder/kusari/blob/67fd59f5fab87aebccd837f0925508b4eedaf27b/contracts/src/AgentVault.sol#L74-L87) |
+| Only the owner can withdraw | [`AgentVault.sol` L67-L71](https://github.com/unspecifiedcoder/kusari/blob/67fd59f5fab87aebccd837f0925508b4eedaf27b/contracts/src/AgentVault.sol#L67-L71) |
+| ENS: only a label's owner can bind an agent to it | [`ENSPolicySource.sol` L49-L55](https://github.com/unspecifiedcoder/kusari/blob/67fd59f5fab87aebccd837f0925508b4eedaf27b/contracts/src/ens/ENSPolicySource.sol#L49-L55) |
+| ENS: an agent is authorized only while it holds exactly the marker role | [`ENSPolicySource.sol` L61-L69](https://github.com/unspecifiedcoder/kusari/blob/67fd59f5fab87aebccd837f0925508b4eedaf27b/contracts/src/ens/ENSPolicySource.sol#L61-L69) |
+| ENS: the policy record is read with ENSIP-10 `resolve` | [`ENSPolicySource.sol` L72-L86](https://github.com/unspecifiedcoder/kusari/blob/67fd59f5fab87aebccd837f0925508b4eedaf27b/contracts/src/ens/ENSPolicySource.sol#L72-L86) |
+| Optional session vault: owner-approved budget, expiry and output floor | [`SessionAgentVault.sol` L84-L91](https://github.com/unspecifiedcoder/kusari/blob/67fd59f5fab87aebccd837f0925508b4eedaf27b/contracts/src/SessionAgentVault.sol#L84-L91) and [L100-L121](https://github.com/unspecifiedcoder/kusari/blob/67fd59f5fab87aebccd837f0925508b4eedaf27b/contracts/src/SessionAgentVault.sol#L100-L121) |
+| Atomic personal onboarding: ENS label, resolver and vault in one transaction (beta) | [`OwnedAgentCoordinator.sol` L89-L109](https://github.com/unspecifiedcoder/kusari/blob/67fd59f5fab87aebccd837f0925508b4eedaf27b/contracts/src/ens/OwnedAgentCoordinator.sol#L89-L109) |
+
+Tests for these paths: [caps](contracts/test/PolicyHookCaps.t.sol), [signatures](contracts/test/PolicyHookSignature.t.sol), [output and direction guards](contracts/test/PolicyHookGuards.t.sol), [impact and rollback](contracts/test/PolicyHookImpact.t.sol), [vault](contracts/test/AgentVault.t.sol), [real ENSv2 fork](contracts/test/ens/ENSPolicySource.t.sol) and [session vault](contracts/test/SessionAgentVault.t.sol).
+
 ## How authority is enforced
 
 ```text
