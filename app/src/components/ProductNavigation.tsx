@@ -31,6 +31,6 @@ export function ProductNavigation() {
 
 export function ProductHeader() {
   const pathname = usePathname();
-  const title = pathname === "/agents" ? "Your agents · Beta" : pathname === "/demo" ? "Shared demo" : pathname === "/freeze" ? "Shared demo owner controls" : pathname === "/setup" ? "Advanced vault tools" : "Overview & proof";
+  const title = pathname === "/sessions" ? "Bounded sessions · Beta" : pathname === "/agents" ? "Your agents · Beta" : pathname === "/demo" ? "Shared demo" : pathname === "/freeze" ? "Shared demo owner controls" : pathname === "/setup" ? "Advanced vault tools" : "Overview & proof";
   return <header className="app-topbar"><div className="app-breadcrumb"><span>Kusari</span><span aria-hidden="true">/</span><strong>{title}</strong></div><ConnectButton /></header>;
 }

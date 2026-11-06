@@ -1,6 +1,6 @@
 # Judge release checkpoints
 
-Updated 7 November 2026 after the shared trade-API rehearsal and the session-contract test pass. Team submission target remains before 7 November 2026, 07:00 IST. The official public event page lists 09:00 IST; use the earlier team target and confirm the dashboard.
+Updated 7 November 2026 after the shared trade-API rehearsal and the session-contract test pass. The latest team plan targets final submission by 08:30 IST, ahead of the dashboard's 09:00 IST cutoff. API work has a 03:00 cutoff and optional personal-agent work a 04:00 cutoff; media and the verified shared demo take priority.
 
 ## Verified release
 
@@ -8,7 +8,7 @@ Updated 7 November 2026 after the shared trade-API rehearsal and the session-con
 - The promoted Vercel release is identified by `b5r0adn51`; it includes the shared trade API and the separately labelled personal Beta UI. Use the canonical domain for signing.
 - One Fly shared-CPU, 1 GB Machine serves the authenticated gateway, Gemini agent and Anon-RPC/Nox bridge. Vercel holds only the server-side gateway credential; owner/deployer keys are excluded from Fly.
 - Public visitors connect a Sepolia wallet and sign a fixed, single-use message for the funded shared sandbox. They need no tokens, approvals or gas. Public model runs require real Gemini.
-- Before adding the separate session-control view, 63 Node regression tests, ESLint, TypeScript and the production build passed. The new session-view helpers subsequently passed three targeted tests, TypeScript and scoped ESLint; this is not a claim that a combined 66-test regression run completed.
+- The combined Node regression suite passed 66 tests after adding the separate session-control helpers. Full ESLint, TypeScript and the production build passed for the previous promoted release; the new session view additionally passed TypeScript and scoped ESLint, with its next production build tracked separately.
 - Current contract validation passed 59 local tests and 28 Sepolia fork tests: 87 total, including the 15 new session-vault tests. Passing local/fork tests does not establish a live deployment or browser transaction.
 - User-signed MetaMask normal and poisoned-news scenarios passed in the live UI. User-signed browser owner revocation and restoration passed on Sepolia. Public signed API requests confirmed NotAuthorized while frozen and successful execution after restoration. Exact receipts and the distinction between browser and API actions are in the README.
 - At the completed shared trade-API checkpoint, the original shared agent was authorized and active, the runner was idle, and the chain snapshot was fresh with readTransport=anon and bridgeMode=anon. This is a recorded observation, not a promise about its present state.

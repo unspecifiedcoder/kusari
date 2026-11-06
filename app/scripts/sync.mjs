@@ -28,6 +28,6 @@ await writeFile(
     `export const sepoliaConfig = ${JSON.stringify(chains["11155111"], null, 2)} as const;\n` +
     `export const ensDeployment = ${JSON.stringify(ensDeployment, null, 2)} as const;\n` +
     `export const ownAgentDeployment = ${JSON.stringify(ownAgentDeployment, null, 2)} as const;\n` +
-    `export const sessionDeployment = ${JSON.stringify(sessionDeployment, null, 2)} as const;\n`,
+    `export const sessionDeployment = ${sessionDeployment ? `${JSON.stringify(sessionDeployment, null, 2)} as const` : "null"};\n`,
 );
 console.log(`synced ${file}${deployment ? "" : " (missing: UI will show 'not deployed')"}`);
