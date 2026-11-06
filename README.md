@@ -30,7 +30,7 @@ The rehearsal policy is **5 kUSD per swap, 100 kUSD per UTC day, one pool, and 2
 
 ## Demo (4 minutes)
 
-On **6 November 2026**, the real Gemini agent and owner CLI completed **6/6 checks** against the current deployment, with chain reads and transaction submission through Anon-RPC/Nox. This is a CLI-verified rehearsal; it does not claim that the browser owner-wallet signing flow was exercised.
+On **6 November 2026**, the real Gemini agent and owner CLI completed **6/6 checks** against the current deployment. Agent reads, simulations and transaction submissions used Anon-RPC/Nox; owner CLI revocation/regrant used a public Sepolia RPC override. This is a CLI-verified rehearsal; it does not claim that the browser owner-wallet signing flow was exercised.
 
 | Beat | Result and Sepolia evidence |
 | --- | --- |
