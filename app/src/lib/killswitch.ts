@@ -1,8 +1,10 @@
 "use client";
 
 import { keccak256, toHex, parseAbi, type Address } from "viem";
-import { useChainId, useConnection, useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import { useRef, useState } from "react";
+import { useConnection, useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { deployment, ensDeployment } from "@/generated/deployment";
+import { assertSepoliaWallet, WALLET_CHAIN_ID } from "./wallet-safety";
 
 const ROLE_RENEW = 1n << 16n;
 const registryAbi = parseAbi([
@@ -15,8 +17,10 @@ const mirrorOwnerAbi = parseAbi(["function ownerOf(address agent) view returns (
 
 /** One kill switch for whichever policy source the live deployment uses (ENS on Sepolia, PolicyMirror elsewhere). */
 export function useKillSwitch() {
-  const { address, isConnected } = useConnection();
-  const chainId = useChainId();
+  const { address, isConnected, chainId, connector } = useConnection();
+  const [preflightError, setPreflightError] = useState<Error | null>(null);
+  const [checkingNetwork, setCheckingNetwork] = useState(false);
+  const preflightBusy = useRef(false);
   const ens = ensDeployment as { userRegistry: Address; agent: Address; name: string; policySource: Address } | null;
   const kind = (deployment as { policyKind?: string } | null)?.policyKind;
   const useEns = Boolean(ens && kind === "external" && deployment && ens.policySource.toLowerCase() === deployment.policySource.toLowerCase());
@@ -27,7 +31,7 @@ export function useKillSwitch() {
   const owner = (useEns ? ensOwner.data : mirrorOwner.data) as Address | undefined;
   const ownerError = useEns ? ensOwner.error : mirrorOwner.error;
   const isOwner = Boolean(isConnected && owner && address?.toLowerCase() === owner.toLowerCase());
-  const correctChain = chainId === deployment?.chainId;
+  const correctChain = chainId === WALLET_CHAIN_ID && deployment.chainId === WALLET_CHAIN_ID;
   const canManage = isOwner && correctChain;
 
   const status = useReadContract({
@@ -38,21 +42,28 @@ export function useKillSwitch() {
     args: agent ? [agent] : undefined,
     query: { enabled: Boolean(agent && deployment), refetchInterval: 4000 },
   });
-  const { writeContract, data: hash, isPending, error, reset } = useWriteContract();
-  const receipt = useWaitForTransactionReceipt({ hash });
+  const { writeContractAsync, data: hash, isPending, error, reset } = useWriteContract();
+  const receipt = useWaitForTransactionReceipt({ hash, chainId: WALLET_CHAIN_ID });
 
-  const freeze = () => {
-    if (!agent || !deployment || !canManage || status.data === undefined) return;
+  const changeAuthorization = async (grant: boolean) => {
+    if (!agent || !deployment || !canManage || status.data === undefined || preflightBusy.current || isPending || receipt.isLoading) return;
+    preflightBusy.current = true;
+    setCheckingNetwork(true);
+    setPreflightError(null);
     reset();
-    if (useEns) writeContract({ address: ens!.userRegistry, abi: registryAbi, functionName: "revokeRoles", args: [labelId, ROLE_RENEW, agent] });
-    else writeContract({ address: deployment.policySource, abi: sourceAbi, functionName: "freeze", args: [agent] });
+    try {
+      await assertSepoliaWallet(connector, address);
+      if (useEns) await writeContractAsync({ chainId: WALLET_CHAIN_ID, account: address, connector, address: ens!.userRegistry, abi: registryAbi, functionName: grant ? "grantRoles" : "revokeRoles", args: [labelId, ROLE_RENEW, agent] });
+      else await writeContractAsync({ chainId: WALLET_CHAIN_ID, account: address, connector, address: deployment.policySource, abi: sourceAbi, functionName: grant ? "unfreeze" : "freeze", args: [agent] });
+    } catch (cause) {
+      setPreflightError(cause instanceof Error ? cause : new Error("Wallet request failed. No authorization change was confirmed."));
+    } finally {
+      preflightBusy.current = false;
+      setCheckingNetwork(false);
+    }
   };
-  const unfreeze = () => {
-    if (!agent || !deployment || !canManage || status.data === undefined) return;
-    reset();
-    if (useEns) writeContract({ address: ens!.userRegistry, abi: registryAbi, functionName: "grantRoles", args: [labelId, ROLE_RENEW, agent] });
-    else writeContract({ address: deployment.policySource, abi: sourceAbi, functionName: "unfreeze", args: [agent] });
-  };
+  const freeze = () => void changeAuthorization(false);
+  const unfreeze = () => void changeAuthorization(true);
 
   return {
     agent,
@@ -67,11 +78,11 @@ export function useKillSwitch() {
     statusError: status.error,
     freeze,
     unfreeze,
-    isPending: isPending || receipt.isLoading,
+    isPending: checkingNetwork || isPending || receipt.isLoading,
     hash,
     confirmed: receipt.data?.status === "success",
     transactionFailed: receipt.data?.status === "reverted",
-    error,
+    error: preflightError ?? error,
     refetch: status.refetch,
   };
 }

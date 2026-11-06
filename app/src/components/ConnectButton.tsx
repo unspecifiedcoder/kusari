@@ -1,7 +1,7 @@
 "use client";
 
 import { useId, useRef, useState } from "react";
-import { useConnection, useChainId, useConnect, useDisconnect, useSwitchChain } from "wagmi";
+import { useConnection, useConnect, useDisconnect, useSwitchChain } from "wagmi";
 import { sepolia } from "wagmi/chains";
 
 const short = (address: string) => `${address.slice(0, 6)}…${address.slice(-4)}`;
@@ -12,8 +12,7 @@ const explainError = (error: Error | null, action = "Connection") => {
 };
 
 export function ConnectButton() {
-  const { address, isConnected } = useConnection();
-  const chainId = useChainId();
+  const { address, isConnected, chainId } = useConnection();
   const { connectors, connect, isPending, error, reset } = useConnect();
   const { disconnect } = useDisconnect();
   const { switchChain, isPending: isSwitching, error: switchError } = useSwitchChain();
