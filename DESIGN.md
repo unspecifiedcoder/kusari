@@ -163,7 +163,7 @@ Instrument Sans is self-hosted from the local variable Latin font, with its OFL 
 
 ## Layout
 
-The application shell has a persistent navigation rail at desktop widths from 1100px. Its rail is 216px wide and stays within the viewport height. The content region has a maximum width of 1424px, with increasing horizontal padding as the viewport grows. Below the desktop boundary, navigation becomes a three-destination row above the content.
+The application shell has a persistent navigation rail at desktop widths from 1100px. Its rail is 216px wide and stays within the viewport height. The content region has a maximum width of 1424px, with increasing horizontal padding as the viewport grows. Below the desktop boundary, four destinations form a two-column navigation grid above the content.
 
 The workspace has a main task area and a compact policy area. At the desktop breakpoint the policy column is 300px, increasing to 330px from 1500px. The main composer remains flexible and may shrink safely. Its request choices become two columns only when the composer's own container is at least 480px wide; this is not inferred from the viewport alone.
 
@@ -191,7 +191,17 @@ Request choices remain native labelled radios. The selected option uses a tinted
 
 ### Navigation
 
-The three destinations are Agent workspace, Overview & proof, and Owner controls. The current destination uses `aria-current` and a restrained tinted surface. Desktop navigation combines text and consistent SVG icons; the narrow layout keeps the text destinations visible. Source and network context are secondary information.
+The four destinations are Try the demo, Your agents · Beta, Overview & proof, and Owner controls, in that order. The landing page's primary action is Try the demo; personal onboarding is secondary. The header identifies the owner-controls route as shared-demo owner controls; personal controls belong to the selected owned workspace. The current destination uses `aria-current` and a restrained tinted surface. Desktop navigation combines text and consistent SVG icons; the narrow layout keeps the text destinations visible. Source and network context are secondary information.
+
+### Owned-agent Onboarding
+
+The `/agents` route extends the existing Operate workspace and is visibly Beta. Its main task is one Create my agent action with an optional display name and optional safety-limit disclosure. Before the action is enabled, a funding region shows the owner's Sepolia balance, actual coordinator gas estimate plus margin and the separate agent-gas forward. Insufficient funding points to the ETHGlobal faucet and funded demo before any signature is requested.
+
+Creation explains two distinct wallet requests: one gas-free, local key-protection message and one Sepolia coordinator transaction. The latter creates the ENS policy and vault, adds 25 test kUSD and forwards 0.0001 Sepolia ETH for agent gas. Default limits are stated plainly. Pending, cancelled, failed and confirmed states use explicit copy; a saved transaction is not a completion flag. The earlier six-step checklist is retained only for workspaces created with that legacy flow.
+
+The completed owned workspace keeps the run composer above funding and recovery details. At widths from 1280px, a 320px policy column sits beside the flexible task region. At narrower widths the same information follows the task in reading order. Inputs have explicit native labels, a minimum 46px height and visible focus. Separate funding controls distinguish test tokens from Sepolia gas.
+
+The restricted key can be locked and unlocked with a local wallet signature; older records retain their passphrase unlock. Optional recovery exports an encrypted JSON backup. No raw private-key input or required backup task is presented. The custody disclosure distinguishes the browser signer, Fly.io decisions/relay and the parent ENS trust dependency. It states that the page must remain open, stable same-wallet signatures are needed and losing browser storage without an export loses the random agent key. Owner freeze/restore affects the selected agent and uses the existing outlined owner-action treatment. Results retain the five-field summary, with a simulation prediction separated from the actual receipt and routing counters described without anonymity claims.
 
 ### Request Composer
 

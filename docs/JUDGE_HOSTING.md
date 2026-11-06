@@ -79,6 +79,7 @@ Only these runtime secrets belong on Fly:
 | `AGENT_PRIVATE_KEY` | Existing Sepolia demo agent's restricted vault-swap authority |
 | `GEMINI_API_KEY` | Existing model decision call |
 | `KUSARI_DEMO_GATEWAY_TOKEN` | Fixed-route server-to-server authentication; also set in Vercel |
+| `KUSARI_DEMO_API_KEY` | Optional dedicated bearer for shared `/v1/trade`; never a wallet key or the private gateway token |
 
 Set the non-secret `KUSARI_DEMO_PUBLIC_ORIGIN=https://kusari.outcomeseal.com` in the Fly runtime configuration. Keep a single Machine because Sandbox nonce and admission state is not shared across Machines.
 
@@ -94,7 +95,11 @@ fly deploy --config fly.toml --app <actual-app> --remote-only --ha=false
 fly scale count 1 --app <actual-app>
 ```
 
-Set Vercel's `KUSARI_DEMO_GATEWAY_URL` to `https://<actual-app>.fly.dev/` and use the matching server-side gateway token. Public visitors can request only the two signed Sandbox scenarios; presenter-only controls and owner authorization remain separate.
+Set Vercel's `KUSARI_DEMO_GATEWAY_URL` to `https://<actual-app>.fly.dev/` and use the matching server-side gateway token. Public visitors can request the two signed shared-Sandbox scenarios or use the separately bounded owned-workspace routes. Presenter-only controls and owner authorization remain separate.
+
+Owned workspaces use the same single persistent Machine for async Gemini jobs, single-use admission challenges and the bounded transaction relay. `/api/workspace/{challenge,prepare,result,relay,status,state}` forwards only fixed, same-origin JSON requests with a server-side bearer. There is no general RPC forwarding or hosted personal signer. Workspace chain reads and submissions use a dedicated Nox client which verifies that the bridge reports anonymous mode; the shared demo transport toggle cannot downgrade it. Owner setup and funding use the connected wallet provider.
+
+No new personal-key secret, database, Machine or paid service is required. The personal agent key is encrypted in browser storage. Keep recovery backups, the owner wallet and passphrase with the user. Job and rate-limit state remain in memory and are lost on a restart; a known transaction hash can still be inspected on Sepolia. Deploy between presentations rather than during an active run. See [owned-workspace boundaries](OWN_AGENTS.md).
 
 For presenter-run trades, use authenticated Fly SSH to execute the bounded helper inside the Machine. It supports only `normal`, `attack` and read-only `status`; there is no arbitrary URL, RPC or transport option:
 
