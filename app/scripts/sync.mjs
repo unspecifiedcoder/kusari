@@ -9,11 +9,11 @@ await mkdir(out, { recursive: true });
 
 await copyFile(new URL("shared/types.ts", root), new URL("types.ts", out));
 
-const file = process.env.DEPLOYMENT_FILE ?? "deployments/11155111.json";
+const file = (process.env.DEPLOYMENT_FILE ?? "deployments/11155111.json").trim();
 const src = new URL(file, root);
 const deployment = existsSync(src) ? JSON.parse(await readFile(src, "utf8")) : null;
 const chains = JSON.parse(await readFile(new URL("config/chains.json", root), "utf8"));
-const ensFile = new URL(process.env.ENS_OUT ?? "deployments/11155111-ens.json", root);
+const ensFile = new URL((process.env.ENS_OUT ?? "deployments/11155111-ens.json").trim(), root);
 const ensDeployment = existsSync(ensFile) ? JSON.parse(await readFile(ensFile, "utf8")) : null;
 
 await writeFile(

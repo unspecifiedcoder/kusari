@@ -1,0 +1,16 @@
+{
+  "owner": "0xc815eDb747e34DA879AFE1a0EF3DF641B4921000",
+  "agent": "0x72db032c0dFB6E7502e16A73fabdab31712dc706",
+  "name": "alpha.kusari-pramod.eth",
+  "userRegistry": "0x479a0588634C3c20509707D05d95561BC2d5FB36",
+  "resolver": "0xBDf4Ca409529182C45cE767683a1CCafD15225b5",
+  "parentRegistered": "yes",
+  "parentLinked": "yes",
+  "labelRegistered": "yes",
+  "policySource": "0x2daa4eeacfde394679aae27e1f554442002b3438",
+  "dnsName": "0x05616c7068610d6b75736172692d7072616d6f640365746800",
+  "node": "0x98931b7ffbb9e991ec996f93b7ff4e02073b1736ea3176fda5a3b9db37a48020",
+  "bound": "yes",
+  "roleGranted": "yes",
+  "records": "yes"
+}

@@ -36,6 +36,7 @@ import {PolicyMirror} from "src/PolicyMirror.sol";
 ///   AGENT_ADDRESS   optional: create a demo vault for this agent, fund it, and authorize it (mock/mirror).
 ///   OWNER_ADDRESS   optional: owner of the demo vault (can withdraw + freeze). Default: the deployer.
 ///   DEPLOY_TAG      optional filename suffix, e.g. "-fork" for local runs (gitignored).
+///   DEPLOYER_PRIVATE_KEY optional environment-only signer; avoids passing a key in CLI arguments.
 ///
 /// Local:  anvil --fork-url $SEPOLIA_RPC_URL   then
 ///         forge script script/Deploy.s.sol --rpc-url http://localhost:8545 --broadcast --private-key <anvil key>
@@ -72,10 +73,13 @@ contract Deploy is Script {
         address source = vm.envOr("POLICY_SOURCE", address(0));
         kind = source != address(0) ? "external" : vm.envOr("POLICY_KIND", string("mock"));
 
-        vm.startBroadcast();
-        address owner = vm.envOr("OWNER_ADDRESS", msg.sender);
+        uint256 deployerKey = vm.envOr("DEPLOYER_PRIVATE_KEY", uint256(0));
+        address deployer = deployerKey == 0 ? msg.sender : vm.addr(deployerKey);
+        if (deployerKey == 0) vm.startBroadcast();
+        else vm.startBroadcast(deployerKey);
+        address owner = vm.envOr("OWNER_ADDRESS", deployer);
         if (_is("external")) out.policySource = source;
-        else if (_is("mirror")) out.policySource = address(new PolicyMirror(msg.sender));
+        else if (_is("mirror")) out.policySource = address(new PolicyMirror(deployer));
         else if (_is("mock")) out.policySource = address(new MockPolicySource());
         else revert("POLICY_KIND must be mirror or mock");
         if (_is("mock")) {
@@ -83,7 +87,7 @@ contract Deploy is Script {
             console2.log("WARNING: MockPolicySource has no access control. Local forks only.");
         }
         _deployHook();
-        PoolKey memory key = _deployPool(msg.sender);
+        PoolKey memory key = _deployPool(deployer);
         out.factory = address(new AgentVaultFactory(poolManager, out.hook));
         if (agent != address(0)) _demoVault(agent, owner, key);
         vm.stopBroadcast();
@@ -108,8 +112,15 @@ contract Deploy is Script {
 
     /// @dev Demo token pair, pool with the hook, full-range liquidity.
     function _deployPool(address deployer) internal returns (PoolKey memory key) {
-        MockERC20 a = new MockERC20("Kusari USD", "kUSD", 18);
-        MockERC20 b = new MockERC20("Kusari ETH", "kETH", 18);
+        // The demo trades token0 (kUSD) for token1 (kETH). CREATE address ordering is not
+        // stable across owners/nonces, so assign names from the predicted sorted order.
+        uint64 nonce = vm.getNonce(deployer);
+        address predictedA = vm.computeCreateAddress(deployer, nonce);
+        address predictedB = vm.computeCreateAddress(deployer, nonce + 1);
+        bool aIsToken0 = predictedA < predictedB;
+        MockERC20 a = new MockERC20(aIsToken0 ? "Kusari USD" : "Kusari ETH", aIsToken0 ? "kUSD" : "kETH", 18);
+        MockERC20 b = new MockERC20(aIsToken0 ? "Kusari ETH" : "Kusari USD", aIsToken0 ? "kETH" : "kUSD", 18);
+        require(address(a) == predictedA && address(b) == predictedB, "token nonce prediction mismatch");
         (MockERC20 t0, MockERC20 t1) = address(a) < address(b) ? (a, b) : (b, a);
         t0.mint(deployer, 1_000_000e18);
         t1.mint(deployer, 1_000_000e18);

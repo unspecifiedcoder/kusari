@@ -22,6 +22,7 @@ type AgentState = {
   authorized: boolean;
   active: boolean;
 };
+type Connection = "connecting" | "live" | "offline";
 
 const time = (t?: unknown) => (typeof t === "number" ? new Date(t).toLocaleTimeString() : "");
 const short = (h?: unknown) => (typeof h === "string" ? `${h.slice(0, 10)}…${h.slice(-6)}` : "");
@@ -41,18 +42,33 @@ function LiveDemo() {
   const agent = useEventStream(`${AGENT}/events`, 40);
   const [status, setStatus] = useState<{ agent?: string; injected?: boolean; transport?: string; busy?: boolean; lastState?: AgentState | null; lastStateAt?: number; stateStatus?: string; stateError?: string }>({});
   const [bridgeMode, setBridgeMode] = useState<string | null>(null);
+  const [statusConnection, setStatusConnection] = useState<Connection>("connecting");
   const [controlError, setControlError] = useState<string | null>(null);
   const k = useKillSwitch();
 
   useEffect(() => {
     const controller = new AbortController();
-    const refresh = () => {
-      void fetch(`${AGENT}/status`, { cache: "no-store", signal: controller.signal }).then((r) => { if (!r.ok) throw new Error("Runner unavailable"); return r.json(); }).then(setStatus).catch(() => {});
-      void fetch(`${ANON_BRIDGE}/metrics`, { cache: "no-store", signal: controller.signal }).then((r) => { if (!r.ok) throw new Error("Bridge unavailable"); return r.json(); }).then((metrics) => setBridgeMode(metrics.mode ?? null)).catch(() => setBridgeMode(null));
+    let disposed = false;
+    let refreshing = false;
+    const read = async (url: string) => {
+      const response = await fetch(url, { cache: "no-store", signal: AbortSignal.any([controller.signal, AbortSignal.timeout(10_000)]) });
+      if (!response.ok) throw new Error("Service unavailable");
+      return response.json();
+    };
+    const refresh = async () => {
+      if (refreshing) return;
+      refreshing = true;
+      try {
+        const [runner, metrics] = await Promise.allSettled([read(`${AGENT}/status`), read(`${ANON_BRIDGE}/metrics`)]);
+        if (disposed) return;
+        if (runner.status === "fulfilled") { setStatus(runner.value); setStatusConnection("live"); }
+        else setStatusConnection("offline");
+        setBridgeMode(metrics.status === "fulfilled" ? metrics.value.mode ?? null : null);
+      } finally { refreshing = false; }
     };
     void refresh();
-    const interval = setInterval(refresh, 5_000);
-    return () => { controller.abort(); clearInterval(interval); };
+    const interval = setInterval(() => void refresh(), 5_000);
+    return () => { disposed = true; controller.abort(); clearInterval(interval); };
   }, []);
 
   const latest = useMemo(() => agent.entries.find((e) => e.type === "state") as unknown as AgentState | undefined, [agent.entries]);
@@ -64,6 +80,9 @@ function LiveDemo() {
   // Busy from "reading" until "idle". Live Sepolia cycles take ~20s (mixnet reads + tx confirmation).
   const lastCycleEvent = agent.entries.find((e) => e.type === "reading" || e.type === "idle");
   const running = lastCycleEvent ? lastCycleEvent.type === "reading" : Boolean(status.busy);
+  const connection: Connection = agent.status === "offline" || statusConnection === "offline" ? "offline" : agent.status === "live" && statusConnection === "live" ? "live" : "connecting";
+  const currentState = Boolean(state && connection === "live" && status.stateStatus === "fresh");
+  const lastSnapshot = status.lastStateAt ? new Date(status.lastStateAt).toLocaleTimeString() : null;
 
   const post = async (path: string) => {
     if (!allowDemoControls) return;
@@ -75,14 +94,16 @@ function LiveDemo() {
   return (
     <div className="space-y-8">
       <section className="space-y-3"><p className="text-xs font-semibold uppercase tracking-widest text-emerald-400">Live demonstration · Sepolia</p><h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Watch the boundary hold.</h1><p className="max-w-3xl text-sm leading-6 text-zinc-400">Follow a normal trade, an intentionally poisoned news feed, and owner revocation. The attack is staged: the agent prompt is deliberately gullible. Contract enforcement is real.</p></section>
-      {agent.status === "offline" && <div role="status" className="rounded-xl border border-amber-800/60 bg-amber-950/30 p-4 text-sm leading-6 text-amber-200">The live runner is disconnected. Panels retain the last received state; they are not current readings. <Link href="/#onchain-evidence" className="underline underline-offset-4">Verify the recorded run</Link> or <Link href="/" className="underline underline-offset-4">inspect the contracts</Link>.</div>}
-      {!allowDemoControls && <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 text-sm leading-6 text-zinc-400"><span className="font-medium text-zinc-200">Public observation mode.</span> The presenter operates the shared testnet agent. Its live state and event streams appear below; trading and transport controls are restricted to the presenter’s local machine.</div>}
+      {!allowDemoControls && <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 text-sm leading-6 text-zinc-400"><div className="max-w-2xl"><span className="font-medium text-zinc-200">Watch without connecting a wallet.</span> The presenter runs this shared Sepolia agent; this page updates automatically. You don’t need test ETH or tokens to follow the demonstration.</div><Link href="/#onchain-evidence" className="shrink-0 rounded-lg border border-zinc-700 px-3 py-2 text-xs font-medium text-zinc-200 hover:border-zinc-500">View the recorded proof ↗</Link></div>}
+      <Walkthrough />
+      {connection === "connecting" && <p role="status" className="rounded-xl border border-zinc-800 p-4 text-sm leading-6 text-zinc-400">Connecting to the presenter’s runner… Readings and activity will appear when the connection is ready. You can <Link href="/#onchain-evidence" className="text-zinc-200 underline underline-offset-4">inspect a recorded run</Link> while you wait.</p>}
+      {connection === "offline" && <div role="status" className="rounded-xl border border-amber-800/60 bg-amber-950/30 p-4 text-sm leading-6 text-amber-200"><p className="font-medium">The live runner is unavailable. Reconnecting automatically.</p><p className="mt-1">{state ? "The values below are the last received snapshot, not current readings." : "No live snapshot has been received in this visit."} <Link href="/#onchain-evidence" className="underline underline-offset-4">Follow the recorded transactions</Link> or <Link href="/" className="underline underline-offset-4">inspect the current policy</Link>.</p></div>}
       {status.stateStatus === "stale" && <p role="status" className="rounded-xl border border-amber-800/60 p-4 text-sm text-amber-200">The runner’s last successful chain snapshot is stale. {status.lastStateAt ? `Received ${new Date(status.lastStateAt).toLocaleTimeString()}.` : ""} Current chain values remain available on the overview.</p>}
       {bridgeMode === "direct" && <p role="status" className="rounded-xl border border-amber-800/60 p-4 text-sm font-medium text-amber-200">The bridge is in direct fallback mode. Its current traffic is not anonymized.</p>}
       <Controls
         injected={injected}
         running={running}
-        online={agent.status === "live"}
+        online={connection === "live"}
         onRun={() => post("/tick")}
         onInject={() => post(`/inject?on=${injected ? 0 : 1}`)}
         anonOn={anonOn}
@@ -95,12 +116,12 @@ function LiveDemo() {
         <Card title="Agent">
           {state ? (
             state.authorized && state.active ? (
-              <div className="text-2xl font-semibold text-emerald-400">Active</div>
+              <div className={`text-2xl font-semibold ${currentState ? "text-emerald-400" : "text-zinc-400"}`}>{currentState ? "Authorized" : "Last seen: authorized"}</div>
             ) : (
-              <div className="text-2xl font-semibold text-red-400">Frozen</div>
+              <div className={`text-2xl font-semibold ${currentState ? "text-red-400" : "text-zinc-400"}`}>{currentState ? "Trading blocked" : "Last seen: blocked"}</div>
             )
           ) : (
-            <div className="text-2xl font-semibold text-zinc-500">…</div>
+            <div className="text-2xl font-semibold text-zinc-500">{connection === "offline" ? "Unavailable" : "Awaiting snapshot"}</div>
           )}
           <div className="font-mono text-xs text-zinc-400">{k.name ?? ""}</div>
           <div className="text-xs text-zinc-500">Vault holds {state ? `${state.vaultToken0.toFixed(2)} kUSD / ${state.vaultToken1.toFixed(3)} kETH` : "…"}</div>
@@ -121,15 +142,16 @@ function LiveDemo() {
           <div className="text-xs text-zinc-500">read from ENS on every swap · enforced by the Uniswap v4 hook</div>
         </Card>
       </section>
+      <p className="text-xs leading-5 text-zinc-500">{currentState ? `Latest chain snapshot${lastSnapshot ? `: ${lastSnapshot}` : ""}.` : state ? `Last received values${lastSnapshot ? `: ${lastSnapshot}` : ""}; waiting for a fresh chain snapshot.` : "The cards will show actual chain readings when the runner is ready."} Event times below refer to when each event occurred.</p>
 
-      <Card title="Agent activity" right={<StatusDot status={agent.status} />}>
-        <Activity entries={agent.entries} />
+      <Card title="Agent activity" right={<StatusDot status={connection} />}>
+        <Activity entries={agent.entries} connection={connection} running={running} />
       </Card>
 
       <section className="grid gap-4 md:grid-cols-2">
-        <Card title="Anon-RPC OFF: the RPC provider's log" right={<StatusDot status={proxy.status} />}>
+        <Card title="Public-provider comparison log" right={<StatusDot status={proxy.status} />}>
           <Feed
-            empty="Empty: with Anon-RPC on, the agent sends this provider nothing. Turn Anon-RPC OFF to see what a provider learns."
+            empty={proxy.status === "offline" ? "The comparison log is unavailable and will reconnect automatically. Recorded evidence remains available above." : proxy.status === "connecting" ? "Connecting to the comparison log…" : allowDemoControls ? "No calls have reached the comparison provider. Turn Anon-RPC off for the controlled leak comparison." : "No calls have reached the comparison provider in this session. The presenter controls the leak comparison; an empty log alone does not prove anonymity."}
             rows={proxy.entries.map((e) => ({
               t: time(e.t),
               main: `${String(e.ip)}  ${String(e.method)}`,
@@ -140,7 +162,7 @@ function LiveDemo() {
         </Card>
         <Card title={bridgeMode === "anon" ? "Anon-RPC bridge: Nox mixnet" : bridgeMode === "direct" ? "Bridge: direct fallback (not anonymous)" : "Bridge traffic · verifying route"} right={<StatusDot status={bridge.status} />}>
           <Feed
-            empty="No traffic yet. Press “Run agent once”."
+            empty={bridge.status === "offline" ? "Bridge traffic is unavailable. Its current route cannot be verified; the page reconnects automatically." : bridge.status === "connecting" ? "Connecting to the bridge traffic feed…" : allowDemoControls ? "No bridge traffic yet. Run the agent once to inspect its RPC activity." : "No bridge traffic has been received yet. This panel fills automatically when the presenter’s runner reads the chain."}
             rows={bridge.entries.map((e) => ({
               t: time(e.t),
               main: `→ ${String(e.transport ?? "route unknown")}  ${String(e.method)}`,
@@ -151,6 +173,18 @@ function LiveDemo() {
         </Card>
       </section>
     </div>
+  );
+}
+
+function Walkthrough() {
+  return (
+    <section aria-label="How to follow the demonstration" className="grid gap-3 sm:grid-cols-3">
+      {[
+        ["01", "Normal trade", "Look for a confirmed swap within the ENS spending limits."],
+        ["02", "Staged attack", "The poisoned news asks for too much. Inspect the hook’s revert and transaction link."],
+        ["03", "Owner revocation", "The owner revokes the ENS role. The next small trade should be blocked."],
+      ].map(([number, title, description]) => <article key={number} className="rounded-xl border border-zinc-800/80 bg-zinc-950 p-4"><p className="text-sm font-medium text-zinc-200"><span className="mr-2 font-mono text-xs text-emerald-400">{number}</span>{title}</p><p className="mt-2 text-xs leading-5 text-zinc-500">{description}</p></article>)}
+    </section>
   );
 }
 
@@ -166,6 +200,8 @@ function Controls(props: {
 }) {
   const k = useKillSwitch();
   const frozen = k.authorized === false;
+
+  if (!allowDemoControls && !k.canManage) return <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-800 p-4"><p className="text-xs leading-5 text-zinc-400">Trading and transport changes are presenter-controlled. Owner revocation requires the verified ENS owner’s wallet.</p><Link href="/freeze" className="text-xs font-medium text-zinc-200 underline underline-offset-4">Inspect owner revocation →</Link></div>;
 
   return (
     <section className="flex flex-wrap items-center gap-3 rounded-xl border border-zinc-800 p-4">
@@ -199,7 +235,7 @@ function Controls(props: {
       </>}
       <div className="ml-auto flex items-center gap-2">
         {k.error && <span className="text-xs text-red-400">{k.error.message.split("\n")[0]}</span>}
-        {k.hash && <span className="font-mono text-xs text-zinc-400">{k.confirmed ? "✓" : "…"} {short(k.hash)}</span>}
+        {k.hash && <a className={`font-mono text-xs underline underline-offset-4 ${k.transactionFailed ? "text-red-300" : "text-zinc-400"}`} href={`https://sepolia.etherscan.io/tx/${k.hash}`} target="_blank" rel="noreferrer">{k.transactionFailed ? "Transaction reverted" : k.confirmed ? "Confirmed" : "Transaction submitted"} · {short(k.hash)} ↗</a>}
         <Link href="/freeze" className="text-xs text-zinc-500 underline">owner view</Link>
         <button
           onClick={frozen ? k.unfreeze : k.freeze}
@@ -214,9 +250,9 @@ function Controls(props: {
   );
 }
 
-function Activity({ entries }: { entries: Record<string, unknown>[] }) {
+function Activity({ entries, connection, running }: { entries: Record<string, unknown>[]; connection: Connection; running: boolean }) {
   const rows = entries.filter((e) => ["decision", "swap", "error", "inject"].includes(String(e.type)));
-  if (!rows.length) return <p className="text-sm text-zinc-600">No activity yet. Press “Run agent once”.</p>;
+  if (!rows.length) return <div className="space-y-3 text-sm leading-6 text-zinc-400"><p>{connection === "offline" ? "The activity feed is unavailable. This page will reconnect automatically." : connection === "connecting" ? "Connecting to the presenter’s activity feed…" : running ? "The agent is reading the chain. Its decision and transaction result will appear here." : allowDemoControls ? "No activity yet. Run the agent once to begin the demonstration." : "The runner is connected and awaiting the presenter. Decisions and transaction results will appear here automatically."}</p>{!allowDemoControls && <Link href="/#onchain-evidence" className="inline-block text-xs font-medium text-zinc-200 underline underline-offset-4">Follow the previous run onchain →</Link>}</div>;
   return (
     <ul className="space-y-2 text-sm">
       {rows.map((e, i) => {

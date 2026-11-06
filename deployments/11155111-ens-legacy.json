@@ -1,0 +1,16 @@
+{
+  "owner": "0x940AAB0511dc73E34d28a4e5f7FFD80422955E1a",
+  "agent": "0x8046e63138bCCCaB69EE1c631ccE9975C7229F00",
+  "name": "alpha.kusari-demo.eth",
+  "userRegistry": "0xC3b8C79abE7900d9783Cc24bE504B413f0FE3eE0",
+  "resolver": "0x6CCA0119bF9fe1F46BCc0225a40F68Ff3b86eB38",
+  "parentRegistered": "yes",
+  "parentLinked": "yes",
+  "labelRegistered": "yes",
+  "dnsName": "0x05616c7068610b6b75736172692d64656d6f0365746800",
+  "node": "0xed85351803dba314bbc009cc605442772874754b8b919d22cc7e1710e72fb75e",
+  "roleGranted": "yes",
+  "policySource": "0xd1188dbab240f4dc20be742b1b8ec7f03759762e",
+  "bound": "yes",
+  "records": "yes"
+}

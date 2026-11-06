@@ -16,11 +16,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-full flex-col bg-zinc-950 text-zinc-100">
         <Providers>
           <header className="border-b border-zinc-800/80 bg-zinc-950/90">
-            <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-4 px-5 py-4 sm:px-8">
-            <nav aria-label="Main navigation" className="flex flex-wrap items-center gap-5">
-              <Link href="/" className="mr-2 flex items-center gap-2 text-xl font-semibold tracking-tight">
+            <div className="mx-auto grid max-w-6xl grid-cols-[auto_1fr] items-center gap-x-5 gap-y-4 px-5 py-4 sm:px-8 lg:flex lg:justify-between lg:gap-6">
+              <Link href="/" aria-label="Kusari overview" className="flex shrink-0 items-center gap-2 text-xl font-semibold tracking-tight">
                 <span aria-hidden="true" className="text-emerald-400">鎖</span> Kusari
               </Link>
+            <nav aria-label="Main navigation" className="col-span-2 row-start-2 flex items-center gap-6 border-t border-zinc-800/70 pt-3 text-sm lg:order-0 lg:mr-auto lg:border-0 lg:pt-0">
               <Link href="/" className="text-sm text-zinc-400 hover:text-white">
                 Overview
               </Link>
@@ -31,8 +31,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                 Owner controls
               </Link>
             </nav>
-            <div className="flex flex-wrap items-center gap-3">
-              <ReadRouteBadge />
+            <div className="col-start-2 row-start-1 flex min-w-0 items-center justify-end gap-3">
+              <div className="hidden xl:block"><ReadRouteBadge /></div>
               <ConnectButton />
             </div>
             </div>
@@ -41,7 +41,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <footer className="border-t border-zinc-800/80 px-5 py-5 text-xs leading-6 text-zinc-500">
             <div className="mx-auto flex max-w-6xl flex-wrap justify-between gap-2">
               <span>ETHGlobal Mumbai · Sepolia testnet · Test tokens only</span>
-              <a href="https://github.com/unspecifiedcoder/kusari" target="_blank" rel="noreferrer" className="text-zinc-400 hover:text-white">Open-source code ↗</a>
+              <a href="https://github.com/unspecifiedcoder/kusari/tree/codex/judge-ready" target="_blank" rel="noreferrer" className="text-zinc-400 hover:text-white">Open-source code ↗</a>
             </div>
           </footer>
         </Providers>

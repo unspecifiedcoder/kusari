@@ -55,6 +55,12 @@ const sourceAbi = parseAbi(["function bind(address agent, string label, bytes dn
 
 type State = Record<string, string>;
 const state: State = existsSync(OUT) ? JSON.parse(readFileSync(OUT, "utf8")) : {};
+for (const [field, expected] of Object.entries({ owner: owner.address, agent, name: FULL })) {
+  if (!expected) throw new Error(`Missing ${field} for ENS setup`);
+  if (state[field] && state[field].toLowerCase() !== expected.toLowerCase()) {
+    throw new Error(`ENS checkpoint ${field} does not match this identity; use a fresh ENS_OUT file`);
+  }
+}
 const save = () => writeFileSync(OUT, JSON.stringify(state, null, 2) + "\n");
 
 async function send(label: string, req: Parameters<typeof wallet.writeContract>[0]) {

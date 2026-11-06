@@ -61,6 +61,11 @@ const snapshots = createSnapshotCache({ load: async () => {
   const [state] = await Promise.all([readState(agentAccount.address), readBridgeMode()]);
   return summarizeState(state);
 } });
+// Keep one shared read-only snapshot warm between viewers. refresh() is single-flight;
+// this timer never calls cycle(), the model, a signer or transaction submission.
+const snapshotRefreshTimer = setInterval(() => { void snapshots.refresh(); }, 5000);
+snapshotRefreshTimer.unref();
+void snapshots.refresh();
 
 function emit(type: string, data: Record<string, unknown> = {}) {
   const e = { type, t: Date.now(), id: ++eventSequence, ...data };
@@ -116,6 +121,7 @@ async function cycle() {
   } finally {
     busy = false;
     snapshots.invalidate(); // trade or revoke may have changed chain state since the pre-trade read
+    void snapshots.refresh();
     emit("idle"); // the dashboard treats the agent as busy from "reading" until "idle"
   }
 }
@@ -126,7 +132,7 @@ const cors = {
   "access-control-allow-headers": "content-type",
 };
 
-createServer(async (req, res) => {
+const server = createServer(async (req, res) => {
   const url = new URL(req.url ?? "/", "http://x");
   if (req.method === "OPTIONS") return res.writeHead(204, cors).end();
   if (url.pathname === "/events") {
@@ -155,6 +161,7 @@ createServer(async (req, res) => {
     setReadRpc(target);
     setWriteRpc(target);
     snapshots.invalidate();
+    void snapshots.refresh();
     emit("transport", { transport, via: target });
     return json(200, { transport, via: target });
   }
@@ -168,6 +175,7 @@ createServer(async (req, res) => {
 }).listen(config.eventsPort, "127.0.0.1", () => {
   console.log(`agent ${agentAccount.address} on http://localhost:${config.eventsPort} (reads + txs via ${readRpc}, ${transport})`);
 });
+server.once("close", () => clearInterval(snapshotRefreshTimer));
 
 const loop = Number(process.env.AGENT_LOOP_SECONDS ?? 0);
 if (loop > 0) setInterval(() => void cycle(), loop * 1000);
