@@ -1,0 +1,100 @@
+{
+  "status": "passed",
+  "verifiedAt": "2026-11-06T22:46:49.927Z",
+  "chainId": 11155111,
+  "origin": "https://kusari.outcomeseal.com",
+  "name": "alpha.kusari-pramod.eth",
+  "owner": "0xc815eDb747e34DA879AFE1a0EF3DF641B4921000",
+  "agent": "0x72db032c0dFB6E7502e16A73fabdab31712dc706",
+  "vault": "0x209c26182c40F6B34Ef5fe11b21709496dc6a2ed",
+  "transactions": [
+    {
+      "step": "baseline-fixed-two",
+      "hash": "0x2e71d3552d16f6602302eec2de490736cb8fbd75b37dfed3fda2fd4399376e76",
+      "status": "success",
+      "blockNumber": "12079552",
+      "method": "swap",
+      "requestedKUSD": "2",
+      "agent": "0x72db032c0dfb6e7502e16a73fabdab31712dc706",
+      "vault": "0x209c26182c40f6b34ef5fe11b21709496dc6a2ed"
+    },
+    {
+      "step": "ens-cap-one",
+      "hash": "0x678590d997ac7d2912fa366eb5e66c724b7e96b143faf3dabc805bf5e0a4317f",
+      "status": "success",
+      "blockNumber": "12079558",
+      "method": "setData",
+      "capKUSD": "1",
+      "otherPolicyFieldsPreserved": true
+    },
+    {
+      "step": "same-two-over-cap",
+      "hash": "0xb8bb08ad97eda13dbe3d7557ffc16a973f6de4a519d4dd0b6f143347b0fad481",
+      "status": "reverted",
+      "blockNumber": "12079568",
+      "method": "swap",
+      "requestedKUSD": "2",
+      "agent": "0x72db032c0dfb6e7502e16a73fabdab31712dc706",
+      "vault": "0x209c26182c40f6b34ef5fe11b21709496dc6a2ed"
+    },
+    {
+      "step": "ens-cap-five-restored",
+      "hash": "0x4f7f2701adbe1f9f87559a0ad40db1288980fa638dba4830d76baefb16529088",
+      "status": "success",
+      "blockNumber": "12079573",
+      "method": "setData",
+      "capKUSD": "5",
+      "otherPolicyFieldsPreserved": true
+    },
+    {
+      "step": "ens-freeze",
+      "hash": "0x0fee035ea61dd213600478c5835832eadc2ed516eb960aa60c0399eb2b295ce2",
+      "status": "success",
+      "blockNumber": "12079577",
+      "method": "revokeRoles",
+      "roleBitmap": "65536",
+      "agent": "0x72db032c0dFB6E7502e16A73fabdab31712dc706"
+    },
+    {
+      "step": "two-while-frozen",
+      "hash": "0xe0e22b73d30b97550d02b73701603adef23274c5ffd63cdbe88d98e14b60391c",
+      "status": "reverted",
+      "blockNumber": "12079583",
+      "method": "swap",
+      "requestedKUSD": "2",
+      "agent": "0x72db032c0dfb6e7502e16a73fabdab31712dc706",
+      "vault": "0x209c26182c40f6b34ef5fe11b21709496dc6a2ed"
+    },
+    {
+      "step": "ens-role-restored",
+      "hash": "0xa20c5fd8254761cb2f5ce197f83185b24b02a3e0516ad5fb22fb2ecd6194701a",
+      "status": "success",
+      "blockNumber": "12079586",
+      "method": "grantRoles",
+      "roleBitmap": "65536",
+      "agent": "0x72db032c0dFB6E7502e16A73fabdab31712dc706"
+    },
+    {
+      "step": "gemini-resumed-one",
+      "hash": "0x4576e47890febaad4b7d5904df89bde0ac4c12362cceb2f82f6ba5a3b778938e",
+      "status": "success",
+      "blockNumber": "12079591",
+      "method": "swap",
+      "requestedKUSD": "1",
+      "agent": "0x72db032c0dfb6e7502e16a73fabdab31712dc706",
+      "vault": "0x209c26182c40f6b34ef5fe11b21709496dc6a2ed"
+    }
+  ],
+  "finalState": {
+    "capKUSD": "5",
+    "dailyCapKUSD": "100",
+    "maxImpactBps": 200,
+    "authorized": true
+  },
+  "notes": [
+    "New browser walkthrough with human MetaMask signatures and confirmations; wallet popup is outside recorded page.",
+    "Fixed 2 kUSD cases are deterministic and do not call Gemini. The last 1 kUSD trade follows the real Gemini decision observed in the browser.",
+    "Receipts confirm status, not decoded revert reasons. ExceedsPerSwap and NotAuthorized were separately observed in simulation.",
+    "Independent receipt/calldata verification uses public RPC and no signing keys. Video edits shorten waits and label reading holds."
+  ]
+}

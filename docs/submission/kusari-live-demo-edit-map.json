@@ -1,0 +1,3430 @@
+{
+  "kind": "edited real browser capture sequence, not a continuous high-frame-rate screen recording",
+  "sourceDimensions": [
+    1766,
+    1112
+  ],
+  "outputDimensions": [
+    1766,
+    1232
+  ],
+  "durationSeconds": 193.99999999999983,
+  "fps": 30,
+  "captureMedianIntervalSeconds": 0.7355,
+  "sourceFirstMs": 43,
+  "sourceLastMs": 697202,
+  "sourceFrameCount": 407,
+  "captureErrors": [
+    {
+      "t": 1404,
+      "message": "Error: node_repl exec context not found"
+    },
+    {
+      "t": 2012,
+      "message": "Error: node_repl exec context not found"
+    },
+    {
+      "t": 2623,
+      "message": "Error: node_repl exec context not found"
+    },
+    {
+      "t": 3237,
+      "message": "Error: node_repl exec context not found"
+    },
+    {
+      "t": 3913,
+      "message": "Error: node_repl exec context not found"
+    },
+    {
+      "t": 4452,
+      "message": "Error: node_repl exec context not found"
+    },
+    {
+      "t": 5064,
+      "message": "Error: node_repl exec context not found"
+    },
+    {
+      "t": 5679,
+      "message": "Error: node_repl exec context not found"
+    },
+    {
+      "t": 6285,
+      "message": "Error: node_repl exec context not found"
+    },
+    {
+      "t": 6897,
+      "message": "Error: node_repl exec context not found"
+    },
+    {
+      "t": 7498,
+      "message": "Error: node_repl exec context not found"
+    },
+    {
+      "t": 8110,
+      "message": "Error: node_repl exec context not found"
+    },
+    {
+      "t": 8724,
+      "message": "Error: node_repl exec context not found"
+    },
+    {
+      "t": 9335,
+      "message": "Error: node_repl exec context not found"
+    },
+    {
+      "t": 9937,
+      "message": "Error: node_repl exec context not found"
+    },
+    {
+      "t": 10552,
+      "message": "Error: node_repl exec context not found"
+    },
+    {
+      "t": 11166,
+      "message": "Error: node_repl exec context not found"
+    },
+    {
+      "t": 11773,
+      "message": "Error: node_repl exec context not found"
+    },
+    {
+      "t": 12386,
+      "message": "Error: node_repl exec context not found"
+    },
+    {
+      "t": 12999,
+      "message": "Error: node_repl exec context not found"
+    },
+    {
+      "t": 13610,
+      "message": "Error: node_repl exec context not found"
+    },
+    {
+      "t": 14210,
+      "message": "Error: node_repl exec context not found"
+    },
+    {
+      "t": 14817,
+      "message": "Error: node_repl exec context not found"
+    },
+    {
+      "t": 15423,
+      "message": "Error: node_repl exec context not found"
+    },
+    {
+      "t": 16037,
+      "message": "Error: node_repl exec context not found"
+    },
+    {
+      "t": 16647,
+      "message": "Error: node_repl exec context not found"
+    },
+    {
+      "t": 17257,
+      "message": "Error: node_repl exec context not found"
+    },
+    {
+      "t": 17869,
+      "message": "Error: node_repl exec context not found"
+    },
+    {
+      "t": 18484,
+      "message": "Error: node_repl exec context not found"
+    },
+    {
+      "t": 19085,
+      "message": "Error: node_repl exec context not found"
+    },
+    {
+      "t": 19700,
+      "message": "Error: node_repl exec context not found"
+    },
+    {
+      "t": 20313,
+      "message": "Error: node_repl exec context not found"
+    },
+    {
+      "t": 20928,
+      "message": "Error: node_repl exec context not found"
+    },
+    {
+      "t": 21539,
+      "message": "Error: node_repl exec context not found"
+    },
+    {
+      "t": 22152,
+      "message": "Error: node_repl exec context not found"
+    },
+    {
+      "t": 22766,
+      "message": "Error: node_repl exec context not found"
+    },
+    {
+      "t": 23379,
+      "message": "Error: node_repl exec context not found"
+    },
+    {
+      "t": 24013,
+      "message": "Error: node_repl exec context not found"
+    },
+    {
+      "t": 24595,
+      "message": "Error: node_repl exec context not found"
+    },
+    {
+      "t": 25207,
+      "message": "Error: node_repl exec context not found"
+    },
+    {
+      "t": 25819,
+      "message": "Error: node_repl exec context not found"
+    },
+    {
+      "t": 26432,
+      "message": "Error: node_repl exec context not found"
+    },
+    {
+      "t": 27048,
+      "message": "Error: node_repl exec context not found"
+    },
+    {
+      "t": 27661,
+      "message": "Error: node_repl exec context not found"
+    },
+    {
+      "t": 28272,
+      "message": "Error: node_repl exec context not found"
+    },
+    {
+      "t": 28882,
+      "message": "Error: node_repl exec context not found"
+    }
+  ],
+  "markers": [
+    {
+      "t": 0,
+      "label": "intro"
+    },
+    {
+      "t": 22811,
+      "label": "baseline-fixed-test"
+    },
+    {
+      "t": 160679,
+      "label": "baseline-confirmed",
+      "hash": "0x2e71d3552d16f6602302eec2de490736cb8fbd75b37dfed3fda2fd4399376e76"
+    },
+    {
+      "t": 173996,
+      "label": "edit-cap-one"
+    },
+    {
+      "t": 227906,
+      "label": "cap-one-confirmed",
+      "hash": "0x678590d997ac7d2912fa366eb5e66c724b7e96b143faf3dabc805bf5e0a4317f"
+    },
+    {
+      "t": 243765,
+      "label": "repeat-two-at-one"
+    },
+    {
+      "t": 351479,
+      "label": "cap-rejection-confirmed",
+      "hash": "0xb8bb08ad97eda13dbe3d7557ffc16a973f6de4a519d4dd0b6f143347b0fad481"
+    },
+    {
+      "t": 367487,
+      "label": "restore-cap-five"
+    },
+    {
+      "t": 421351,
+      "label": "cap-five-restored",
+      "hash": "0x4f7f2701adbe1f9f87559a0ad40db1288980fa638dba4830d76baefb16529088"
+    },
+    {
+      "t": 425115,
+      "label": "freeze-request"
+    },
+    {
+      "t": 464402,
+      "label": "freeze-confirmed",
+      "hash": "0x0fee035ea61dd213600478c5835832eadc2ed516eb960aa60c0399eb2b295ce2"
+    },
+    {
+      "t": 475778,
+      "label": "frozen-fixed-test"
+    },
+    {
+      "t": 521138,
+      "label": "frozen-rejection-confirmed",
+      "hash": "0xe0e22b73d30b97550d02b73701603adef23274c5ffd63cdbe88d98e14b60391c"
+    },
+    {
+      "t": 533036,
+      "label": "restore-authorization"
+    },
+    {
+      "t": 569575,
+      "label": "authorization-restored",
+      "hash": "0xa20c5fd8254761cb2f5ce197f83185b24b02a3e0516ad5fb22fb2ecd6194701a"
+    },
+    {
+      "t": 574335,
+      "label": "gemini-normal-run"
+    },
+    {
+      "t": 636799,
+      "label": "gemini-resumed-confirmed",
+      "hash": "0x4576e47890febaad4b7d5904df89bde0ac4c12362cceb2f82f6ba5a3b778938e"
+    },
+    {
+      "t": 661965,
+      "label": "integration-proof"
+    },
+    {
+      "t": 684733,
+      "label": "closing"
+    }
+  ],
+  "phases": [
+    {
+      "phase": "intro",
+      "outputStart": 0.0,
+      "outputEnd": 6.0,
+      "sourceFirstMs": 43,
+      "sourceLastMs": 43,
+      "retainedSeconds": 6.0,
+      "sourceFrameCount": 1,
+      "selectedFrameCount": 1,
+      "readingHoldSeconds": 5.0
+    },
+    {
+      "phase": "baseline-fixed-test",
+      "outputStart": 6.0,
+      "outputEnd": 19.999999999999993,
+      "sourceFirstMs": 47260,
+      "sourceLastMs": 145072,
+      "retainedSeconds": 13.999999999999993,
+      "sourceFrameCount": 47,
+      "selectedFrameCount": 18,
+      "readingHoldSeconds": 0
+    },
+    {
+      "phase": "baseline-confirmed",
+      "outputStart": 19.999999999999993,
+      "outputEnd": 27.999999999999993,
+      "sourceFirstMs": 162998,
+      "sourceLastMs": 167433,
+      "retainedSeconds": 8.0,
+      "sourceFrameCount": 6,
+      "selectedFrameCount": 6,
+      "readingHoldSeconds": 2.5649999999999995
+    },
+    {
+      "phase": "edit-cap-one",
+      "outputStart": 27.999999999999993,
+      "outputEnd": 39.999999999999986,
+      "sourceFirstMs": 174747,
+      "sourceLastMs": 227143,
+      "retainedSeconds": 11.999999999999993,
+      "sourceFrameCount": 32,
+      "selectedFrameCount": 16,
+      "readingHoldSeconds": 0
+    },
+    {
+      "phase": "cap-one-confirmed",
+      "outputStart": 39.999999999999986,
+      "outputEnd": 47.999999999999986,
+      "sourceFirstMs": 227906,
+      "sourceLastMs": 234628,
+      "retainedSeconds": 8.0,
+      "sourceFrameCount": 8,
+      "selectedFrameCount": 8,
+      "readingHoldSeconds": 0.27800000000000047
+    },
+    {
+      "phase": "repeat-two-at-one",
+      "outputStart": 47.999999999999986,
+      "outputEnd": 59.99999999999999,
+      "sourceFirstMs": 243765,
+      "sourceLastMs": 342571,
+      "retainedSeconds": 12.000000000000007,
+      "sourceFrameCount": 73,
+      "selectedFrameCount": 17,
+      "readingHoldSeconds": 0
+    },
+    {
+      "phase": "cap-rejection-confirmed",
+      "outputStart": 59.99999999999999,
+      "outputEnd": 70.0,
+      "sourceFirstMs": 352832,
+      "sourceLastMs": 357179,
+      "retainedSeconds": 10.000000000000007,
+      "sourceFrameCount": 7,
+      "selectedFrameCount": 7,
+      "readingHoldSeconds": 4.653
+    },
+    {
+      "phase": "restore-cap-five",
+      "outputStart": 70.0,
+      "outputEnd": 79.99999999999999,
+      "sourceFirstMs": 368646,
+      "sourceLastMs": 400396,
+      "retainedSeconds": 9.999999999999986,
+      "sourceFrameCount": 30,
+      "selectedFrameCount": 14,
+      "readingHoldSeconds": 0
+    },
+    {
+      "phase": "cap-five-restored",
+      "outputStart": 79.99999999999999,
+      "outputEnd": 87.99999999999997,
+      "sourceFirstMs": 421351,
+      "sourceLastMs": 424296,
+      "retainedSeconds": 7.999999999999986,
+      "sourceFrameCount": 5,
+      "selectedFrameCount": 5,
+      "readingHoldSeconds": 3.3890000000000002
+    },
+    {
+      "phase": "freeze-request",
+      "outputStart": 87.99999999999997,
+      "outputEnd": 97.99999999999997,
+      "sourceFirstMs": 425962,
+      "sourceLastMs": 456369,
+      "retainedSeconds": 10.0,
+      "sourceFrameCount": 29,
+      "selectedFrameCount": 14,
+      "readingHoldSeconds": 0
+    },
+    {
+      "phase": "freeze-confirmed",
+      "outputStart": 97.99999999999997,
+      "outputEnd": 105.99999999999996,
+      "sourceFirstMs": 465167,
+      "sourceLastMs": 469680,
+      "retainedSeconds": 7.999999999999986,
+      "sourceFrameCount": 7,
+      "selectedFrameCount": 7,
+      "readingHoldSeconds": 2.487
+    },
+    {
+      "phase": "frozen-fixed-test",
+      "outputStart": 105.99999999999996,
+      "outputEnd": 117.99999999999994,
+      "sourceFirstMs": 476778,
+      "sourceLastMs": 520366,
+      "retainedSeconds": 11.999999999999986,
+      "sourceFrameCount": 39,
+      "selectedFrameCount": 15,
+      "readingHoldSeconds": 0
+    },
+    {
+      "phase": "frozen-rejection-confirmed",
+      "outputStart": 117.99999999999994,
+      "outputEnd": 127.99999999999993,
+      "sourceFirstMs": 522306,
+      "sourceLastMs": 526676,
+      "retainedSeconds": 9.999999999999986,
+      "sourceFrameCount": 7,
+      "selectedFrameCount": 7,
+      "readingHoldSeconds": 4.63
+    },
+    {
+      "phase": "restore-authorization",
+      "outputStart": 127.99999999999993,
+      "outputEnd": 137.9999999999999,
+      "sourceFirstMs": 534342,
+      "sourceLastMs": 562402,
+      "retainedSeconds": 9.999999999999957,
+      "sourceFrameCount": 21,
+      "selectedFrameCount": 13,
+      "readingHoldSeconds": 0
+    },
+    {
+      "phase": "authorization-restored",
+      "outputStart": 137.9999999999999,
+      "outputEnd": 145.9999999999999,
+      "sourceFirstMs": 570293,
+      "sourceLastMs": 573647,
+      "retainedSeconds": 8.0,
+      "sourceFrameCount": 5,
+      "selectedFrameCount": 5,
+      "readingHoldSeconds": 2.8360000000000003
+    },
+    {
+      "phase": "gemini-normal-run",
+      "outputStart": 145.9999999999999,
+      "outputEnd": 163.9999999999999,
+      "sourceFirstMs": 575457,
+      "sourceLastMs": 624942,
+      "retainedSeconds": 18.0,
+      "sourceFrameCount": 47,
+      "selectedFrameCount": 24,
+      "readingHoldSeconds": 0
+    },
+    {
+      "phase": "gemini-resumed-confirmed",
+      "outputStart": 163.9999999999999,
+      "outputEnd": 173.99999999999986,
+      "sourceFirstMs": 638938,
+      "sourceLastMs": 661217,
+      "retainedSeconds": 9.999999999999972,
+      "sourceFrameCount": 17,
+      "selectedFrameCount": 13,
+      "readingHoldSeconds": 0
+    },
+    {
+      "phase": "integration-proof",
+      "outputStart": 173.99999999999986,
+      "outputEnd": 185.99999999999983,
+      "sourceFirstMs": 662658,
+      "sourceLastMs": 669238,
+      "retainedSeconds": 11.999999999999972,
+      "sourceFrameCount": 10,
+      "selectedFrameCount": 10,
+      "readingHoldSeconds": 4.42
+    },
+    {
+      "phase": "closing",
+      "outputStart": 185.99999999999983,
+      "outputEnd": 193.99999999999983,
+      "sourceFirstMs": 685541,
+      "sourceLastMs": 697202,
+      "retainedSeconds": 8.0,
+      "sourceFrameCount": 16,
+      "selectedFrameCount": 11,
+      "readingHoldSeconds": 0
+    }
+  ],
+  "captions": [
+    {
+      "start": 0.0,
+      "end": 6.0,
+      "phase": "intro",
+      "text": "Kusari gives AI agents a public ENS policy and onchain trading limits.",
+      "lines": [
+        "Kusari gives AI agents a public ENS policy and onchain trading limits."
+      ]
+    },
+    {
+      "start": 6.0,
+      "end": 12.999999999999996,
+      "phase": "baseline-fixed-test",
+      "text": "The first test is deterministic: request exactly 2 kUSD from the shared Sepolia vault.",
+      "lines": [
+        "The first test is deterministic: request exactly 2 kUSD from the shared Sepolia vault."
+      ]
+    },
+    {
+      "start": 12.999999999999996,
+      "end": 19.999999999999993,
+      "phase": "baseline-fixed-test",
+      "text": "With the owner's per-trade cap at 5 kUSD, this request fits the amount limit.",
+      "lines": [
+        "With the owner's per-trade cap at 5 kUSD, this request fits the amount limit."
+      ]
+    },
+    {
+      "start": 19.999999999999993,
+      "end": 27.999999999999993,
+      "phase": "baseline-confirmed",
+      "text": "The 2 kUSD swap is confirmed on Sepolia. This is a new transaction from this recorded browser session.",
+      "lines": [
+        "The 2 kUSD swap is confirmed on Sepolia. This is a new transaction from this recorded browser session."
+      ]
+    },
+    {
+      "start": 27.999999999999993,
+      "end": 39.999999999999986,
+      "phase": "edit-cap-one",
+      "text": "The owner changes the per-trade cap from 5 to 1 kUSD. The wallet writes the ENS resolver's kusari.policy data.",
+      "lines": [
+        "The owner changes the per-trade cap from 5 to 1 kUSD. The wallet writes the ENS resolver's kusari.policy data."
+      ]
+    },
+    {
+      "start": 39.999999999999986,
+      "end": 47.999999999999986,
+      "phase": "cap-one-confirmed",
+      "text": "The ENS policy update has confirmed. Kusari now reads a 1 kUSD per-trade cap.",
+      "lines": [
+        "The ENS policy update has confirmed. Kusari now reads a 1 kUSD per-trade cap."
+      ]
+    },
+    {
+      "start": 47.999999999999986,
+      "end": 59.99999999999999,
+      "phase": "repeat-two-at-one",
+      "text": "Run exactly the same 2 kUSD test again. It deliberately exceeds the updated 1 kUSD limit.",
+      "lines": [
+        "Run exactly the same 2 kUSD test again. It deliberately exceeds the updated 1 kUSD limit."
+      ]
+    },
+    {
+      "start": 59.99999999999999,
+      "end": 70.0,
+      "phase": "cap-rejection-confirmed",
+      "text": "The receipt confirms a revert. Simulation reported ExceedsPerSwap. Only the ENS cap changed; no app or contract redeployment.",
+      "lines": [
+        "The receipt confirms a revert. Simulation reported ExceedsPerSwap. Only the ENS cap changed; no app or",
+        "contract redeployment."
+      ]
+    },
+    {
+      "start": 70.0,
+      "end": 79.99999999999999,
+      "phase": "restore-cap-five",
+      "text": "Restore the cap to 5 kUSD for the next authorization check. This is another owner-approved ENS record update.",
+      "lines": [
+        "Restore the cap to 5 kUSD for the next authorization check. This is another owner-approved ENS record",
+        "update."
+      ]
+    },
+    {
+      "start": 79.99999999999999,
+      "end": 87.99999999999997,
+      "phase": "cap-five-restored",
+      "text": "The restored 5 kUSD cap is confirmed. Next, test ENS authorization independently of the amount limit.",
+      "lines": [
+        "The restored 5 kUSD cap is confirmed. Next, test ENS authorization independently of the amount limit."
+      ]
+    },
+    {
+      "start": 87.99999999999997,
+      "end": 97.99999999999997,
+      "phase": "freeze-request",
+      "text": "The owner revokes this agent's ENS authorization role in one Sepolia transaction.",
+      "lines": [
+        "The owner revokes this agent's ENS authorization role in one Sepolia transaction."
+      ]
+    },
+    {
+      "start": 97.99999999999997,
+      "end": 105.99999999999996,
+      "phase": "freeze-confirmed",
+      "text": "Revocation is confirmed. The agent's authority is now revoked; completed trades are not undone.",
+      "lines": [
+        "Revocation is confirmed. The agent's authority is now revoked; completed trades are not undone."
+      ]
+    },
+    {
+      "start": 105.99999999999996,
+      "end": 117.99999999999994,
+      "phase": "frozen-fixed-test",
+      "text": "Request 2 kUSD again. It fits the restored 5 kUSD cap, but the agent no longer has ENS authorization.",
+      "lines": [
+        "Request 2 kUSD again. It fits the restored 5 kUSD cap, but the agent no longer has ENS authorization."
+      ]
+    },
+    {
+      "start": 117.99999999999994,
+      "end": 127.99999999999993,
+      "phase": "frozen-rejection-confirmed",
+      "text": "The receipt confirms a revert. Simulation reported NotAuthorized. A valid agent signature cannot override revocation.",
+      "lines": [
+        "The receipt confirms a revert. Simulation reported NotAuthorized. A valid agent signature cannot override",
+        "revocation."
+      ]
+    },
+    {
+      "start": 127.99999999999993,
+      "end": 137.9999999999999,
+      "phase": "restore-authorization",
+      "text": "Only the owner can grant that role again. Restore the agent's ENS authorization.",
+      "lines": [
+        "Only the owner can grant that role again. Restore the agent's ENS authorization."
+      ]
+    },
+    {
+      "start": 137.9999999999999,
+      "end": 145.9999999999999,
+      "phase": "authorization-restored",
+      "text": "Authorization is restored onchain. The agent can again execute requests that satisfy the policy.",
+      "lines": [
+        "Authorization is restored onchain. The agent can again execute requests that satisfy the policy."
+      ]
+    },
+    {
+      "start": 145.9999999999999,
+      "end": 154.9999999999999,
+      "phase": "gemini-normal-run",
+      "text": "Now switch from the deterministic policy test to a real Gemini decision.",
+      "lines": [
+        "Now switch from the deterministic policy test to a real Gemini decision."
+      ]
+    },
+    {
+      "start": 154.9999999999999,
+      "end": 163.9999999999999,
+      "phase": "gemini-normal-run",
+      "text": "Gemini reads news and pool state and may request up to 1 kUSD, or hold. The same ENS policy and hook still apply.",
+      "lines": [
+        "Gemini reads news and pool state and may request up to 1 kUSD, or hold. The same ENS policy and hook still",
+        "apply."
+      ]
+    },
+    {
+      "start": 163.9999999999999,
+      "end": 173.99999999999986,
+      "phase": "gemini-resumed-confirmed",
+      "text": "Gemini's requested trade is confirmed on Sepolia. The restored agent has completed the authorization loop.",
+      "lines": [
+        "Gemini's requested trade is confirmed on Sepolia. The restored agent has completed the authorization loop."
+      ]
+    },
+    {
+      "start": 173.99999999999986,
+      "end": 185.99999999999983,
+      "phase": "integration-proof",
+      "text": "Agent reads and signed submissions use Anon-RPC and Nox. Transactions remain public; routing observations are not an anonymity proof.",
+      "lines": [
+        "Agent reads and signed submissions use Anon-RPC and Nox. Transactions remain public; routing observations",
+        "are not an anonymity proof."
+      ]
+    },
+    {
+      "start": 185.99999999999983,
+      "end": 193.99999999999983,
+      "phase": "closing",
+      "text": "AI proposes. The owner sets authority. The contracts enforce the boundary. Verify the transaction receipts and source.",
+      "lines": [
+        "AI proposes. The owner sets authority. The contracts enforce the boundary. Verify the transaction receipts and",
+        "source."
+      ]
+    }
+  ],
+  "edits": [
+    {
+      "at": 6.0,
+      "omittedSourceSeconds": 42.217,
+      "phase": "baseline-fixed-test"
+    },
+    {
+      "at": 10.0,
+      "omittedSourceSeconds": 84.812,
+      "phase": "baseline-fixed-test"
+    },
+    {
+      "at": 19.999999999999993,
+      "omittedSourceSeconds": 16.926,
+      "phase": "baseline-confirmed"
+    },
+    {
+      "at": 27.999999999999993,
+      "omittedSourceSeconds": 4.749,
+      "phase": "edit-cap-one"
+    },
+    {
+      "at": 31.285999999999994,
+      "omittedSourceSeconds": 10.054,
+      "phase": "edit-cap-one"
+    },
+    {
+      "at": 31.999999999999993,
+      "omittedSourceSeconds": 14.811,
+      "phase": "edit-cap-one"
+    },
+    {
+      "at": 34.75099999999999,
+      "omittedSourceSeconds": 16.294,
+      "phase": "edit-cap-one"
+    },
+    {
+      "at": 47.999999999999986,
+      "omittedSourceSeconds": 8.859,
+      "phase": "repeat-two-at-one"
+    },
+    {
+      "at": 51.99999999999999,
+      "omittedSourceSeconds": 87.806,
+      "phase": "repeat-two-at-one"
+    },
+    {
+      "at": 59.99999999999999,
+      "omittedSourceSeconds": 9.261,
+      "phase": "cap-rejection-confirmed"
+    },
+    {
+      "at": 70.0,
+      "omittedSourceSeconds": 6.814,
+      "phase": "restore-cap-five"
+    },
+    {
+      "at": 73.33333333333333,
+      "omittedSourceSeconds": 22.75,
+      "phase": "restore-cap-five"
+    },
+    {
+      "at": 79.99999999999999,
+      "omittedSourceSeconds": 19.955,
+      "phase": "cap-five-restored"
+    },
+    {
+      "at": 91.08599999999996,
+      "omittedSourceSeconds": 9.715,
+      "phase": "freeze-request"
+    },
+    {
+      "at": 91.33333333333329,
+      "omittedSourceSeconds": 11.692,
+      "phase": "freeze-request"
+    },
+    {
+      "at": 97.99999999999997,
+      "omittedSourceSeconds": 7.798,
+      "phase": "freeze-confirmed"
+    },
+    {
+      "at": 105.99999999999996,
+      "omittedSourceSeconds": 4.611,
+      "phase": "frozen-fixed-test"
+    },
+    {
+      "at": 109.31099999999995,
+      "omittedSourceSeconds": 7.9,
+      "phase": "frozen-fixed-test"
+    },
+    {
+      "at": 109.99999999999994,
+      "omittedSourceSeconds": 25.628,
+      "phase": "frozen-fixed-test"
+    },
+    {
+      "at": 127.99999999999993,
+      "omittedSourceSeconds": 3.036,
+      "phase": "restore-authorization"
+    },
+    {
+      "at": 131.33333333333326,
+      "omittedSourceSeconds": 19.06,
+      "phase": "restore-authorization"
+    },
+    {
+      "at": 137.9999999999999,
+      "omittedSourceSeconds": 6.891,
+      "phase": "authorization-restored"
+    },
+    {
+      "at": 149.2369999999999,
+      "omittedSourceSeconds": 9.775,
+      "phase": "gemini-normal-run"
+    },
+    {
+      "at": 149.99999999999991,
+      "omittedSourceSeconds": 18.031,
+      "phase": "gemini-normal-run"
+    },
+    {
+      "at": 150.1579999999999,
+      "omittedSourceSeconds": 4.679,
+      "phase": "gemini-normal-run"
+    },
+    {
+      "at": 163.9999999999999,
+      "omittedSourceSeconds": 12.996,
+      "phase": "gemini-resumed-confirmed"
+    },
+    {
+      "at": 167.33333333333317,
+      "omittedSourceSeconds": 3.295,
+      "phase": "gemini-resumed-confirmed"
+    },
+    {
+      "at": 168.25999999999985,
+      "omittedSourceSeconds": 10.425,
+      "phase": "gemini-resumed-confirmed"
+    },
+    {
+      "at": 185.99999999999983,
+      "omittedSourceSeconds": 11.883,
+      "phase": "closing"
+    },
+    {
+      "at": 188.66666666666652,
+      "omittedSourceSeconds": 4.396,
+      "phase": "closing"
+    }
+  ],
+  "frames": [
+    {
+      "file": "frame-000000.jpg",
+      "sourceTimeMs": 43,
+      "phase": "intro",
+      "sourceDuration": 47.217,
+      "duration": 1.0,
+      "gapCutSeconds": 46.217,
+      "readingHold": false,
+      "outputStart": 0.0,
+      "outputEnd": 1.0
+    },
+    {
+      "file": "frame-000000.jpg",
+      "sourceTimeMs": 43,
+      "phase": "intro",
+      "sourceDuration": 0,
+      "duration": 5.0,
+      "gapCutSeconds": 0,
+      "readingHold": true,
+      "outputStart": 1.0,
+      "outputEnd": 6.0
+    },
+    {
+      "file": "frame-000001.jpg",
+      "sourceTimeMs": 47260,
+      "phase": "baseline-fixed-test",
+      "sourceDuration": 1.29,
+      "duration": 1.29,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 6.0,
+      "outputEnd": 7.29
+    },
+    {
+      "file": "frame-000002.jpg",
+      "sourceTimeMs": 48550,
+      "phase": "baseline-fixed-test",
+      "sourceDuration": 0.763,
+      "duration": 0.7629999999999999,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 7.29,
+      "outputEnd": 8.053
+    },
+    {
+      "file": "frame-000003.jpg",
+      "sourceTimeMs": 49313,
+      "phase": "baseline-fixed-test",
+      "sourceDuration": 0.97,
+      "duration": 0.9699999999999998,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 8.053,
+      "outputEnd": 9.023
+    },
+    {
+      "file": "frame-000004.jpg",
+      "sourceTimeMs": 50283,
+      "phase": "baseline-fixed-test",
+      "sourceDuration": 0.722,
+      "duration": 0.722,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 9.023,
+      "outputEnd": 9.745
+    },
+    {
+      "file": "frame-000005.jpg",
+      "sourceTimeMs": 51005,
+      "phase": "baseline-fixed-test",
+      "sourceDuration": 18.283,
+      "duration": 0.25500000000000034,
+      "gapCutSeconds": 17.283,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 9.745,
+      "outputEnd": 10.0
+    },
+    {
+      "file": "frame-000035.jpg",
+      "sourceTimeMs": 135618,
+      "phase": "baseline-fixed-test",
+      "sourceDuration": 0.656,
+      "duration": 0.20199999999999463,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.4540000000000042,
+      "outputStart": 10.0,
+      "outputEnd": 10.201999999999995
+    },
+    {
+      "file": "frame-000036.jpg",
+      "sourceTimeMs": 136274,
+      "phase": "baseline-fixed-test",
+      "sourceDuration": 0.796,
+      "duration": 0.7959999999999994,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 10.201999999999995,
+      "outputEnd": 10.997999999999994
+    },
+    {
+      "file": "frame-000037.jpg",
+      "sourceTimeMs": 137070,
+      "phase": "baseline-fixed-test",
+      "sourceDuration": 0.686,
+      "duration": 0.6860000000000035,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 10.997999999999994,
+      "outputEnd": 11.683999999999997
+    },
+    {
+      "file": "frame-000038.jpg",
+      "sourceTimeMs": 137756,
+      "phase": "baseline-fixed-test",
+      "sourceDuration": 0.719,
+      "duration": 0.7190000000000012,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 11.683999999999997,
+      "outputEnd": 12.402999999999999
+    },
+    {
+      "file": "frame-000039.jpg",
+      "sourceTimeMs": 138475,
+      "phase": "baseline-fixed-test",
+      "sourceDuration": 0.705,
+      "duration": 0.7049999999999983,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 12.402999999999999,
+      "outputEnd": 13.107999999999997
+    },
+    {
+      "file": "frame-000040.jpg",
+      "sourceTimeMs": 139180,
+      "phase": "baseline-fixed-test",
+      "sourceDuration": 0.901,
+      "duration": 0.9010000000000034,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 13.107999999999997,
+      "outputEnd": 14.009
+    },
+    {
+      "file": "frame-000041.jpg",
+      "sourceTimeMs": 140081,
+      "phase": "baseline-fixed-test",
+      "sourceDuration": 0.748,
+      "duration": 0.7479999999999976,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 14.009,
+      "outputEnd": 14.756999999999998
+    },
+    {
+      "file": "frame-000042.jpg",
+      "sourceTimeMs": 140829,
+      "phase": "baseline-fixed-test",
+      "sourceDuration": 0.705,
+      "duration": 0.7049999999999983,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 14.756999999999998,
+      "outputEnd": 15.461999999999996
+    },
+    {
+      "file": "frame-000043.jpg",
+      "sourceTimeMs": 141534,
+      "phase": "baseline-fixed-test",
+      "sourceDuration": 0.94,
+      "duration": 0.9399999999999977,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 15.461999999999996,
+      "outputEnd": 16.401999999999994
+    },
+    {
+      "file": "frame-000044.jpg",
+      "sourceTimeMs": 142474,
+      "phase": "baseline-fixed-test",
+      "sourceDuration": 0.689,
+      "duration": 0.6890000000000001,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 16.401999999999994,
+      "outputEnd": 17.090999999999994
+    },
+    {
+      "file": "frame-000045.jpg",
+      "sourceTimeMs": 143163,
+      "phase": "baseline-fixed-test",
+      "sourceDuration": 1.223,
+      "duration": 1.222999999999999,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 17.090999999999994,
+      "outputEnd": 18.313999999999993
+    },
+    {
+      "file": "frame-000046.jpg",
+      "sourceTimeMs": 144386,
+      "phase": "baseline-fixed-test",
+      "sourceDuration": 0.686,
+      "duration": 0.6859999999999999,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 18.313999999999993,
+      "outputEnd": 18.999999999999993
+    },
+    {
+      "file": "frame-000047.jpg",
+      "sourceTimeMs": 145072,
+      "phase": "baseline-fixed-test",
+      "sourceDuration": 17.926,
+      "duration": 1.0,
+      "gapCutSeconds": 16.926,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 18.999999999999993,
+      "outputEnd": 19.999999999999993
+    },
+    {
+      "file": "frame-000048.jpg",
+      "sourceTimeMs": 162998,
+      "phase": "baseline-confirmed",
+      "sourceDuration": 1.103,
+      "duration": 1.103,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "outputStart": 19.999999999999993,
+      "outputEnd": 21.102999999999994
+    },
+    {
+      "file": "frame-000049.jpg",
+      "sourceTimeMs": 164101,
+      "phase": "baseline-confirmed",
+      "sourceDuration": 1.113,
+      "duration": 1.113,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "outputStart": 21.102999999999994,
+      "outputEnd": 22.215999999999994
+    },
+    {
+      "file": "frame-000050.jpg",
+      "sourceTimeMs": 165214,
+      "phase": "baseline-confirmed",
+      "sourceDuration": 0.734,
+      "duration": 0.734,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "outputStart": 22.215999999999994,
+      "outputEnd": 22.949999999999996
+    },
+    {
+      "file": "frame-000051.jpg",
+      "sourceTimeMs": 165948,
+      "phase": "baseline-confirmed",
+      "sourceDuration": 0.686,
+      "duration": 0.686,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "outputStart": 22.949999999999996,
+      "outputEnd": 23.635999999999996
+    },
+    {
+      "file": "frame-000052.jpg",
+      "sourceTimeMs": 166634,
+      "phase": "baseline-confirmed",
+      "sourceDuration": 0.799,
+      "duration": 0.799,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "outputStart": 23.635999999999996,
+      "outputEnd": 24.434999999999995
+    },
+    {
+      "file": "frame-000053.jpg",
+      "sourceTimeMs": 167433,
+      "phase": "baseline-confirmed",
+      "sourceDuration": 7.314,
+      "duration": 1.0,
+      "gapCutSeconds": 6.314,
+      "readingHold": false,
+      "outputStart": 24.434999999999995,
+      "outputEnd": 25.434999999999995
+    },
+    {
+      "file": "frame-000053.jpg",
+      "sourceTimeMs": 167433,
+      "phase": "baseline-confirmed",
+      "sourceDuration": 0,
+      "duration": 2.5649999999999995,
+      "gapCutSeconds": 0,
+      "readingHold": true,
+      "outputStart": 25.434999999999995,
+      "outputEnd": 27.999999999999993
+    },
+    {
+      "file": "frame-000054.jpg",
+      "sourceTimeMs": 174747,
+      "phase": "edit-cap-one",
+      "sourceDuration": 0.767,
+      "duration": 0.767,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 27.999999999999993,
+      "outputEnd": 28.766999999999992
+    },
+    {
+      "file": "frame-000055.jpg",
+      "sourceTimeMs": 175514,
+      "phase": "edit-cap-one",
+      "sourceDuration": 0.736,
+      "duration": 0.7360000000000001,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 28.766999999999992,
+      "outputEnd": 29.502999999999993
+    },
+    {
+      "file": "frame-000056.jpg",
+      "sourceTimeMs": 176250,
+      "phase": "edit-cap-one",
+      "sourceDuration": 0.783,
+      "duration": 0.7829999999999999,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 29.502999999999993,
+      "outputEnd": 30.285999999999994
+    },
+    {
+      "file": "frame-000057.jpg",
+      "sourceTimeMs": 177033,
+      "phase": "edit-cap-one",
+      "sourceDuration": 11.054,
+      "duration": 1.0,
+      "gapCutSeconds": 10.054,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 30.285999999999994,
+      "outputEnd": 31.285999999999994
+    },
+    {
+      "file": "frame-000058.jpg",
+      "sourceTimeMs": 188087,
+      "phase": "edit-cap-one",
+      "sourceDuration": 1.29,
+      "duration": 0.714,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 31.285999999999994,
+      "outputEnd": 31.999999999999993
+    },
+    {
+      "file": "frame-000075.jpg",
+      "sourceTimeMs": 202861,
+      "phase": "edit-cap-one",
+      "sourceDuration": 0.892,
+      "duration": 0.1410000000000018,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.7509999999999977,
+      "outputStart": 31.999999999999993,
+      "outputEnd": 32.14099999999999
+    },
+    {
+      "file": "frame-000076.jpg",
+      "sourceTimeMs": 203753,
+      "phase": "edit-cap-one",
+      "sourceDuration": 0.842,
+      "duration": 0.8419999999999987,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 32.14099999999999,
+      "outputEnd": 32.98299999999999
+    },
+    {
+      "file": "frame-000077.jpg",
+      "sourceTimeMs": 204595,
+      "phase": "edit-cap-one",
+      "sourceDuration": 0.768,
+      "duration": 0.7680000000000007,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 32.98299999999999,
+      "outputEnd": 33.75099999999999
+    },
+    {
+      "file": "frame-000078.jpg",
+      "sourceTimeMs": 205363,
+      "phase": "edit-cap-one",
+      "sourceDuration": 17.294,
+      "duration": 1.0,
+      "gapCutSeconds": 16.294,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 33.75099999999999,
+      "outputEnd": 34.75099999999999
+    },
+    {
+      "file": "frame-000079.jpg",
+      "sourceTimeMs": 222657,
+      "phase": "edit-cap-one",
+      "sourceDuration": 0.709,
+      "duration": 0.7089999999999996,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 34.75099999999999,
+      "outputEnd": 35.459999999999994
+    },
+    {
+      "file": "frame-000080.jpg",
+      "sourceTimeMs": 223366,
+      "phase": "edit-cap-one",
+      "sourceDuration": 0.714,
+      "duration": 0.7139999999999986,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 35.459999999999994,
+      "outputEnd": 36.17399999999999
+    },
+    {
+      "file": "frame-000081.jpg",
+      "sourceTimeMs": 224080,
+      "phase": "edit-cap-one",
+      "sourceDuration": 0.72,
+      "duration": 0.7199999999999989,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 36.17399999999999,
+      "outputEnd": 36.89399999999999
+    },
+    {
+      "file": "frame-000082.jpg",
+      "sourceTimeMs": 224800,
+      "phase": "edit-cap-one",
+      "sourceDuration": 0.764,
+      "duration": 0.7639999999999993,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 36.89399999999999,
+      "outputEnd": 37.65799999999999
+    },
+    {
+      "file": "frame-000083.jpg",
+      "sourceTimeMs": 225564,
+      "phase": "edit-cap-one",
+      "sourceDuration": 0.827,
+      "duration": 0.8270000000000017,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 37.65799999999999,
+      "outputEnd": 38.484999999999985
+    },
+    {
+      "file": "frame-000084.jpg",
+      "sourceTimeMs": 226391,
+      "phase": "edit-cap-one",
+      "sourceDuration": 0.752,
+      "duration": 0.7519999999999989,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 38.484999999999985,
+      "outputEnd": 39.23699999999998
+    },
+    {
+      "file": "frame-000085.jpg",
+      "sourceTimeMs": 227143,
+      "phase": "edit-cap-one",
+      "sourceDuration": 0.763,
+      "duration": 0.7630000000000017,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 39.23699999999998,
+      "outputEnd": 39.999999999999986
+    },
+    {
+      "file": "frame-000086.jpg",
+      "sourceTimeMs": 227906,
+      "phase": "cap-one-confirmed",
+      "sourceDuration": 0.72,
+      "duration": 0.72,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "outputStart": 39.999999999999986,
+      "outputEnd": 40.719999999999985
+    },
+    {
+      "file": "frame-000087.jpg",
+      "sourceTimeMs": 228626,
+      "phase": "cap-one-confirmed",
+      "sourceDuration": 0.812,
+      "duration": 0.812,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "outputStart": 40.719999999999985,
+      "outputEnd": 41.53199999999998
+    },
+    {
+      "file": "frame-000088.jpg",
+      "sourceTimeMs": 229438,
+      "phase": "cap-one-confirmed",
+      "sourceDuration": 0.689,
+      "duration": 0.689,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "outputStart": 41.53199999999998,
+      "outputEnd": 42.22099999999998
+    },
+    {
+      "file": "frame-000089.jpg",
+      "sourceTimeMs": 230127,
+      "phase": "cap-one-confirmed",
+      "sourceDuration": 0.799,
+      "duration": 0.799,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "outputStart": 42.22099999999998,
+      "outputEnd": 43.01999999999998
+    },
+    {
+      "file": "frame-000090.jpg",
+      "sourceTimeMs": 230926,
+      "phase": "cap-one-confirmed",
+      "sourceDuration": 2.093,
+      "duration": 2.093,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "outputStart": 43.01999999999998,
+      "outputEnd": 45.112999999999985
+    },
+    {
+      "file": "frame-000091.jpg",
+      "sourceTimeMs": 233019,
+      "phase": "cap-one-confirmed",
+      "sourceDuration": 0.72,
+      "duration": 0.72,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "outputStart": 45.112999999999985,
+      "outputEnd": 45.832999999999984
+    },
+    {
+      "file": "frame-000092.jpg",
+      "sourceTimeMs": 233739,
+      "phase": "cap-one-confirmed",
+      "sourceDuration": 0.889,
+      "duration": 0.889,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "outputStart": 45.832999999999984,
+      "outputEnd": 46.72199999999999
+    },
+    {
+      "file": "frame-000093.jpg",
+      "sourceTimeMs": 234628,
+      "phase": "cap-one-confirmed",
+      "sourceDuration": 9.137,
+      "duration": 1.0,
+      "gapCutSeconds": 8.137,
+      "readingHold": false,
+      "outputStart": 46.72199999999999,
+      "outputEnd": 47.72199999999999
+    },
+    {
+      "file": "frame-000093.jpg",
+      "sourceTimeMs": 234628,
+      "phase": "cap-one-confirmed",
+      "sourceDuration": 0,
+      "duration": 0.27800000000000047,
+      "gapCutSeconds": 0,
+      "readingHold": true,
+      "outputStart": 47.72199999999999,
+      "outputEnd": 47.999999999999986
+    },
+    {
+      "file": "frame-000094.jpg",
+      "sourceTimeMs": 243765,
+      "phase": "repeat-two-at-one",
+      "sourceDuration": 0.773,
+      "duration": 0.773,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 47.999999999999986,
+      "outputEnd": 48.77299999999999
+    },
+    {
+      "file": "frame-000095.jpg",
+      "sourceTimeMs": 244538,
+      "phase": "repeat-two-at-one",
+      "sourceDuration": 0.717,
+      "duration": 0.717,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 48.77299999999999,
+      "outputEnd": 49.48999999999999
+    },
+    {
+      "file": "frame-000096.jpg",
+      "sourceTimeMs": 245255,
+      "phase": "repeat-two-at-one",
+      "sourceDuration": 0.825,
+      "duration": 0.825,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 49.48999999999999,
+      "outputEnd": 50.31499999999999
+    },
+    {
+      "file": "frame-000097.jpg",
+      "sourceTimeMs": 246080,
+      "phase": "repeat-two-at-one",
+      "sourceDuration": 0.787,
+      "duration": 0.7869999999999999,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 50.31499999999999,
+      "outputEnd": 51.10199999999999
+    },
+    {
+      "file": "frame-000098.jpg",
+      "sourceTimeMs": 246867,
+      "phase": "repeat-two-at-one",
+      "sourceDuration": 0.686,
+      "duration": 0.6859999999999999,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 51.10199999999999,
+      "outputEnd": 51.78799999999999
+    },
+    {
+      "file": "frame-000099.jpg",
+      "sourceTimeMs": 247553,
+      "phase": "repeat-two-at-one",
+      "sourceDuration": 0.827,
+      "duration": 0.2120000000000002,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 51.78799999999999,
+      "outputEnd": 51.99999999999999
+    },
+    {
+      "file": "frame-000156.jpg",
+      "sourceTimeMs": 335177,
+      "phase": "repeat-two-at-one",
+      "sourceDuration": 0.716,
+      "duration": 0.32200000000000983,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.39399999999999125,
+      "outputStart": 51.99999999999999,
+      "outputEnd": 52.322
+    },
+    {
+      "file": "frame-000157.jpg",
+      "sourceTimeMs": 335893,
+      "phase": "repeat-two-at-one",
+      "sourceDuration": 0.8,
+      "duration": 0.7999999999999972,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 52.322,
+      "outputEnd": 53.122
+    },
+    {
+      "file": "frame-000158.jpg",
+      "sourceTimeMs": 336693,
+      "phase": "repeat-two-at-one",
+      "sourceDuration": 0.704,
+      "duration": 0.7040000000000006,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 53.122,
+      "outputEnd": 53.826
+    },
+    {
+      "file": "frame-000159.jpg",
+      "sourceTimeMs": 337397,
+      "phase": "repeat-two-at-one",
+      "sourceDuration": 0.825,
+      "duration": 0.8250000000000028,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 53.826,
+      "outputEnd": 54.651
+    },
+    {
+      "file": "frame-000160.jpg",
+      "sourceTimeMs": 338222,
+      "phase": "repeat-two-at-one",
+      "sourceDuration": 0.673,
+      "duration": 0.6730000000000018,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 54.651,
+      "outputEnd": 55.324000000000005
+    },
+    {
+      "file": "frame-000161.jpg",
+      "sourceTimeMs": 338895,
+      "phase": "repeat-two-at-one",
+      "sourceDuration": 0.687,
+      "duration": 0.6869999999999976,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 55.324000000000005,
+      "outputEnd": 56.011
+    },
+    {
+      "file": "frame-000162.jpg",
+      "sourceTimeMs": 339582,
+      "phase": "repeat-two-at-one",
+      "sourceDuration": 0.716,
+      "duration": 0.7160000000000011,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 56.011,
+      "outputEnd": 56.727000000000004
+    },
+    {
+      "file": "frame-000163.jpg",
+      "sourceTimeMs": 340298,
+      "phase": "repeat-two-at-one",
+      "sourceDuration": 0.709,
+      "duration": 0.7090000000000032,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 56.727000000000004,
+      "outputEnd": 57.43600000000001
+    },
+    {
+      "file": "frame-000164.jpg",
+      "sourceTimeMs": 341007,
+      "phase": "repeat-two-at-one",
+      "sourceDuration": 0.701,
+      "duration": 0.7010000000000005,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 57.43600000000001,
+      "outputEnd": 58.13700000000001
+    },
+    {
+      "file": "frame-000165.jpg",
+      "sourceTimeMs": 341708,
+      "phase": "repeat-two-at-one",
+      "sourceDuration": 0.863,
+      "duration": 0.8629999999999995,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 58.13700000000001,
+      "outputEnd": 59.00000000000001
+    },
+    {
+      "file": "frame-000166.jpg",
+      "sourceTimeMs": 342571,
+      "phase": "repeat-two-at-one",
+      "sourceDuration": 10.261,
+      "duration": 0.9999999999999858,
+      "gapCutSeconds": 9.261,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 59.00000000000001,
+      "outputEnd": 59.99999999999999
+    },
+    {
+      "file": "frame-000167.jpg",
+      "sourceTimeMs": 352832,
+      "phase": "cap-rejection-confirmed",
+      "sourceDuration": 0.761,
+      "duration": 0.761,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "outputStart": 59.99999999999999,
+      "outputEnd": 60.760999999999996
+    },
+    {
+      "file": "frame-000168.jpg",
+      "sourceTimeMs": 353593,
+      "phase": "cap-rejection-confirmed",
+      "sourceDuration": 0.717,
+      "duration": 0.717,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "outputStart": 60.760999999999996,
+      "outputEnd": 61.477999999999994
+    },
+    {
+      "file": "frame-000169.jpg",
+      "sourceTimeMs": 354310,
+      "phase": "cap-rejection-confirmed",
+      "sourceDuration": 0.675,
+      "duration": 0.675,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "outputStart": 61.477999999999994,
+      "outputEnd": 62.15299999999999
+    },
+    {
+      "file": "frame-000170.jpg",
+      "sourceTimeMs": 354985,
+      "phase": "cap-rejection-confirmed",
+      "sourceDuration": 0.674,
+      "duration": 0.674,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "outputStart": 62.15299999999999,
+      "outputEnd": 62.82699999999999
+    },
+    {
+      "file": "frame-000171.jpg",
+      "sourceTimeMs": 355659,
+      "phase": "cap-rejection-confirmed",
+      "sourceDuration": 0.721,
+      "duration": 0.721,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "outputStart": 62.82699999999999,
+      "outputEnd": 63.54799999999999
+    },
+    {
+      "file": "frame-000172.jpg",
+      "sourceTimeMs": 356380,
+      "phase": "cap-rejection-confirmed",
+      "sourceDuration": 0.799,
+      "duration": 0.799,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "outputStart": 63.54799999999999,
+      "outputEnd": 64.347
+    },
+    {
+      "file": "frame-000173.jpg",
+      "sourceTimeMs": 357179,
+      "phase": "cap-rejection-confirmed",
+      "sourceDuration": 11.467,
+      "duration": 1.0,
+      "gapCutSeconds": 10.467,
+      "readingHold": false,
+      "outputStart": 64.347,
+      "outputEnd": 65.347
+    },
+    {
+      "file": "frame-000173.jpg",
+      "sourceTimeMs": 357179,
+      "phase": "cap-rejection-confirmed",
+      "sourceDuration": 0,
+      "duration": 4.653,
+      "gapCutSeconds": 0,
+      "readingHold": true,
+      "outputStart": 65.347,
+      "outputEnd": 70.0
+    },
+    {
+      "file": "frame-000174.jpg",
+      "sourceTimeMs": 368646,
+      "phase": "restore-cap-five",
+      "sourceDuration": 0.755,
+      "duration": 0.755,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 70.0,
+      "outputEnd": 70.755
+    },
+    {
+      "file": "frame-000175.jpg",
+      "sourceTimeMs": 369401,
+      "phase": "restore-cap-five",
+      "sourceDuration": 0.752,
+      "duration": 0.7520000000000001,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 70.755,
+      "outputEnd": 71.50699999999999
+    },
+    {
+      "file": "frame-000176.jpg",
+      "sourceTimeMs": 370153,
+      "phase": "restore-cap-five",
+      "sourceDuration": 0.676,
+      "duration": 0.6760000000000002,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 71.50699999999999,
+      "outputEnd": 72.18299999999999
+    },
+    {
+      "file": "frame-000177.jpg",
+      "sourceTimeMs": 370829,
+      "phase": "restore-cap-five",
+      "sourceDuration": 0.767,
+      "duration": 0.7669999999999999,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 72.18299999999999,
+      "outputEnd": 72.94999999999999
+    },
+    {
+      "file": "frame-000178.jpg",
+      "sourceTimeMs": 371596,
+      "phase": "restore-cap-five",
+      "sourceDuration": 10.992,
+      "duration": 0.3833333333333333,
+      "gapCutSeconds": 9.992,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 72.94999999999999,
+      "outputEnd": 73.33333333333333
+    },
+    {
+      "file": "frame-000195.jpg",
+      "sourceTimeMs": 394712,
+      "phase": "restore-cap-five",
+      "sourceDuration": 0.701,
+      "duration": 0.6836666666666673,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0173333333333332,
+      "outputStart": 73.33333333333333,
+      "outputEnd": 74.017
+    },
+    {
+      "file": "frame-000196.jpg",
+      "sourceTimeMs": 395413,
+      "phase": "restore-cap-five",
+      "sourceDuration": 0.679,
+      "duration": 0.6789999999999985,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 74.017,
+      "outputEnd": 74.696
+    },
+    {
+      "file": "frame-000197.jpg",
+      "sourceTimeMs": 396092,
+      "phase": "restore-cap-five",
+      "sourceDuration": 0.7,
+      "duration": 0.6999999999999993,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 74.696,
+      "outputEnd": 75.396
+    },
+    {
+      "file": "frame-000198.jpg",
+      "sourceTimeMs": 396792,
+      "phase": "restore-cap-five",
+      "sourceDuration": 0.715,
+      "duration": 0.7149999999999999,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 75.396,
+      "outputEnd": 76.111
+    },
+    {
+      "file": "frame-000199.jpg",
+      "sourceTimeMs": 397507,
+      "phase": "restore-cap-five",
+      "sourceDuration": 0.704,
+      "duration": 0.7040000000000006,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 76.111,
+      "outputEnd": 76.815
+    },
+    {
+      "file": "frame-000200.jpg",
+      "sourceTimeMs": 398211,
+      "phase": "restore-cap-five",
+      "sourceDuration": 0.671,
+      "duration": 0.6709999999999994,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 76.815,
+      "outputEnd": 77.48599999999999
+    },
+    {
+      "file": "frame-000201.jpg",
+      "sourceTimeMs": 398882,
+      "phase": "restore-cap-five",
+      "sourceDuration": 0.72,
+      "duration": 0.7199999999999989,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 77.48599999999999,
+      "outputEnd": 78.20599999999999
+    },
+    {
+      "file": "frame-000202.jpg",
+      "sourceTimeMs": 399602,
+      "phase": "restore-cap-five",
+      "sourceDuration": 0.794,
+      "duration": 0.7940000000000005,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 78.20599999999999,
+      "outputEnd": 78.99999999999999
+    },
+    {
+      "file": "frame-000203.jpg",
+      "sourceTimeMs": 400396,
+      "phase": "restore-cap-five",
+      "sourceDuration": 20.955,
+      "duration": 1.0,
+      "gapCutSeconds": 19.955,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 78.99999999999999,
+      "outputEnd": 79.99999999999999
+    },
+    {
+      "file": "frame-000204.jpg",
+      "sourceTimeMs": 421351,
+      "phase": "cap-five-restored",
+      "sourceDuration": 0.836,
+      "duration": 0.836,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "outputStart": 79.99999999999999,
+      "outputEnd": 80.83599999999998
+    },
+    {
+      "file": "frame-000205.jpg",
+      "sourceTimeMs": 422187,
+      "phase": "cap-five-restored",
+      "sourceDuration": 0.702,
+      "duration": 0.702,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "outputStart": 80.83599999999998,
+      "outputEnd": 81.53799999999998
+    },
+    {
+      "file": "frame-000206.jpg",
+      "sourceTimeMs": 422889,
+      "phase": "cap-five-restored",
+      "sourceDuration": 0.702,
+      "duration": 0.702,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "outputStart": 81.53799999999998,
+      "outputEnd": 82.23999999999998
+    },
+    {
+      "file": "frame-000207.jpg",
+      "sourceTimeMs": 423591,
+      "phase": "cap-five-restored",
+      "sourceDuration": 0.705,
+      "duration": 0.705,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "outputStart": 82.23999999999998,
+      "outputEnd": 82.94499999999998
+    },
+    {
+      "file": "frame-000208.jpg",
+      "sourceTimeMs": 424296,
+      "phase": "cap-five-restored",
+      "sourceDuration": 1.666,
+      "duration": 1.666,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "outputStart": 82.94499999999998,
+      "outputEnd": 84.61099999999998
+    },
+    {
+      "file": "frame-000208.jpg",
+      "sourceTimeMs": 424296,
+      "phase": "cap-five-restored",
+      "sourceDuration": 0,
+      "duration": 3.3890000000000002,
+      "gapCutSeconds": 0,
+      "readingHold": true,
+      "outputStart": 84.61099999999998,
+      "outputEnd": 87.99999999999997
+    },
+    {
+      "file": "frame-000209.jpg",
+      "sourceTimeMs": 425962,
+      "phase": "freeze-request",
+      "sourceDuration": 0.692,
+      "duration": 0.692,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 87.99999999999997,
+      "outputEnd": 88.69199999999996
+    },
+    {
+      "file": "frame-000210.jpg",
+      "sourceTimeMs": 426654,
+      "phase": "freeze-request",
+      "sourceDuration": 0.704,
+      "duration": 0.704,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 88.69199999999996,
+      "outputEnd": 89.39599999999996
+    },
+    {
+      "file": "frame-000211.jpg",
+      "sourceTimeMs": 427358,
+      "phase": "freeze-request",
+      "sourceDuration": 0.69,
+      "duration": 0.69,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 89.39599999999996,
+      "outputEnd": 90.08599999999996
+    },
+    {
+      "file": "frame-000212.jpg",
+      "sourceTimeMs": 428048,
+      "phase": "freeze-request",
+      "sourceDuration": 10.715,
+      "duration": 1.0,
+      "gapCutSeconds": 9.715,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 90.08599999999996,
+      "outputEnd": 91.08599999999996
+    },
+    {
+      "file": "frame-000213.jpg",
+      "sourceTimeMs": 438763,
+      "phase": "freeze-request",
+      "sourceDuration": 0.764,
+      "duration": 0.24733333333333363,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 91.08599999999996,
+      "outputEnd": 91.33333333333329
+    },
+    {
+      "file": "frame-000229.jpg",
+      "sourceTimeMs": 450459,
+      "phase": "freeze-request",
+      "sourceDuration": 0.707,
+      "duration": 0.46366666666666845,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.2433333333333323,
+      "outputStart": 91.33333333333329,
+      "outputEnd": 91.79699999999995
+    },
+    {
+      "file": "frame-000230.jpg",
+      "sourceTimeMs": 451166,
+      "phase": "freeze-request",
+      "sourceDuration": 0.693,
+      "duration": 0.6929999999999996,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 91.79699999999995,
+      "outputEnd": 92.48999999999995
+    },
+    {
+      "file": "frame-000231.jpg",
+      "sourceTimeMs": 451859,
+      "phase": "freeze-request",
+      "sourceDuration": 0.674,
+      "duration": 0.6739999999999995,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 92.48999999999995,
+      "outputEnd": 93.16399999999996
+    },
+    {
+      "file": "frame-000232.jpg",
+      "sourceTimeMs": 452533,
+      "phase": "freeze-request",
+      "sourceDuration": 0.829,
+      "duration": 0.8290000000000006,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 93.16399999999996,
+      "outputEnd": 93.99299999999997
+    },
+    {
+      "file": "frame-000233.jpg",
+      "sourceTimeMs": 453362,
+      "phase": "freeze-request",
+      "sourceDuration": 0.722,
+      "duration": 0.7220000000000013,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 93.99299999999997,
+      "outputEnd": 94.71499999999997
+    },
+    {
+      "file": "frame-000234.jpg",
+      "sourceTimeMs": 454084,
+      "phase": "freeze-request",
+      "sourceDuration": 0.828,
+      "duration": 0.8279999999999994,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 94.71499999999997,
+      "outputEnd": 95.54299999999998
+    },
+    {
+      "file": "frame-000235.jpg",
+      "sourceTimeMs": 454912,
+      "phase": "freeze-request",
+      "sourceDuration": 0.655,
+      "duration": 0.6550000000000011,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 95.54299999999998,
+      "outputEnd": 96.19799999999998
+    },
+    {
+      "file": "frame-000236.jpg",
+      "sourceTimeMs": 455567,
+      "phase": "freeze-request",
+      "sourceDuration": 0.802,
+      "duration": 0.8019999999999996,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 96.19799999999998,
+      "outputEnd": 96.99999999999997
+    },
+    {
+      "file": "frame-000237.jpg",
+      "sourceTimeMs": 456369,
+      "phase": "freeze-request",
+      "sourceDuration": 8.798,
+      "duration": 0.9999999999999964,
+      "gapCutSeconds": 7.798,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 96.99999999999997,
+      "outputEnd": 97.99999999999997
+    },
+    {
+      "file": "frame-000238.jpg",
+      "sourceTimeMs": 465167,
+      "phase": "freeze-confirmed",
+      "sourceDuration": 0.783,
+      "duration": 0.783,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "outputStart": 97.99999999999997,
+      "outputEnd": 98.78299999999997
+    },
+    {
+      "file": "frame-000239.jpg",
+      "sourceTimeMs": 465950,
+      "phase": "freeze-confirmed",
+      "sourceDuration": 0.829,
+      "duration": 0.829,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "outputStart": 98.78299999999997,
+      "outputEnd": 99.61199999999997
+    },
+    {
+      "file": "frame-000240.jpg",
+      "sourceTimeMs": 466779,
+      "phase": "freeze-confirmed",
+      "sourceDuration": 0.829,
+      "duration": 0.829,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "outputStart": 99.61199999999997,
+      "outputEnd": 100.44099999999996
+    },
+    {
+      "file": "frame-000241.jpg",
+      "sourceTimeMs": 467608,
+      "phase": "freeze-confirmed",
+      "sourceDuration": 0.689,
+      "duration": 0.689,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "outputStart": 100.44099999999996,
+      "outputEnd": 101.12999999999995
+    },
+    {
+      "file": "frame-000242.jpg",
+      "sourceTimeMs": 468297,
+      "phase": "freeze-confirmed",
+      "sourceDuration": 0.706,
+      "duration": 0.706,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "outputStart": 101.12999999999995,
+      "outputEnd": 101.83599999999996
+    },
+    {
+      "file": "frame-000243.jpg",
+      "sourceTimeMs": 469003,
+      "phase": "freeze-confirmed",
+      "sourceDuration": 0.677,
+      "duration": 0.677,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "outputStart": 101.83599999999996,
+      "outputEnd": 102.51299999999996
+    },
+    {
+      "file": "frame-000244.jpg",
+      "sourceTimeMs": 469680,
+      "phase": "freeze-confirmed",
+      "sourceDuration": 7.098,
+      "duration": 1.0,
+      "gapCutSeconds": 6.098,
+      "readingHold": false,
+      "outputStart": 102.51299999999996,
+      "outputEnd": 103.51299999999996
+    },
+    {
+      "file": "frame-000244.jpg",
+      "sourceTimeMs": 469680,
+      "phase": "freeze-confirmed",
+      "sourceDuration": 0,
+      "duration": 2.487,
+      "gapCutSeconds": 0,
+      "readingHold": true,
+      "outputStart": 103.51299999999996,
+      "outputEnd": 105.99999999999996
+    },
+    {
+      "file": "frame-000245.jpg",
+      "sourceTimeMs": 476778,
+      "phase": "frozen-fixed-test",
+      "sourceDuration": 0.841,
+      "duration": 0.841,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 105.99999999999996,
+      "outputEnd": 106.84099999999995
+    },
+    {
+      "file": "frame-000246.jpg",
+      "sourceTimeMs": 477619,
+      "phase": "frozen-fixed-test",
+      "sourceDuration": 0.752,
+      "duration": 0.752,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 106.84099999999995,
+      "outputEnd": 107.59299999999995
+    },
+    {
+      "file": "frame-000247.jpg",
+      "sourceTimeMs": 478371,
+      "phase": "frozen-fixed-test",
+      "sourceDuration": 0.718,
+      "duration": 0.718,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 107.59299999999995,
+      "outputEnd": 108.31099999999995
+    },
+    {
+      "file": "frame-000248.jpg",
+      "sourceTimeMs": 479089,
+      "phase": "frozen-fixed-test",
+      "sourceDuration": 8.9,
+      "duration": 1.0,
+      "gapCutSeconds": 7.9,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 108.31099999999995,
+      "outputEnd": 109.31099999999995
+    },
+    {
+      "file": "frame-000249.jpg",
+      "sourceTimeMs": 487989,
+      "phase": "frozen-fixed-test",
+      "sourceDuration": 0.739,
+      "duration": 0.6890000000000001,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 109.31099999999995,
+      "outputEnd": 109.99999999999994
+    },
+    {
+      "file": "frame-000274.jpg",
+      "sourceTimeMs": 514040,
+      "phase": "frozen-fixed-test",
+      "sourceDuration": 0.741,
+      "duration": 0.4750000000000014,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.26599999999999824,
+      "outputStart": 109.99999999999994,
+      "outputEnd": 110.47499999999994
+    },
+    {
+      "file": "frame-000275.jpg",
+      "sourceTimeMs": 514781,
+      "phase": "frozen-fixed-test",
+      "sourceDuration": 0.723,
+      "duration": 0.722999999999999,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 110.47499999999994,
+      "outputEnd": 111.19799999999994
+    },
+    {
+      "file": "frame-000276.jpg",
+      "sourceTimeMs": 515504,
+      "phase": "frozen-fixed-test",
+      "sourceDuration": 0.721,
+      "duration": 0.7210000000000001,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 111.19799999999994,
+      "outputEnd": 111.91899999999994
+    },
+    {
+      "file": "frame-000277.jpg",
+      "sourceTimeMs": 516225,
+      "phase": "frozen-fixed-test",
+      "sourceDuration": 0.739,
+      "duration": 0.7390000000000008,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 111.91899999999994,
+      "outputEnd": 112.65799999999994
+    },
+    {
+      "file": "frame-000278.jpg",
+      "sourceTimeMs": 516964,
+      "phase": "frozen-fixed-test",
+      "sourceDuration": 0.735,
+      "duration": 0.7349999999999994,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 112.65799999999994,
+      "outputEnd": 113.39299999999994
+    },
+    {
+      "file": "frame-000279.jpg",
+      "sourceTimeMs": 517699,
+      "phase": "frozen-fixed-test",
+      "sourceDuration": 0.639,
+      "duration": 0.6389999999999993,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 113.39299999999994,
+      "outputEnd": 114.03199999999994
+    },
+    {
+      "file": "frame-000280.jpg",
+      "sourceTimeMs": 518338,
+      "phase": "frozen-fixed-test",
+      "sourceDuration": 0.671,
+      "duration": 0.6709999999999994,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 114.03199999999994,
+      "outputEnd": 114.70299999999995
+    },
+    {
+      "file": "frame-000281.jpg",
+      "sourceTimeMs": 519009,
+      "phase": "frozen-fixed-test",
+      "sourceDuration": 0.671,
+      "duration": 0.6709999999999994,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 114.70299999999995,
+      "outputEnd": 115.37399999999994
+    },
+    {
+      "file": "frame-000282.jpg",
+      "sourceTimeMs": 519680,
+      "phase": "frozen-fixed-test",
+      "sourceDuration": 0.686,
+      "duration": 0.6859999999999999,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 115.37399999999994,
+      "outputEnd": 116.05999999999995
+    },
+    {
+      "file": "frame-000283.jpg",
+      "sourceTimeMs": 520366,
+      "phase": "frozen-fixed-test",
+      "sourceDuration": 1.94,
+      "duration": 1.9400000000000013,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 116.05999999999995,
+      "outputEnd": 117.99999999999994
+    },
+    {
+      "file": "frame-000284.jpg",
+      "sourceTimeMs": 522306,
+      "phase": "frozen-rejection-confirmed",
+      "sourceDuration": 0.829,
+      "duration": 0.829,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "outputStart": 117.99999999999994,
+      "outputEnd": 118.82899999999994
+    },
+    {
+      "file": "frame-000285.jpg",
+      "sourceTimeMs": 523135,
+      "phase": "frozen-rejection-confirmed",
+      "sourceDuration": 0.672,
+      "duration": 0.672,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "outputStart": 118.82899999999994,
+      "outputEnd": 119.50099999999993
+    },
+    {
+      "file": "frame-000286.jpg",
+      "sourceTimeMs": 523807,
+      "phase": "frozen-rejection-confirmed",
+      "sourceDuration": 0.699,
+      "duration": 0.699,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "outputStart": 119.50099999999993,
+      "outputEnd": 120.19999999999993
+    },
+    {
+      "file": "frame-000287.jpg",
+      "sourceTimeMs": 524506,
+      "phase": "frozen-rejection-confirmed",
+      "sourceDuration": 0.766,
+      "duration": 0.766,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "outputStart": 120.19999999999993,
+      "outputEnd": 120.96599999999994
+    },
+    {
+      "file": "frame-000288.jpg",
+      "sourceTimeMs": 525272,
+      "phase": "frozen-rejection-confirmed",
+      "sourceDuration": 0.642,
+      "duration": 0.642,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "outputStart": 120.96599999999994,
+      "outputEnd": 121.60799999999993
+    },
+    {
+      "file": "frame-000289.jpg",
+      "sourceTimeMs": 525914,
+      "phase": "frozen-rejection-confirmed",
+      "sourceDuration": 0.762,
+      "duration": 0.762,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "outputStart": 121.60799999999993,
+      "outputEnd": 122.36999999999993
+    },
+    {
+      "file": "frame-000290.jpg",
+      "sourceTimeMs": 526676,
+      "phase": "frozen-rejection-confirmed",
+      "sourceDuration": 7.666,
+      "duration": 1.0,
+      "gapCutSeconds": 6.666,
+      "readingHold": false,
+      "outputStart": 122.36999999999993,
+      "outputEnd": 123.36999999999993
+    },
+    {
+      "file": "frame-000290.jpg",
+      "sourceTimeMs": 526676,
+      "phase": "frozen-rejection-confirmed",
+      "sourceDuration": 0,
+      "duration": 4.63,
+      "gapCutSeconds": 0,
+      "readingHold": true,
+      "outputStart": 123.36999999999993,
+      "outputEnd": 127.99999999999993
+    },
+    {
+      "file": "frame-000291.jpg",
+      "sourceTimeMs": 534342,
+      "phase": "restore-authorization",
+      "sourceDuration": 0.927,
+      "duration": 0.927,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 127.99999999999993,
+      "outputEnd": 128.92699999999994
+    },
+    {
+      "file": "frame-000292.jpg",
+      "sourceTimeMs": 535269,
+      "phase": "restore-authorization",
+      "sourceDuration": 0.702,
+      "duration": 0.702,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 128.92699999999994,
+      "outputEnd": 129.62899999999993
+    },
+    {
+      "file": "frame-000293.jpg",
+      "sourceTimeMs": 535971,
+      "phase": "restore-authorization",
+      "sourceDuration": 0.762,
+      "duration": 0.762,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 129.62899999999993,
+      "outputEnd": 130.39099999999993
+    },
+    {
+      "file": "frame-000294.jpg",
+      "sourceTimeMs": 536733,
+      "phase": "restore-authorization",
+      "sourceDuration": 13.722,
+      "duration": 0.9423333333333335,
+      "gapCutSeconds": 12.722,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 130.39099999999993,
+      "outputEnd": 131.33333333333326
+    },
+    {
+      "file": "frame-000303.jpg",
+      "sourceTimeMs": 556519,
+      "phase": "restore-authorization",
+      "sourceDuration": 0.781,
+      "duration": 0.5646666666666658,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.21633333333333482,
+      "outputStart": 131.33333333333326,
+      "outputEnd": 131.8979999999999
+    },
+    {
+      "file": "frame-000304.jpg",
+      "sourceTimeMs": 557300,
+      "phase": "restore-authorization",
+      "sourceDuration": 0.67,
+      "duration": 0.6699999999999999,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 131.8979999999999,
+      "outputEnd": 132.5679999999999
+    },
+    {
+      "file": "frame-000305.jpg",
+      "sourceTimeMs": 557970,
+      "phase": "restore-authorization",
+      "sourceDuration": 0.814,
+      "duration": 0.8140000000000001,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 132.5679999999999,
+      "outputEnd": 133.3819999999999
+    },
+    {
+      "file": "frame-000306.jpg",
+      "sourceTimeMs": 558784,
+      "phase": "restore-authorization",
+      "sourceDuration": 0.783,
+      "duration": 0.7829999999999995,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 133.3819999999999,
+      "outputEnd": 134.16499999999988
+    },
+    {
+      "file": "frame-000307.jpg",
+      "sourceTimeMs": 559567,
+      "phase": "restore-authorization",
+      "sourceDuration": 0.731,
+      "duration": 0.7309999999999999,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 134.16499999999988,
+      "outputEnd": 134.89599999999987
+    },
+    {
+      "file": "frame-000308.jpg",
+      "sourceTimeMs": 560298,
+      "phase": "restore-authorization",
+      "sourceDuration": 0.687,
+      "duration": 0.6869999999999994,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 134.89599999999987,
+      "outputEnd": 135.58299999999988
+    },
+    {
+      "file": "frame-000309.jpg",
+      "sourceTimeMs": 560985,
+      "phase": "restore-authorization",
+      "sourceDuration": 0.673,
+      "duration": 0.673,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 135.58299999999988,
+      "outputEnd": 136.2559999999999
+    },
+    {
+      "file": "frame-000310.jpg",
+      "sourceTimeMs": 561658,
+      "phase": "restore-authorization",
+      "sourceDuration": 0.744,
+      "duration": 0.7439999999999998,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 136.2559999999999,
+      "outputEnd": 136.9999999999999
+    },
+    {
+      "file": "frame-000311.jpg",
+      "sourceTimeMs": 562402,
+      "phase": "restore-authorization",
+      "sourceDuration": 7.891,
+      "duration": 1.0000000000000018,
+      "gapCutSeconds": 6.891,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 136.9999999999999,
+      "outputEnd": 137.9999999999999
+    },
+    {
+      "file": "frame-000312.jpg",
+      "sourceTimeMs": 570293,
+      "phase": "authorization-restored",
+      "sourceDuration": 0.695,
+      "duration": 0.695,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "outputStart": 137.9999999999999,
+      "outputEnd": 138.69499999999988
+    },
+    {
+      "file": "frame-000313.jpg",
+      "sourceTimeMs": 570988,
+      "phase": "authorization-restored",
+      "sourceDuration": 0.655,
+      "duration": 0.655,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "outputStart": 138.69499999999988,
+      "outputEnd": 139.34999999999988
+    },
+    {
+      "file": "frame-000314.jpg",
+      "sourceTimeMs": 571643,
+      "phase": "authorization-restored",
+      "sourceDuration": 1.173,
+      "duration": 1.173,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "outputStart": 139.34999999999988,
+      "outputEnd": 140.52299999999988
+    },
+    {
+      "file": "frame-000315.jpg",
+      "sourceTimeMs": 572816,
+      "phase": "authorization-restored",
+      "sourceDuration": 0.831,
+      "duration": 0.831,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "outputStart": 140.52299999999988,
+      "outputEnd": 141.35399999999987
+    },
+    {
+      "file": "frame-000316.jpg",
+      "sourceTimeMs": 573647,
+      "phase": "authorization-restored",
+      "sourceDuration": 1.81,
+      "duration": 1.81,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "outputStart": 141.35399999999987,
+      "outputEnd": 143.16399999999987
+    },
+    {
+      "file": "frame-000316.jpg",
+      "sourceTimeMs": 573647,
+      "phase": "authorization-restored",
+      "sourceDuration": 0,
+      "duration": 2.8360000000000003,
+      "gapCutSeconds": 0,
+      "readingHold": true,
+      "outputStart": 143.16399999999987,
+      "outputEnd": 145.9999999999999
+    },
+    {
+      "file": "frame-000317.jpg",
+      "sourceTimeMs": 575457,
+      "phase": "gemini-normal-run",
+      "sourceDuration": 0.692,
+      "duration": 0.692,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 145.9999999999999,
+      "outputEnd": 146.6919999999999
+    },
+    {
+      "file": "frame-000318.jpg",
+      "sourceTimeMs": 576149,
+      "phase": "gemini-normal-run",
+      "sourceDuration": 0.733,
+      "duration": 0.7329999999999999,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 146.6919999999999,
+      "outputEnd": 147.4249999999999
+    },
+    {
+      "file": "frame-000319.jpg",
+      "sourceTimeMs": 576882,
+      "phase": "gemini-normal-run",
+      "sourceDuration": 0.812,
+      "duration": 0.8120000000000003,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 147.4249999999999,
+      "outputEnd": 148.2369999999999
+    },
+    {
+      "file": "frame-000320.jpg",
+      "sourceTimeMs": 577694,
+      "phase": "gemini-normal-run",
+      "sourceDuration": 10.775,
+      "duration": 1.0,
+      "gapCutSeconds": 9.775,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 148.2369999999999,
+      "outputEnd": 149.2369999999999
+    },
+    {
+      "file": "frame-000321.jpg",
+      "sourceTimeMs": 588469,
+      "phase": "gemini-normal-run",
+      "sourceDuration": 0.776,
+      "duration": 0.7629999999999999,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 149.2369999999999,
+      "outputEnd": 149.99999999999991
+    },
+    {
+      "file": "frame-000345.jpg",
+      "sourceTimeMs": 606421,
+      "phase": "gemini-normal-run",
+      "sourceDuration": 5.679,
+      "duration": 0.1579999999999977,
+      "gapCutSeconds": 4.679,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.8420000000000023,
+      "outputStart": 149.99999999999991,
+      "outputEnd": 150.1579999999999
+    },
+    {
+      "file": "frame-000346.jpg",
+      "sourceTimeMs": 612100,
+      "phase": "gemini-normal-run",
+      "sourceDuration": 0.789,
+      "duration": 0.7890000000000015,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 150.1579999999999,
+      "outputEnd": 150.9469999999999
+    },
+    {
+      "file": "frame-000347.jpg",
+      "sourceTimeMs": 612889,
+      "phase": "gemini-normal-run",
+      "sourceDuration": 0.662,
+      "duration": 0.661999999999999,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 150.9469999999999,
+      "outputEnd": 151.6089999999999
+    },
+    {
+      "file": "frame-000348.jpg",
+      "sourceTimeMs": 613551,
+      "phase": "gemini-normal-run",
+      "sourceDuration": 0.864,
+      "duration": 0.8640000000000008,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 151.6089999999999,
+      "outputEnd": 152.4729999999999
+    },
+    {
+      "file": "frame-000349.jpg",
+      "sourceTimeMs": 614415,
+      "phase": "gemini-normal-run",
+      "sourceDuration": 0.772,
+      "duration": 0.7719999999999985,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 152.4729999999999,
+      "outputEnd": 153.2449999999999
+    },
+    {
+      "file": "frame-000350.jpg",
+      "sourceTimeMs": 615187,
+      "phase": "gemini-normal-run",
+      "sourceDuration": 0.954,
+      "duration": 0.9540000000000006,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 153.2449999999999,
+      "outputEnd": 154.1989999999999
+    },
+    {
+      "file": "frame-000351.jpg",
+      "sourceTimeMs": 616141,
+      "phase": "gemini-normal-run",
+      "sourceDuration": 0.669,
+      "duration": 0.6690000000000005,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 154.1989999999999,
+      "outputEnd": 154.8679999999999
+    },
+    {
+      "file": "frame-000352.jpg",
+      "sourceTimeMs": 616810,
+      "phase": "gemini-normal-run",
+      "sourceDuration": 0.687,
+      "duration": 0.6870000000000012,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 154.8679999999999,
+      "outputEnd": 155.55499999999992
+    },
+    {
+      "file": "frame-000353.jpg",
+      "sourceTimeMs": 617497,
+      "phase": "gemini-normal-run",
+      "sourceDuration": 0.719,
+      "duration": 0.7190000000000012,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 155.55499999999992,
+      "outputEnd": 156.27399999999992
+    },
+    {
+      "file": "frame-000354.jpg",
+      "sourceTimeMs": 618216,
+      "phase": "gemini-normal-run",
+      "sourceDuration": 0.689,
+      "duration": 0.6890000000000001,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 156.27399999999992,
+      "outputEnd": 156.9629999999999
+    },
+    {
+      "file": "frame-000355.jpg",
+      "sourceTimeMs": 618905,
+      "phase": "gemini-normal-run",
+      "sourceDuration": 0.859,
+      "duration": 0.8590000000000018,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 156.9629999999999,
+      "outputEnd": 157.82199999999992
+    },
+    {
+      "file": "frame-000356.jpg",
+      "sourceTimeMs": 619764,
+      "phase": "gemini-normal-run",
+      "sourceDuration": 0.798,
+      "duration": 0.7980000000000018,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 157.82199999999992,
+      "outputEnd": 158.61999999999992
+    },
+    {
+      "file": "frame-000357.jpg",
+      "sourceTimeMs": 620562,
+      "phase": "gemini-normal-run",
+      "sourceDuration": 0.75,
+      "duration": 0.75,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 158.61999999999992,
+      "outputEnd": 159.36999999999992
+    },
+    {
+      "file": "frame-000358.jpg",
+      "sourceTimeMs": 621312,
+      "phase": "gemini-normal-run",
+      "sourceDuration": 0.673,
+      "duration": 0.6730000000000018,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 159.36999999999992,
+      "outputEnd": 160.04299999999992
+    },
+    {
+      "file": "frame-000359.jpg",
+      "sourceTimeMs": 621985,
+      "phase": "gemini-normal-run",
+      "sourceDuration": 0.685,
+      "duration": 0.6850000000000023,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 160.04299999999992,
+      "outputEnd": 160.72799999999992
+    },
+    {
+      "file": "frame-000360.jpg",
+      "sourceTimeMs": 622670,
+      "phase": "gemini-normal-run",
+      "sourceDuration": 0.783,
+      "duration": 0.7830000000000013,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 160.72799999999992,
+      "outputEnd": 161.5109999999999
+    },
+    {
+      "file": "frame-000361.jpg",
+      "sourceTimeMs": 623453,
+      "phase": "gemini-normal-run",
+      "sourceDuration": 0.691,
+      "duration": 0.6910000000000025,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 161.5109999999999,
+      "outputEnd": 162.2019999999999
+    },
+    {
+      "file": "frame-000362.jpg",
+      "sourceTimeMs": 624144,
+      "phase": "gemini-normal-run",
+      "sourceDuration": 0.798,
+      "duration": 0.7980000000000018,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 162.2019999999999,
+      "outputEnd": 162.99999999999991
+    },
+    {
+      "file": "frame-000363.jpg",
+      "sourceTimeMs": 624942,
+      "phase": "gemini-normal-run",
+      "sourceDuration": 13.996,
+      "duration": 0.9999999999999858,
+      "gapCutSeconds": 12.996,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 162.99999999999991,
+      "outputEnd": 163.9999999999999
+    },
+    {
+      "file": "frame-000364.jpg",
+      "sourceTimeMs": 638938,
+      "phase": "gemini-resumed-confirmed",
+      "sourceDuration": 0.771,
+      "duration": 0.771,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 163.9999999999999,
+      "outputEnd": 164.77099999999987
+    },
+    {
+      "file": "frame-000365.jpg",
+      "sourceTimeMs": 639709,
+      "phase": "gemini-resumed-confirmed",
+      "sourceDuration": 0.765,
+      "duration": 0.765,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 164.77099999999987,
+      "outputEnd": 165.53599999999986
+    },
+    {
+      "file": "frame-000366.jpg",
+      "sourceTimeMs": 640474,
+      "phase": "gemini-resumed-confirmed",
+      "sourceDuration": 0.736,
+      "duration": 0.7360000000000002,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 165.53599999999986,
+      "outputEnd": 166.27199999999985
+    },
+    {
+      "file": "frame-000367.jpg",
+      "sourceTimeMs": 641210,
+      "phase": "gemini-resumed-confirmed",
+      "sourceDuration": 0.736,
+      "duration": 0.7359999999999998,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 166.27199999999985,
+      "outputEnd": 167.00799999999984
+    },
+    {
+      "file": "frame-000368.jpg",
+      "sourceTimeMs": 641946,
+      "phase": "gemini-resumed-confirmed",
+      "sourceDuration": 0.687,
+      "duration": 0.3253333333333335,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 167.00799999999984,
+      "outputEnd": 167.33333333333317
+    },
+    {
+      "file": "frame-000373.jpg",
+      "sourceTimeMs": 645493,
+      "phase": "gemini-resumed-confirmed",
+      "sourceDuration": 11.425,
+      "duration": 0.9266666666666659,
+      "gapCutSeconds": 10.425,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.07333333333333414,
+      "outputStart": 167.33333333333317,
+      "outputEnd": 168.25999999999985
+    },
+    {
+      "file": "frame-000374.jpg",
+      "sourceTimeMs": 656918,
+      "phase": "gemini-resumed-confirmed",
+      "sourceDuration": 0.745,
+      "duration": 0.7449999999999992,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 168.25999999999985,
+      "outputEnd": 169.00499999999985
+    },
+    {
+      "file": "frame-000375.jpg",
+      "sourceTimeMs": 657663,
+      "phase": "gemini-resumed-confirmed",
+      "sourceDuration": 0.733,
+      "duration": 0.7330000000000005,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 169.00499999999985,
+      "outputEnd": 169.73799999999986
+    },
+    {
+      "file": "frame-000376.jpg",
+      "sourceTimeMs": 658396,
+      "phase": "gemini-resumed-confirmed",
+      "sourceDuration": 0.702,
+      "duration": 0.702,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 169.73799999999986,
+      "outputEnd": 170.43999999999986
+    },
+    {
+      "file": "frame-000377.jpg",
+      "sourceTimeMs": 659098,
+      "phase": "gemini-resumed-confirmed",
+      "sourceDuration": 0.673,
+      "duration": 0.673,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 170.43999999999986,
+      "outputEnd": 171.11299999999986
+    },
+    {
+      "file": "frame-000378.jpg",
+      "sourceTimeMs": 659771,
+      "phase": "gemini-resumed-confirmed",
+      "sourceDuration": 0.7,
+      "duration": 0.6999999999999993,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 171.11299999999986,
+      "outputEnd": 171.81299999999985
+    },
+    {
+      "file": "frame-000379.jpg",
+      "sourceTimeMs": 660471,
+      "phase": "gemini-resumed-confirmed",
+      "sourceDuration": 0.746,
+      "duration": 0.7460000000000004,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 171.81299999999985,
+      "outputEnd": 172.55899999999986
+    },
+    {
+      "file": "frame-000380.jpg",
+      "sourceTimeMs": 661217,
+      "phase": "gemini-resumed-confirmed",
+      "sourceDuration": 1.441,
+      "duration": 1.4410000000000007,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 172.55899999999986,
+      "outputEnd": 173.99999999999986
+    },
+    {
+      "file": "frame-000381.jpg",
+      "sourceTimeMs": 662658,
+      "phase": "integration-proof",
+      "sourceDuration": 0.776,
+      "duration": 0.776,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "outputStart": 173.99999999999986,
+      "outputEnd": 174.77599999999987
+    },
+    {
+      "file": "frame-000382.jpg",
+      "sourceTimeMs": 663434,
+      "phase": "integration-proof",
+      "sourceDuration": 0.701,
+      "duration": 0.701,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "outputStart": 174.77599999999987,
+      "outputEnd": 175.47699999999986
+    },
+    {
+      "file": "frame-000383.jpg",
+      "sourceTimeMs": 664135,
+      "phase": "integration-proof",
+      "sourceDuration": 0.749,
+      "duration": 0.749,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "outputStart": 175.47699999999986,
+      "outputEnd": 176.22599999999986
+    },
+    {
+      "file": "frame-000384.jpg",
+      "sourceTimeMs": 664884,
+      "phase": "integration-proof",
+      "sourceDuration": 0.749,
+      "duration": 0.749,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "outputStart": 176.22599999999986,
+      "outputEnd": 176.97499999999985
+    },
+    {
+      "file": "frame-000385.jpg",
+      "sourceTimeMs": 665633,
+      "phase": "integration-proof",
+      "sourceDuration": 0.716,
+      "duration": 0.716,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "outputStart": 176.97499999999985,
+      "outputEnd": 177.69099999999986
+    },
+    {
+      "file": "frame-000386.jpg",
+      "sourceTimeMs": 666349,
+      "phase": "integration-proof",
+      "sourceDuration": 0.748,
+      "duration": 0.748,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "outputStart": 177.69099999999986,
+      "outputEnd": 178.43899999999985
+    },
+    {
+      "file": "frame-000387.jpg",
+      "sourceTimeMs": 667097,
+      "phase": "integration-proof",
+      "sourceDuration": 0.688,
+      "duration": 0.688,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "outputStart": 178.43899999999985,
+      "outputEnd": 179.12699999999984
+    },
+    {
+      "file": "frame-000388.jpg",
+      "sourceTimeMs": 667785,
+      "phase": "integration-proof",
+      "sourceDuration": 0.736,
+      "duration": 0.736,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "outputStart": 179.12699999999984,
+      "outputEnd": 179.86299999999983
+    },
+    {
+      "file": "frame-000389.jpg",
+      "sourceTimeMs": 668521,
+      "phase": "integration-proof",
+      "sourceDuration": 0.717,
+      "duration": 0.717,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "outputStart": 179.86299999999983,
+      "outputEnd": 180.57999999999984
+    },
+    {
+      "file": "frame-000390.jpg",
+      "sourceTimeMs": 669238,
+      "phase": "integration-proof",
+      "sourceDuration": 16.303,
+      "duration": 1.0,
+      "gapCutSeconds": 15.303,
+      "readingHold": false,
+      "outputStart": 180.57999999999984,
+      "outputEnd": 181.57999999999984
+    },
+    {
+      "file": "frame-000390.jpg",
+      "sourceTimeMs": 669238,
+      "phase": "integration-proof",
+      "sourceDuration": 0,
+      "duration": 4.42,
+      "gapCutSeconds": 0,
+      "readingHold": true,
+      "outputStart": 181.57999999999984,
+      "outputEnd": 185.99999999999983
+    },
+    {
+      "file": "frame-000391.jpg",
+      "sourceTimeMs": 685541,
+      "phase": "closing",
+      "sourceDuration": 1.466,
+      "duration": 1.466,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 185.99999999999983,
+      "outputEnd": 187.46599999999984
+    },
+    {
+      "file": "frame-000392.jpg",
+      "sourceTimeMs": 687007,
+      "phase": "closing",
+      "sourceDuration": 0.738,
+      "duration": 0.7379999999999998,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 187.46599999999984,
+      "outputEnd": 188.20399999999984
+    },
+    {
+      "file": "frame-000393.jpg",
+      "sourceTimeMs": 687745,
+      "phase": "closing",
+      "sourceDuration": 0.684,
+      "duration": 0.4626666666666668,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 188.20399999999984,
+      "outputEnd": 188.66666666666652
+    },
+    {
+      "file": "frame-000399.jpg",
+      "sourceTimeMs": 692130,
+      "phase": "closing",
+      "sourceDuration": 0.702,
+      "duration": 0.22783333333333378,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.4741666666666662,
+      "outputStart": 188.66666666666652,
+      "outputEnd": 188.89449999999985
+    },
+    {
+      "file": "frame-000400.jpg",
+      "sourceTimeMs": 692832,
+      "phase": "closing",
+      "sourceDuration": 0.702,
+      "duration": 0.702,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 188.89449999999985,
+      "outputEnd": 189.59649999999985
+    },
+    {
+      "file": "frame-000401.jpg",
+      "sourceTimeMs": 693534,
+      "phase": "closing",
+      "sourceDuration": 0.721,
+      "duration": 0.7209999999999992,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 189.59649999999985,
+      "outputEnd": 190.31749999999985
+    },
+    {
+      "file": "frame-000402.jpg",
+      "sourceTimeMs": 694255,
+      "phase": "closing",
+      "sourceDuration": 0.837,
+      "duration": 0.8369999999999997,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 190.31749999999985,
+      "outputEnd": 191.15449999999984
+    },
+    {
+      "file": "frame-000403.jpg",
+      "sourceTimeMs": 695092,
+      "phase": "closing",
+      "sourceDuration": 0.69,
+      "duration": 0.6899999999999995,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 191.15449999999984,
+      "outputEnd": 191.84449999999984
+    },
+    {
+      "file": "frame-000404.jpg",
+      "sourceTimeMs": 695782,
+      "phase": "closing",
+      "sourceDuration": 0.719,
+      "duration": 0.7189999999999994,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 191.84449999999984,
+      "outputEnd": 192.56349999999983
+    },
+    {
+      "file": "frame-000405.jpg",
+      "sourceTimeMs": 696501,
+      "phase": "closing",
+      "sourceDuration": 0.701,
+      "duration": 0.7010000000000005,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 192.56349999999983,
+      "outputEnd": 193.26449999999983
+    },
+    {
+      "file": "frame-000406.jpg",
+      "sourceTimeMs": 697202,
+      "phase": "closing",
+      "sourceDuration": 0.7355,
+      "duration": 0.7355,
+      "gapCutSeconds": 0.0,
+      "readingHold": false,
+      "sourceOffsetSeconds": 0.0,
+      "outputStart": 193.26449999999983,
+      "outputEnd": 193.99999999999983
+    }
+  ],
+  "warning": null,
+  "rawFilesModified": false,
+  "audio": "none",
+  "uploaded": false
+}
