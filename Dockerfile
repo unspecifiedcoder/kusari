@@ -28,7 +28,7 @@ COPY proxy/server.mjs ./proxy/server.mjs
 COPY shared/types.ts ./shared/types.ts
 COPY config/chains.json ./config/chains.json
 COPY deployments/*.json ./deployments/
-COPY scripts/demo-gateway.mjs scripts/start-hosted-demo.mjs scripts/present-hosted-demo.mjs ./scripts/
+COPY scripts/demo-gateway.mjs scripts/start-hosted-demo.mjs scripts/present-hosted-demo.mjs scripts/sandbox-access.mjs ./scripts/
 
 USER node
 EXPOSE 8788

@@ -12,10 +12,10 @@ export default function Home() {
           <h1 className="max-w-2xl text-4xl font-semibold leading-[1.12] tracking-tight sm:text-5xl">Give your agent a budget.<br /><span className="text-zinc-400">Keep the final say.</span></h1>
           <p className="mt-6 max-w-2xl text-base leading-7 text-zinc-300">Kusari puts an AI trading agent inside owner-defined boundaries. An ENS policy sets the rules, a Uniswap v4 hook enforces them, and the owner can revoke access.</p>
           <div className="mt-7 flex flex-wrap items-center gap-3">
-            <Link href="/demo" className="rounded-xl bg-emerald-400 px-5 py-3 text-sm font-semibold text-zinc-950 hover:bg-emerald-300">Open demonstration <span aria-hidden="true">→</span></Link>
+            <Link href="/demo#try-sandbox" className="rounded-xl bg-emerald-400 px-5 py-3 text-sm font-semibold text-zinc-950 hover:bg-emerald-300">Try the live AI agent <span aria-hidden="true">→</span></Link>
             <a href="#onchain-evidence" className="rounded-xl border border-zinc-700 px-5 py-3 text-sm font-medium text-zinc-200 hover:border-zinc-500">Verify the transactions</a>
           </div>
-          <p className="mt-4 text-xs text-zinc-500">No wallet required to inspect. This release demonstrates one configured agent on Sepolia.</p>
+          <p className="mt-4 text-xs text-zinc-500">Inspect without a wallet, or connect to run the funded Sepolia sandbox. Your wallet supplies no tokens or gas.</p>
         </div>
       </section>
       <JudgeOverview />

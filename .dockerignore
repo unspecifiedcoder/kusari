@@ -26,6 +26,7 @@
 !scripts/demo-gateway.mjs
 !scripts/start-hosted-demo.mjs
 !scripts/present-hosted-demo.mjs
+!scripts/sandbox-access.mjs
 
 # These exclusions win even if a future source include is widened.
 **/.env

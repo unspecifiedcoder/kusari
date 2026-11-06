@@ -10,11 +10,12 @@
 import { createServer, type ServerResponse } from "node:http";
 import { formatEther } from "viem";
 import { config, deployment, ANON_RPC, LEAK_RPC } from "./config.ts";
-import { readState, setReadRpc, readRpc, type AgentState } from "./state.ts";
+import { readState, setReadRpc, readRpc, reader, type AgentState } from "./state.ts";
 import { decide, type Decision } from "./llm.ts";
 import { newsFeed } from "./news.ts";
 import { executeSwap, agentAccount, setWriteRpc } from "./swap.ts";
 import { createSnapshotCache } from "./snapshot-cache.mjs";
+import { readSandboxJson, runRealSandboxCycle } from "../../scripts/sandbox-access.mjs";
 
 let injected = false;
 let transport: "anon" | "leak" | "direct" = config.readRpc === ANON_RPC ? "anon" : config.readRpc === LEAK_RPC ? "leak" : "direct";
@@ -24,6 +25,8 @@ const scriptedOnly = process.env.AGENT_SCRIPTED === "1";
 const recentEvents: Record<string, unknown>[] = [];
 let eventSequence = 0;
 let bridgeMode: "anon" | "direct" | "unknown" = "unknown";
+let activeRunId: string | null = null;
+let activeScenario: "normal" | "attack" | null = null;
 
 async function readBridgeMode() {
   if (readRpc !== ANON_RPC) return;
@@ -68,7 +71,7 @@ snapshotRefreshTimer.unref();
 void snapshots.refresh();
 
 function emit(type: string, data: Record<string, unknown> = {}) {
-  const e = { type, t: Date.now(), id: ++eventSequence, ...data };
+  const e = { type, t: Date.now(), id: ++eventSequence, ...data, ...(activeRunId ? { runId: activeRunId } : {}) };
   recentEvents.unshift(e);
   recentEvents.length = Math.min(recentEvents.length, 40);
   console.log(type, JSON.stringify(data));
@@ -83,9 +86,12 @@ function scripted(vault: number, maxPerSwap: number): Decision {
     : { action: "swap", amountIn: Math.min(1, maxPerSwap), reason: "[scripted] small routine buy within limits" };
 }
 
-async function cycle() {
-  if (busy) return emit("error", { message: "a cycle is already running" });
+async function cycle(options: { reserved?: boolean; runId?: string; scenario?: "normal" | "attack" } = {}) {
+  if (busy && !options.reserved) return emit("error", { message: "a cycle is already running" });
   busy = true;
+  activeRunId = options.runId ?? null;
+  activeScenario = options.scenario ?? null;
+  const cycleInjected = options.scenario ? options.scenario === "attack" : injected;
   try {
     emit("reading", { via: readRpc, transport });
     const [s] = await Promise.all([readState(agentAccount.address), readBridgeMode()]);
@@ -96,7 +102,29 @@ async function cycle() {
     snapshots.record(state);
     emit("state", state);
 
-    const news = newsFeed(injected);
+    const news = newsFeed(cycleInjected);
+    if (options.scenario) {
+      await runRealSandboxCycle({
+        scenario: options.scenario,
+        scripted: scriptedOnly,
+        configuredChainId: deployment.chainId,
+        maxPerSwap,
+        getChainId: () => reader.getChainId(),
+        getAgentBalance: () => reader.getBalance({ address: agentAccount.address }),
+        decide: async () => {
+          const r = await decide({ price: s.price, vaultKUSD: vault, maxPerSwap: options.scenario === "normal" ? Math.min(maxPerSwap, 1) : maxPerSwap, remainingToday: options.scenario === "normal" ? Math.min(remaining, 1) : remaining, news });
+          return { ...r, source: r.model };
+        },
+        onDecision: (d: Decision & { source: string }) => emit("decision", { ...d, injected: cycleInjected, sandbox: true }),
+        execute: async (d: Decision) => {
+          emit("swapping", { amountIn: d.amountIn, sandbox: true });
+          const r = await executeSwap(d.amountIn, { sendEvenIfBlocked: true, sqrtPriceX96: s.sqrtPriceX96 });
+          emit("swap", { ...r, sandbox: true });
+          return r;
+        },
+      });
+      return;
+    }
     let d: Decision & { source: string };
     if (scriptedOnly) {
       d = { ...scripted(vault, maxPerSwap), source: "scripted" };
@@ -117,12 +145,14 @@ async function cycle() {
       emit("swap", { ...r });
     }
   } catch (e) {
-    emit("error", { message: (e as Error).message.split("\n")[0] });
+    emit("error", { message: (e as Error).message.split("\n")[0], ...((e as Error).name === "ModelDidNotFollowInjection" ? { code: "ModelDidNotFollowInjection" } : {}) });
   } finally {
     busy = false;
     snapshots.invalidate(); // trade or revoke may have changed chain state since the pre-trade read
     void snapshots.refresh();
     emit("idle"); // the dashboard treats the agent as busy from "reading" until "idle"
+    activeRunId = null;
+    activeScenario = null;
   }
 }
 
@@ -147,7 +177,22 @@ const server = createServer(async (req, res) => {
     res.end(JSON.stringify(body));
   };
   if (url.pathname === "/status") {
-    return json(200, { agent: agentAccount.address, vault: deployment.demoVault, readRpc, transport, readTransport: actualReadTransport(), bridgeMode, injected, scriptedOnly, busy, canControl: true, recentEvents, ...snapshots.get() });
+    return json(200, { agent: agentAccount.address, vault: deployment.demoVault, readRpc, transport, readTransport: actualReadTransport(), bridgeMode, injected: activeScenario ? activeScenario === "attack" : injected, scriptedOnly, busy, activeRunId, canControl: true, recentEvents, ...snapshots.get() });
+  }
+  if (req.method === "POST" && url.pathname === "/sandbox/run") {
+    if (busy) return json(409, { error: "a cycle is already running" });
+    if (deployment.chainId !== 11155111 || scriptedOnly || !process.env.GEMINI_API_KEY) return json(503, { error: "Real Gemini Sepolia sandbox is not configured" });
+    // Reserve before any asynchronous body/chain/model work. All other control paths honor busy.
+    busy = true;
+    try {
+      const input = await readSandboxJson(req, 1024) as { runId?: unknown; scenario?: unknown };
+      if (!input || typeof input !== "object" || Array.isArray(input) || Object.keys(input).length !== 2 || typeof input.runId !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(input.runId) || (input.scenario !== "normal" && input.scenario !== "attack")) throw new Error("Invalid shared sandbox run");
+      void cycle({ reserved: true, runId: input.runId, scenario: input.scenario });
+      return json(202, { runId: input.runId, started: true });
+    } catch {
+      busy = false;
+      return json(400, { error: "Invalid shared sandbox run" });
+    }
   }
   if (req.method === "POST" && url.pathname === "/tick") {
     if (busy) return json(409, { error: "a cycle is already running" });

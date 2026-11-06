@@ -4,16 +4,18 @@
 
 AI trading with ENSv2 owner controls, Uniswap v4 enforcement and Ethereum Foundation Anon-RPC routing. Built at ETHGlobal Mumbai 2026 on Sepolia with test tokens.
 
-**[Open the judge demo →](https://kusari-demo.vercel.app)** · [Deployed source](https://github.com/unspecifiedcoder/kusari/tree/codex/judge-ready) · [Uniswap feedback](FEEDBACK.md)
+**[Judge demo / Sandbox →](https://kusari.outcomeseal.com/demo#try-sandbox)** · [Source](https://github.com/unspecifiedcoder/kusari/tree/codex/judge-ready) · [Uniswap feedback](FEEDBACK.md)
+
+**Release status:** the new domain is configured in Vercel and awaits DNS activation. The interactive Sandbox is implemented; deployment and live visitor validation are pending. `kusari-demo.vercel.app` currently triggers MetaMask's site-security block; a [review is submitted](https://github.com/MetaMask/eth-phishing-detect/issues/309873), not cleared. Do not bypass a wallet security warning. The verified transaction evidence below remains available without a wallet.
 
 ## For judges
 
 1. Open the website without connecting a wallet. Inspect the configured agent, policy, budget and vault balances.
-2. Open **Demonstration** to follow presenter-run activity. Connection and freshness labels distinguish current readings from stale data or recorded proof.
-3. Inspect **Owner controls** to read authorization. Only the current ENS name owner on Sepolia can revoke or regrant the agent's role.
+2. Once the Sandbox release is live, open **Demonstration → Try it yourself**, connect a supported wallet on Sepolia, choose **Normal trade** or **Poisoned-news challenge**, and sign the displayed message. No test ETH, token approval or transfer from your wallet is required.
+3. Follow your run's real Gemini decision and guarded Uniswap v4 execution, then inspect the transaction link. Connection and freshness labels distinguish current readings from stale data or recorded proof. **Owner controls** remain restricted to the current ENS name owner on Sepolia.
 4. Follow the transaction links below to verify a complete run even when the presenter is offline.
 
-This release demonstrates one configured agent, `alpha.kusari-pramod.eth`. Public visitors observe the shared agent; trade and injection controls are presenter-only. The advanced `/setup` route is a vault tool, not a complete self-service agent onboarding flow.
+This release demonstrates one configured agent, `alpha.kusari-pramod.eth`, using a **shared funded Sepolia vault**, not a personal trading account. A visitor's EIP-191 message signature authorizes one fixed sandbox scenario; the backend agent supplies gas and test tokens. A normal decision may spend at most 1 kUSD. The poisoned-news scenario exercises rejection only if the real model requests more than the owner's current cap (5 kUSD in the rehearsal); a hold or refusal is reported honestly without claiming an attack was blocked onchain. The advanced `/setup` route is a vault tool, not a complete self-service agent onboarding flow.
 
 ## What Kusari enforces
 
@@ -79,6 +81,7 @@ The canonical manifests [`deployments/11155111.json`](deployments/11155111.json)
 | Real model decisions and signed swaps | [`llm.ts`](agent/src/llm.ts), [`swap.ts`](agent/src/swap.ts) |
 | Full current-deployment rehearsal | [`e2e.ts`](agent/src/e2e.ts) |
 | Authenticated observation gateway and hosted startup | [`demo-gateway.mjs`](scripts/demo-gateway.mjs), [`start-hosted-demo.mjs`](scripts/start-hosted-demo.mjs) |
+| Wallet-signed Sandbox admission and visitor UI | [`sandbox-access.mjs`](scripts/sandbox-access.mjs), [`SandboxControls.tsx`](app/src/components/SandboxControls.tsx), [`sandbox-http.mjs`](app/src/lib/sandbox-http.mjs) |
 | Contract tests | [`contracts/test/`](contracts/test) |
 
 ## Run locally
@@ -108,7 +111,9 @@ Open `http://localhost:3001/demo`. The presenter can run a normal decision, togg
 
 ## Hosting and privacy boundaries
 
-The frontend can run on Vercel; the Node agent, Chromium/Nox bridge and logging proxy require a persistent backend. The same-origin `/api/demo/*` routes connect to a bearer-protected, fixed-route observation gateway. The gateway token stays server-side; public visitors cannot submit trades or change the agent's transport. See [judge hosting instructions](docs/JUDGE_HOSTING.md).
+The frontend runs on Vercel; the Node agent, Chromium/Nox bridge and logging proxy require a persistent backend on Fly.io. Same-origin `/api/demo/*` observation and `/api/sandbox/{challenge,run}` routes connect to a bearer-protected gateway. The token stays server-side. Sandbox admission verifies a single-use, expiring wallet signature for the exact origin and scenario; it exposes no arbitrary RPC, transport switch, owner-policy change or revoke endpoint. Public Sandbox runs require real Gemini and Sepolia; scripted fallback is unavailable. See [judge hosting instructions](docs/JUDGE_HOSTING.md) for activation and verification.
+
+Sandbox limits are shared across visitors: 30 seconds per wallet, 10 seconds globally, 20 admitted runs per rolling hour and 40 per UTC day. Valid signed admissions consume budget even if the model or transaction fails. Challenges expire after two minutes, are single-use, and have at most 200 outstanding entries. These in-memory limits and challenges reset when the Fly backend restarts; they are operating limits, not durable abuse protection.
 
 | Traffic | Route / disclosure |
 | --- | --- |

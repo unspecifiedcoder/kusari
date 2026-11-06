@@ -6,6 +6,7 @@ import { useEventStream, StatusDot } from "@/components/LiveFeed";
 import { useKillSwitch } from "@/lib/killswitch";
 import { AGENT_URL, ANON_BRIDGE, PROXY_URL, allowDemoControls } from "@/lib/endpoints";
 import { HostedNotice } from "@/components/HostedNotice";
+import { SandboxControls } from "@/components/SandboxControls";
 
 const PROXY_EVENTS = `${PROXY_URL}/events`;
 const BRIDGE_EVENTS = `${ANON_BRIDGE}/events`;
@@ -94,7 +95,8 @@ function LiveDemo() {
   return (
     <div className="space-y-8">
       <section className="space-y-3"><p className="text-xs font-semibold uppercase tracking-widest text-emerald-400">Live demonstration · Sepolia</p><h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Watch the boundary hold.</h1><p className="max-w-3xl text-sm leading-6 text-zinc-400">Follow a normal trade, an intentionally poisoned news feed, and owner revocation. The attack is staged: the agent prompt is deliberately gullible. Contract enforcement is real.</p></section>
-      {!allowDemoControls && <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 text-sm leading-6 text-zinc-400"><div className="max-w-2xl"><span className="font-medium text-zinc-200">Watch without connecting a wallet.</span> The presenter runs this shared Sepolia agent; this page updates automatically. You don’t need test ETH or tokens to follow the demonstration.</div><Link href="/#onchain-evidence" className="shrink-0 rounded-lg border border-zinc-700 px-3 py-2 text-xs font-medium text-zinc-200 hover:border-zinc-500">View the recorded proof ↗</Link></div>}
+      {!allowDemoControls && <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 text-sm leading-6 text-zinc-400"><div className="max-w-2xl"><span className="font-medium text-zinc-200">Watch freely, or request your own sandbox run.</span> Connect a Sepolia wallet and sign one bounded request below to invoke Gemini against the funded demonstration vault. This page updates with real model and transaction results.</div><Link href="/#onchain-evidence" className="shrink-0 rounded-lg border border-zinc-700 px-3 py-2 text-xs font-medium text-zinc-200 hover:border-zinc-500">View the recorded proof ↗</Link></div>}
+      <SandboxControls />
       <Walkthrough />
       {connection === "connecting" && <p role="status" className="rounded-xl border border-zinc-800 p-4 text-sm leading-6 text-zinc-400">Connecting to the presenter’s runner… Readings and activity will appear when the connection is ready. You can <Link href="/#onchain-evidence" className="text-zinc-200 underline underline-offset-4">inspect a recorded run</Link> while you wait.</p>}
       {connection === "offline" && <div role="status" className="rounded-xl border border-amber-800/60 bg-amber-950/30 p-4 text-sm leading-6 text-amber-200"><p className="font-medium">The live runner is unavailable. Reconnecting automatically.</p><p className="mt-1">{state ? "The values below are the last received snapshot, not current readings." : "No live snapshot has been received in this visit."} <Link href="/#onchain-evidence" className="underline underline-offset-4">Follow the recorded transactions</Link> or <Link href="/" className="underline underline-offset-4">inspect the current policy</Link>.</p></div>}
@@ -201,7 +203,7 @@ function Controls(props: {
   const k = useKillSwitch();
   const frozen = k.authorized === false;
 
-  if (!allowDemoControls && !k.canManage) return <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-800 p-4"><p className="text-xs leading-5 text-zinc-400">Trading and transport changes are presenter-controlled. Owner revocation requires the verified ENS owner’s wallet.</p><Link href="/freeze" className="text-xs font-medium text-zinc-200 underline underline-offset-4">Inspect owner revocation →</Link></div>;
+  if (!allowDemoControls && !k.canManage) return <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-800 p-4"><p className="text-xs leading-5 text-zinc-400">Visitors can request the two bounded scenarios above. Transport changes stay presenter-controlled; policy revocation requires the verified ENS owner’s wallet.</p><Link href="/freeze" className="text-xs font-medium text-zinc-200 underline underline-offset-4">Inspect owner revocation →</Link></div>;
 
   return (
     <section className="flex flex-wrap items-center gap-3 rounded-xl border border-zinc-800 p-4">
@@ -252,7 +254,7 @@ function Controls(props: {
 
 function Activity({ entries, connection, running }: { entries: Record<string, unknown>[]; connection: Connection; running: boolean }) {
   const rows = entries.filter((e) => ["decision", "swap", "error", "inject"].includes(String(e.type)));
-  if (!rows.length) return <div className="space-y-3 text-sm leading-6 text-zinc-400"><p>{connection === "offline" ? "The activity feed is unavailable. This page will reconnect automatically." : connection === "connecting" ? "Connecting to the presenter’s activity feed…" : running ? "The agent is reading the chain. Its decision and transaction result will appear here." : allowDemoControls ? "No activity yet. Run the agent once to begin the demonstration." : "The runner is connected and awaiting the presenter. Decisions and transaction results will appear here automatically."}</p>{!allowDemoControls && <Link href="/#onchain-evidence" className="inline-block text-xs font-medium text-zinc-200 underline underline-offset-4">Follow the previous run onchain →</Link>}</div>;
+  if (!rows.length) return <div className="space-y-3 text-sm leading-6 text-zinc-400"><p>{connection === "offline" ? "The activity feed is unavailable. This page will reconnect automatically." : connection === "connecting" ? "Connecting to the agent’s activity feed…" : running ? "The agent is reading the chain. Its decision and transaction result will appear here." : allowDemoControls ? "No activity yet. Run the agent once to begin the demonstration." : "The runner is connected. Request a sandbox run above, or watch another run appear automatically."}</p>{!allowDemoControls && <Link href="/#onchain-evidence" className="inline-block text-xs font-medium text-zinc-200 underline underline-offset-4">Follow the previous run onchain →</Link>}</div>;
   return (
     <ul className="space-y-2 text-sm">
       {rows.map((e, i) => {

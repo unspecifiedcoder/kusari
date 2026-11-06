@@ -5,6 +5,7 @@ import { useRef, useState } from "react";
 import { useConnection, useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { deployment, ensDeployment } from "@/generated/deployment";
 import { assertSepoliaWallet, WALLET_CHAIN_ID } from "./wallet-safety";
+import { useCanonicalSite } from "./canonical-site";
 
 const ROLE_RENEW = 1n << 16n;
 const registryAbi = parseAbi([
@@ -17,6 +18,7 @@ const mirrorOwnerAbi = parseAbi(["function ownerOf(address agent) view returns (
 
 /** One kill switch for whichever policy source the live deployment uses (ENS on Sepolia, PolicyMirror elsewhere). */
 export function useKillSwitch() {
+  const { isCanonical, canonicalOrigin } = useCanonicalSite();
   const { address, isConnected, chainId, connector } = useConnection();
   const [preflightError, setPreflightError] = useState<Error | null>(null);
   const [checkingNetwork, setCheckingNetwork] = useState(false);
@@ -32,7 +34,7 @@ export function useKillSwitch() {
   const ownerError = useEns ? ensOwner.error : mirrorOwner.error;
   const isOwner = Boolean(isConnected && owner && address?.toLowerCase() === owner.toLowerCase());
   const correctChain = chainId === WALLET_CHAIN_ID && deployment.chainId === WALLET_CHAIN_ID;
-  const canManage = isOwner && correctChain;
+  const canManage = isOwner && correctChain && isCanonical;
 
   const status = useReadContract({
     chainId: deployment.chainId,
@@ -74,6 +76,8 @@ export function useKillSwitch() {
     isOwner,
     correctChain,
     canManage,
+    isCanonical,
+    canonicalOrigin,
     ownerError,
     statusError: status.error,
     freeze,

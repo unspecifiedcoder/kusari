@@ -111,9 +111,9 @@ async function main() {
     await ready("logging demo proxy", "http://127.0.0.1:8547/log", 15);
     launch("agent", "agent/src/runtime.ts");
     await ready("agent", "http://127.0.0.1:8787/status", 30);
-    launch("read-only judge gateway", "scripts/demo-gateway.mjs");
-    await ready("read-only judge gateway", "http://127.0.0.1:8788/health", 15, { authorization: `Bearer ${env.KUSARI_DEMO_GATEWAY_TOKEN}` });
-    console.log("Hosted observer ready. Trade controls remain local; automatic trading is disabled.");
+    launch("judge and signed-sandbox gateway", "scripts/demo-gateway.mjs");
+    await ready("judge and signed-sandbox gateway", "http://127.0.0.1:8788/health", 15, { authorization: `Bearer ${env.KUSARI_DEMO_GATEWAY_TOKEN}` });
+    console.log("Hosted sandbox ready. Visitor cycles require a one-use wallet signature; owner and presenter controls stay private. Automatic trading is disabled.");
   } catch (error) {
     console.error(error.message);
     await stop(1);

@@ -1,8 +1,9 @@
-// Read-only gateway for a hosted judge view. Tunnel this port, never the raw RPC bridge or agent port.
+// Hosted observation plus wallet-signed, bounded shared sandbox runs. Never expose raw RPC or agent ports.
 import { createServer } from "node:http";
 import { timingSafeEqual } from "node:crypto";
 import { pathToFileURL, fileURLToPath } from "node:url";
 import { existsSync } from "node:fs";
+import { createSandboxAccess, readSandboxJson, SandboxError } from "./sandbox-access.mjs";
 
 const ROUTES = new Map([
   ["/agent/status", { service: "agent", path: "/status", json: true }],
@@ -51,6 +52,7 @@ export function createDemoGateway({
   requestTimeoutMs = 10_000,
   streamDurationMs = 25_000,
   maxStreams = 24,
+  sandboxAccess,
 } = {}) {
   if (typeof token !== "string" || token.length < 32) throw new Error("KUSARI_DEMO_GATEWAY_TOKEN must contain at least 32 characters");
   for (const origin of Object.values(upstreams)) {
@@ -59,12 +61,58 @@ export function createDemoGateway({
       throw new Error("Gateway upstreams must be local HTTP services");
     }
   }
+  const boundedLimit = (value, fallback, max) => {
+    const parsed = value === undefined ? fallback : Number(value);
+    if (!Number.isInteger(parsed) || parsed < 1 || parsed > max) throw new Error("Sandbox admission limits are outside the safe configured range");
+    return parsed;
+  };
+  const sandbox = sandboxAccess ?? createSandboxAccess({
+    maxHourly: boundedLimit(process.env.KUSARI_SANDBOX_MAX_HOURLY, 20, 20),
+    maxDaily: boundedLimit(process.env.KUSARI_SANDBOX_MAX_DAILY, 40, 40),
+  });
   let streams = 0;
   const server = createServer(async (req, res) => {
     if (!sameSecret(req.headers.authorization, token)) return send(res, 401, { error: "Unauthorized" });
-    if (req.method !== "GET") return send(res, 405, { error: "Read-only demo gateway" });
     const url = new URL(req.url ?? "/", "http://gateway.local");
     if (url.search) return send(res, 400, { error: "Query parameters are not supported" });
+
+    if (["/sandbox/challenge", "/sandbox/run"].includes(url.pathname)) {
+      if (req.method !== "POST") return send(res, 405, { error: "Sandbox requests require POST" });
+      if (String(req.headers["content-type"] ?? "").toLowerCase().split(";")[0].trim() !== "application/json") return send(res, 415, { error: "Sandbox requests require application/json" });
+      try {
+        const input = await readSandboxJson(req);
+        if (url.pathname === "/sandbox/challenge") {
+          const statusResponse = await fetch(new URL("/status", upstreams.agent), { redirect: "error", signal: AbortSignal.timeout(requestTimeoutMs) });
+          if (!statusResponse.ok) { await statusResponse.body?.cancel(); throw new SandboxError(503, "Live sandbox agent is unavailable"); }
+          const status = await statusResponse.json();
+          if (!status || typeof status.busy !== "boolean" || typeof status.scriptedOnly !== "boolean") throw new SandboxError(503, "Live sandbox readiness could not be verified");
+          if (status.busy) throw new SandboxError(409, "Shared sandbox agent is running; wait for it to finish");
+          if (status.scriptedOnly) throw new SandboxError(503, "Public sandbox requires live Gemini");
+          return send(res, 200, sandbox.challenge(input));
+        }
+        const result = await sandbox.run(input, async ({ runId, scenario }) => {
+          const r = await fetch(new URL("/sandbox/run", upstreams.agent), {
+            method: "POST", headers: { "content-type": "application/json" },
+            body: JSON.stringify({ runId, scenario }), redirect: "error", signal: AbortSignal.timeout(requestTimeoutMs),
+          });
+          if (!r.ok) {
+            await r.body?.cancel();
+            throw new SandboxError(r.status === 409 ? 409 : 503, r.status === 409 ? "Shared agent is busy; try again after the cooldown" : "Live Gemini sandbox is unavailable");
+          }
+          const accepted = await r.json();
+          if (accepted.runId !== runId || accepted.started !== true) throw new SandboxError(503, "Sandbox acceptance could not be confirmed");
+        });
+        return send(res, 202, result);
+      } catch (error) {
+        if (error instanceof SandboxError && [408, 413].includes(error.status)) res.setHeader("connection", "close");
+        if (error instanceof SandboxError && error.retryAfterSeconds) res.setHeader("retry-after", String(error.retryAfterSeconds));
+        return send(res, error instanceof SandboxError ? error.status : 503, {
+          error: error instanceof SandboxError ? error.message : "Sandbox request could not be completed",
+          ...(error instanceof SandboxError && error.retryAfterSeconds ? { retryAfterSeconds: error.retryAfterSeconds } : {}),
+        });
+      }
+    }
+    if (req.method !== "GET") return send(res, 405, { error: "Presenter control routes are not public" });
 
     if (url.pathname === "/health") {
       const serviceHealth = await Promise.all(Object.entries({ agent: "/status", bridge: "/metrics", proxy: "/log" }).map(async ([name, path]) => {
@@ -74,7 +122,7 @@ export function createDemoGateway({
           return [name, r.ok];
         } catch { return [name, false]; }
       }));
-      return send(res, 200, { configured: true, controls: "local-presenter-only", services: Object.fromEntries(serviceHealth), checkedAt: Date.now() });
+      return send(res, 200, { configured: true, controls: "signed-shared-testnet-sandbox", services: Object.fromEntries(serviceHealth), checkedAt: Date.now() });
     }
 
     const route = ROUTES.get(url.pathname);
@@ -156,5 +204,5 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const host = process.env.KUSARI_DEMO_GATEWAY_HOST ?? "127.0.0.1";
   if (!["127.0.0.1", "0.0.0.0", "::1"].includes(host)) throw new Error("Unsupported gateway bind host");
   const server = createDemoGateway({ token: process.env.KUSARI_DEMO_GATEWAY_TOKEN });
-  server.listen(port, host, () => console.log(`Read-only judge gateway on port ${port}; presenter controls stay local`));
+  server.listen(port, host, () => console.log(`Judge gateway on port ${port}; shared sandbox requires a wallet signature, presenter controls stay local`));
 }

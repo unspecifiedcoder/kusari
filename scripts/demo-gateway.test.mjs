@@ -4,6 +4,11 @@ import { createServer } from "node:http";
 import { once } from "node:events";
 import { createDemoGateway } from "./demo-gateway.mjs";
 import { createSnapshotCache } from "../agent/src/snapshot-cache.mjs";
+import { createSandboxAccess } from "./sandbox-access.mjs";
+import { createRequire } from "node:module";
+
+const require = createRequire(new URL("../agent/package.json", import.meta.url));
+const { privateKeyToAccount } = require("viem/accounts");
 
 const TOKEN = "test-only-secret-with-more-than-32-characters";
 const listen = async (server) => { server.listen(0, "127.0.0.1"); await once(server, "listening"); return `http://127.0.0.1:${server.address().port}`; };
@@ -126,4 +131,62 @@ test("status snapshots share refreshes, distinguish stale failures and reject re
   assert.equal(broken.peek().stateStatus, "stale");
   assert.match(broken.peek().stateError, /refresh failed/);
   assert.doesNotMatch(broken.peek().stateError, /secret URL/);
+});
+
+test("HTTP sandbox accepts a signed fixed scenario once, rejects oversized/malformed bodies and preserves private controls", async (t) => {
+  const wallet = privateKeyToAccount(`0x${"33".repeat(32)}`);
+  let clock = 1000;
+  let busy = false;
+  let scriptedOnly = false;
+  const starts = [];
+  const source = createServer(async (req, res) => {
+    if (req.url === "/status") {
+      res.writeHead(200, { "content-type": "application/json" });
+      return res.end(JSON.stringify({ busy, scriptedOnly }));
+    }
+    let body = "";
+    for await (const chunk of req) body += chunk;
+    assert.equal(req.url, "/sandbox/run");
+    const input = JSON.parse(body);
+    assert.deepEqual(Object.keys(input).sort(), ["runId", "scenario"]);
+    starts.push(input);
+    res.writeHead(busy ? 409 : 202, { "content-type": "application/json" });
+    res.end(JSON.stringify(busy ? { error: "busy" } : { runId: input.runId, started: true }));
+  });
+  const sourceUrl = await listen(source);
+  const gateway = createDemoGateway({ token: TOKEN, upstreams: { agent: sourceUrl, bridge: sourceUrl, proxy: sourceUrl }, sandboxAccess: createSandboxAccess({ now: () => clock }) });
+  const base = await listen(gateway);
+  t.after(async () => { await close(gateway); await close(source); });
+  const headers = { authorization: `Bearer ${TOKEN}`, "content-type": "application/json" };
+  const post = (path, value) => fetch(`${base}${path}`, { method: "POST", headers, body: JSON.stringify(value) });
+  const challenge = await (await post("/sandbox/challenge", { address: wallet.address, scenario: "normal" })).json();
+  const input = { nonce: challenge.nonce, address: wallet.address, signature: await wallet.signMessage({ message: challenge.message }) };
+  const run = await post("/sandbox/run", input);
+  assert.equal(run.status, 202);
+  const result = await run.json();
+  assert.equal(result.started, true);
+  assert.equal(starts[0].runId, result.runId);
+  assert.equal(starts[0].scenario, "normal");
+  assert.equal((await post("/sandbox/run", input)).status, 409);
+  assert.equal(starts.length, 1);
+  clock += 20_000;
+  const cooldown = await post("/sandbox/challenge", { address: wallet.address, scenario: "attack" });
+  assert.equal(cooldown.status, 429);
+  assert.equal(cooldown.headers.get("retry-after"), "10");
+  assert.equal((await cooldown.json()).retryAfterSeconds, 10);
+  assert.equal((await post("/agent/tick", {})).status, 405);
+  assert.equal((await post("/sandbox/challenge", { address: wallet.address, scenario: "normal", amount: 10 })).status, 400);
+  assert.equal((await fetch(`${base}/sandbox/challenge`, { method: "POST", headers, body: "{" })).status, 400);
+  assert.equal((await post("/sandbox/challenge", { address: wallet.address, scenario: "normal", padding: "x".repeat(5000) })).status, 413);
+  clock += 31_000;
+  busy = true;
+  assert.equal((await post("/sandbox/challenge", { address: wallet.address, scenario: "attack" })).status, 409, "agent busy must be detected before requesting a signature");
+  busy = false;
+  const next = await (await post("/sandbox/challenge", { address: wallet.address, scenario: "attack" })).json();
+  busy = true;
+  assert.equal((await post("/sandbox/run", { nonce: next.nonce, address: wallet.address, signature: await wallet.signMessage({ message: next.message }) })).status, 409);
+  assert.equal(starts.length, 2);
+  busy = false;
+  scriptedOnly = true;
+  assert.equal((await post("/sandbox/challenge", { address: wallet.address, scenario: "attack" })).status, 503, "scripted-only backend must fail before requesting a signature");
 });

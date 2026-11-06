@@ -3,8 +3,15 @@ export const WALLET_CHAIN_ID = 11155111;
 type Connector = { getProvider: () => Promise<unknown> };
 type Provider = { request: (request: { method: string }) => Promise<unknown> };
 
+export function assertAppOrigin(actualOrigin: string, expectedOrigin: string | undefined) {
+  if (expectedOrigin && actualOrigin !== expectedOrigin) {
+    throw new Error(`Use the official Kusari application at ${expectedOrigin} before connecting or signing.`);
+  }
+}
+
 /** Read the selected wallet itself, not the app's configured public-reader chain. */
 export async function assertSepoliaWallet(connector: Connector | undefined, expectedAddress: string | undefined) {
+  if (typeof window !== "undefined") assertAppOrigin(window.location.origin, process.env.NEXT_PUBLIC_APP_ORIGIN);
   if (!connector || !expectedAddress) throw new Error("Connect the owner wallet before continuing.");
   const provider = await connector.getProvider() as Provider | undefined;
   if (!provider || typeof provider.request !== "function") throw new Error("Wallet network could not be verified. Reconnect your wallet.");

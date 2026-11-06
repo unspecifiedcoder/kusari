@@ -19,8 +19,9 @@ kill_timeout = 20
   ENS_OUT = "deployments/11155111-ens-next.json"
   KUSARI_DEMO_GATEWAY_HOST = "0.0.0.0"
   KUSARI_DEMO_GATEWAY_PORT = "8788"
+  KUSARI_DEMO_PUBLIC_ORIGIN = "https://kusari.outcomeseal.com"
 
-# Only the bearer-protected, fixed-route observation gateway is internet-facing.
+# Only the bearer-protected gateway is internet-facing; sandbox runs also require a wallet challenge.
 # Agent, RPC bridge and logging proxy stay on loopback.
 [[services]]
   protocol = "tcp"
