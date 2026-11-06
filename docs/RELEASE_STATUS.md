@@ -14,6 +14,8 @@ Updated 6 November 2026 after the live browser rehearsal. Team submission target
 - The custom-domain scanner returned NONE and the user reported no security warning during scenario signatures and owner transactions. The old kusari-demo.vercel.app classification review remains open; signing is disabled on deployment aliases. Never bypass a wallet warning.
 - Source and deployment changes are pushed to codex/judge-ready; the README links to the correct branch.
 
+The subsequent product-workspace redesign was published and verified at 1440 px desktop, 390 px mobile and 320 px narrow width without horizontal overflow. A user-signed real Gemini 1 kUSD swap displayed all five actual result fields and its receipt in the new UI. Keyboard dismissal of the wallet chooser was verified. Signing/execution prefixes remain identical to commit 54b1432. The final source includes corrected busy-region semantics and the explicit 1 kUSD public-scenario ceiling. Impeccable's source detector reported one font-style warning, accepted for the self-hosted Instrument Sans product type system; no automated screen-reader or headless-browser certification is claimed. See PRODUCT.md, DESIGN.md and docs/UI_BRIEF.md for durable context.
+
 ## Submission work still to confirm
 
 - Complete the ETHGlobal dashboard fields, team/track selection and final submission confirmation.

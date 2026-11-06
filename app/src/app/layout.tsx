@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
-import { ConnectButton } from "@/components/ConnectButton";
-import { ReadRouteBadge } from "@/components/ReadRouteBadge";
+import { ProductNavigation, ProductHeader } from "@/components/ProductNavigation";
 
 export const metadata: Metadata = {
   title: "Kusari · Onchain boundaries for AI agents",
@@ -13,37 +11,17 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className="h-full antialiased">
-      <body className="flex min-h-full flex-col bg-zinc-950 text-zinc-100">
+      <body>
         <Providers>
-          <header className="border-b border-zinc-800/80 bg-zinc-950/90">
-            <div className="mx-auto grid max-w-6xl grid-cols-[auto_1fr] items-center gap-x-5 gap-y-4 px-5 py-4 sm:px-8 lg:flex lg:justify-between lg:gap-6">
-              <Link href="/" aria-label="Kusari overview" className="flex shrink-0 items-center gap-2 text-xl font-semibold tracking-tight">
-                <span aria-hidden="true" className="text-emerald-400">鎖</span> Kusari
-              </Link>
-            <nav aria-label="Main navigation" className="col-span-2 row-start-2 flex items-center gap-6 border-t border-zinc-800/70 pt-3 text-sm lg:order-0 lg:mr-auto lg:border-0 lg:pt-0">
-              <Link href="/" className="text-sm text-zinc-400 hover:text-white">
-                Overview
-              </Link>
-              <Link href="/demo" className="text-sm text-zinc-400 hover:text-white">
-                Demonstration
-              </Link>
-              <Link href="/freeze" className="text-sm text-red-400 hover:text-red-300">
-                Owner controls
-              </Link>
-            </nav>
-            <div className="col-start-2 row-start-1 flex min-w-0 items-center justify-end gap-3">
-              <div className="hidden xl:block"><ReadRouteBadge /></div>
-              <ConnectButton />
+          <a className="skip-link" href="#main-content">Skip to main content</a>
+          <div className="app-shell">
+            <ProductNavigation />
+            <div className="app-body">
+              <ProductHeader />
+              <main id="main-content" tabIndex={-1} className="app-content">{children}</main>
+              <footer className="app-footer"><span>ETHGlobal Mumbai 2026</span><span>Sepolia · Test tokens only</span></footer>
             </div>
-            </div>
-          </header>
-          <main id="main-content" className="mx-auto w-full max-w-6xl flex-1 px-5 py-8 sm:px-8 sm:py-12">{children}</main>
-          <footer className="border-t border-zinc-800/80 px-5 py-5 text-xs leading-6 text-zinc-500">
-            <div className="mx-auto flex max-w-6xl flex-wrap justify-between gap-2">
-              <span>ETHGlobal Mumbai · Sepolia testnet · Test tokens only</span>
-              <a href="https://github.com/unspecifiedcoder/kusari/tree/codex/judge-ready" target="_blank" rel="noreferrer" className="text-zinc-400 hover:text-white">Open-source code ↗</a>
-            </div>
-          </footer>
+          </div>
         </Providers>
       </body>
     </html>

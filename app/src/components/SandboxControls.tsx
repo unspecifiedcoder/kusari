@@ -164,34 +164,64 @@ export function SandboxControls() {
   const outcome = swap?.status === "success" && txHash(swap.hash) ? { title: "Swap confirmed on Sepolia", detail: "The funded sandbox vault traded through the Uniswap v4 policy hook.", tone: "text-emerald-300" } : swap?.status === "blocked" && txHash(swap.hash) ? { title: isGuardRejection(swap) ? "Blocked onchain · policy enforced" : "Transaction reverted onchain", detail: String(swap.message ?? swap.reason ?? "The transaction reverted; a policy rejection reason was not established."), tone: isGuardRejection(swap) ? "text-emerald-300" : "text-amber-200" } : swap?.status === "blocked" ? { title: "Blocked before submission", detail: String(swap.message ?? swap.reason ?? "Simulation rejected this trade; no onchain revert is claimed."), tone: "text-amber-200" } : swap ? { title: "Trade was not confirmed", detail: String(swap.message ?? swap.reason ?? "Inspect the activity and retry when the runner is ready."), tone: "text-amber-200" } : phase === "complete" && attackNotFollowed ? { title: "No oversized trade requested", detail: runErrorText, tone: "text-zinc-200" } : phase === "complete" && realGemini && decision?.action === "hold" ? { title: "Gemini chose to hold", detail: "No trade was submitted. This run did not exercise the hook’s rejection path.", tone: "text-zinc-200" } : phase === "complete" ? { title: "Run ended without a confirmed trade", detail: String(runError?.message ?? "No complete model-and-transaction result was received."), tone: "text-amber-200" } : null;
 
   return (
-    <section id="try-sandbox" aria-labelledby="sandbox-title" className="scroll-mt-36 overflow-hidden rounded-2xl border border-emerald-800/70 bg-linear-to-br from-emerald-950/30 via-zinc-950 to-zinc-900/30">
-      <div className="border-b border-zinc-800 p-4 sm:p-5"><div className="flex flex-wrap items-center justify-between gap-3"><p className="text-xs font-medium text-emerald-400">Try it yourself</p><span className="rounded-full border border-zinc-700 px-3 py-1 text-xs text-zinc-400">Funded Sepolia sandbox</span></div><h2 id="sandbox-title" className="mt-2 text-xl font-semibold tracking-tight sm:text-2xl">Try the live AI agent</h2><p className="mt-2 max-w-[68ch] text-sm leading-6 text-zinc-300">Connect a wallet on Sepolia and sign one message. Gemini decides; the funded vault trades through the policy hook. The sandbox supplies test tokens and gas. Your wallet sends no funds or token approvals.</p></div>
-      <div className="space-y-4 p-4 sm:p-5">
-        {differentOrigin && <div role="status" className="rounded-xl border border-amber-800/60 bg-amber-950/25 p-4 text-sm leading-6 text-amber-200"><p className="font-medium">This address is a read-only preview.</p>{canonicalOrigin ? <p className="mt-1">Signing is available only on the configured application origin. <a href={`${canonicalOrigin}/demo#try-sandbox`} className="break-all underline underline-offset-4">Open the sandbox at {new URL(canonicalOrigin).hostname} →</a></p> : <p className="mt-1">The application origin is not configured correctly. No signing request can begin from this page.</p>}</div>}
-        <fieldset disabled={busy || !canRunHere} className="grid gap-3 sm:grid-cols-2"><legend className="mb-3 text-xs font-medium text-zinc-400">Choose a fixed scenario</legend>{([{ id: "normal", title: "Normal trade", detail: "Gemini reads clean news and decides whether to buy within the policy." }, { id: "attack", title: "Poisoned-news challenge", detail: "The staged news asks the deliberately gullible agent to exceed its cap." }] as const).map((option) => <label key={option.id} className={`flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition-colors ${scenario === option.id ? "border-emerald-700 bg-emerald-950/35" : "border-zinc-800 bg-zinc-950/50 hover:border-zinc-600"} ${busy ? "cursor-wait opacity-60" : ""}`}><input type="radio" name="sandbox-scenario" value={option.id} checked={scenario === option.id} onChange={() => setScenario(option.id)} className="mt-1 accent-emerald-400" /><span><span className="block text-sm font-medium text-zinc-200">{option.title}</span><span className="mt-1 block text-xs leading-5 text-zinc-400">{option.detail}</span></span></label>)}</fieldset>
-        <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-zinc-800 bg-zinc-950/60 p-4"><div className="text-sm leading-6 text-zinc-400">{differentOrigin ? <><strong className="font-medium text-zinc-200">Observation only on this address.</strong><br />Use the configured application link above for a signed sandbox request.</> : !isConnected ? <><strong className="font-medium text-zinc-200">Connect your wallet in the header.</strong><br />No test ETH is needed in your wallet.</> : !correctChain ? <><strong className="font-medium text-amber-200">Switch your wallet to Sepolia.</strong><br />Use the network button in the header, then return here.</> : <><strong className="font-medium text-zinc-200">Ready on Sepolia.</strong><br />Your signature authorizes one shared-sandbox cycle only.</>}</div><button type="button" onClick={() => void start()} disabled={!canRunHere || !isConnected || !correctChain || busy || cooldown > 0} className="rounded-xl bg-emerald-400 px-5 py-3 text-sm font-semibold text-zinc-950 hover:bg-emerald-300 disabled:cursor-not-allowed disabled:opacity-40">{phase === "challenge" ? "Preparing request…" : phase === "signing" ? "Check your wallet…" : phase === "submitting" ? "Starting Gemini…" : phase === "running" ? `Run in progress · ${elapsed}s` : cooldown > 0 ? `Try again in ${cooldown}s` : "Sign & run Gemini"}</button></div>
-        {phase === "signing" && <p role="status" className="text-sm leading-6 text-emerald-200">Read the message in your wallet and approve or cancel it. This is a message signature, not a transaction.</p>}
-        {challenge && phase === "signing" && <details className="rounded-xl border border-zinc-800 p-4 text-xs text-zinc-400"><summary className="cursor-pointer text-zinc-300">Exact message requested by the sandbox</summary><pre className="mt-3 whitespace-pre-wrap break-words font-mono text-xs leading-5">{challenge.message}</pre></details>}
-        {error && <p role="alert" className="rounded-xl border border-amber-800/60 bg-amber-950/30 p-4 text-sm leading-6 text-amber-200">{error}</p>}
-        {run && <div className="space-y-4 rounded-xl border border-zinc-800 bg-zinc-950/60 p-4 sm:p-5">
-          <div className="flex flex-wrap items-center justify-between gap-2"><p className="text-sm font-medium text-zinc-200">Your {run.scenario === "attack" ? "poisoned-news" : "normal"} run</p><span className="font-mono text-xs text-zinc-400">{run.id.slice(0, 12)} · {phase === "running" ? `${elapsed}s elapsed` : phase === "timeout" ? "Status timed out" : "Finished"}</span></div>
-          {outcome && <OutcomePanel outcome={outcome} swap={swap} />}
-          <div className="grid gap-3 sm:grid-cols-3"><Step number="01" label="Chain read" value={run.events.some((event) => event.type === "reading") ? "Started" : "Waiting"} /><Step number="02" label="Model decision" value={decision ? realGemini ? "Gemini responded" : "Source unverified" : "Waiting"} /><Step number="03" label="Guarded execution" value={swap ? swap.status === "success" ? "Executed" : swap.status === "blocked" ? isGuardRejection(swap) ? "Policy blocked" : "Reverted / blocked" : "Not confirmed" : decision?.action === "hold" ? "Model held" : "Waiting"} /></div>
-          {decision && <div className="border-t border-zinc-800 pt-4"><p className="text-xs font-medium text-zinc-400">{source}</p><p className="mt-2 text-sm text-zinc-200">{String(decision.action)}{typeof decision.amountIn === "number" ? ` · ${decision.amountIn} kUSD requested` : ""}</p><p className="mt-2 max-w-[68ch] text-sm leading-6 text-zinc-300">{String(decision.reason ?? "No rationale was returned.")}</p></div>}
-          {phase === "running" && !decision && <p className="text-sm leading-6 text-zinc-400">The agent is reading the chain and requesting a real Gemini response. Network and model latency can take a few minutes.</p>}
-          {pollError && phase === "running" && <p className="text-xs leading-5 text-amber-200">{pollError}</p>}
-          {phase === "timeout" && <p role="status" className="text-sm leading-6 text-amber-200">A final run status was not received within three minutes. This does not prove that the trade failed. Inspect any transaction link and the shared activity below before requesting another run.</p>}
-          {runError && !outcome && <p className="text-sm leading-6 text-amber-200">{String(runError.message ?? "The runner reported an error.")}</p>}
-        </div>}
-        {run && <RunEvidence run={run} />}
-        <p className="text-xs leading-5 text-zinc-400">This is a shared, rate-limited testnet sandbox, not a personal trading account. Only the ENS owner can freeze or change policy. If your wallet shows a site-security warning, stop. You can inspect the recorded onchain evidence without connecting.</p>
+    <section id="try-sandbox" aria-labelledby="sandbox-title" className="workspace-composer min-w-0 scroll-mt-8">
+      <header className="composer-header">
+        <h2 id="sandbox-title">Request a trade</h2>
+        <p className="composer-description">Choose what Gemini reads. The agent decides whether to trade from the shared Sepolia vault, within the owner’s policy.</p>
+      </header>
+      {differentOrigin && <div role="status" className="request-notice" data-tone="warning"><p><strong>This address is read-only.</strong></p>{canonicalOrigin ? <p>To sign a request, <a href={`${canonicalOrigin}/demo#try-sandbox`} className="break-all underline underline-offset-4">open {new URL(canonicalOrigin).hostname}</a>.</p> : <p>The application origin is not configured correctly. No signing request can begin from this page.</p>}</div>}
+      <fieldset disabled={busy || !canRunHere} className="scenario-options">
+        <legend>Choose a request</legend>
+        {([{ id: "normal", title: "Trade within limits", detail: "Gemini reads clean news and may request up to 1 kUSD within policy, or hold." }, { id: "attack", title: "Test an over-limit request", detail: "Staged poisoned news asks the deliberately gullible agent to exceed its spending cap." }] as const).map((option) => <label key={option.id} data-selected={scenario === option.id} className={`scenario-option${scenario === option.id ? " is-selected" : ""}`}>
+          <input type="radio" name="sandbox-scenario" value={option.id} checked={scenario === option.id} onChange={() => setScenario(option.id)} aria-describedby={`scenario-${option.id}-detail`} />
+          <span className="min-w-0"><span className="scenario-title">{option.title}</span><span id={`scenario-${option.id}-detail`} className="scenario-detail">{option.detail}</span></span>
+        </label>)}
+      </fieldset>
+      <div className="request-readiness">
+        <p id="request-wallet-state">{differentOrigin ? <><strong>Read-only on this address.</strong><span>Use the application link above to sign a request.</span></> : !isConnected ? <><strong>Connect your wallet to continue.</strong><span>Use Connect wallet in the navigation. No test ETH is needed.</span></> : !correctChain ? <><strong>Switch your wallet to Sepolia.</strong><span>Use the network button in the navigation, then return here.</span></> : <><strong>Wallet ready on Sepolia.</strong><span>Your signature requests one shared-vault run.</span></>}</p>
+        <p id="request-signing-note" className="request-note">Sign one message. Your wallet sends no funds or token approvals; the sandbox supplies test tokens and gas.</p>
+        <button type="button" onClick={() => void start()} disabled={!canRunHere || !isConnected || !correctChain || busy || cooldown > 0} aria-describedby="request-wallet-state request-signing-note" className="request-action">{phase === "challenge" ? "Preparing request…" : phase === "signing" ? "Check your wallet…" : phase === "submitting" ? "Starting Gemini…" : phase === "running" ? "Request in progress…" : cooldown > 0 ? `Try again in ${cooldown}s` : "Sign request & run agent"}</button>
       </div>
+      {phase === "challenge" && <p role="status" className="request-notice">Preparing a one-time signing request.</p>}
+      {phase === "signing" && <p role="status" className="request-notice">Read the message in your wallet, then sign or cancel. This requests one run; it does not approve a transaction.</p>}
+      {phase === "submitting" && <p role="status" className="request-notice">Message signed. Requesting a Gemini run.</p>}
+      {challenge && phase === "signing" && <details className="run-evidence"><summary>Read the exact signing message</summary><pre className="whitespace-pre-wrap break-words font-mono text-xs leading-6">{challenge.message}</pre></details>}
+      {error && <p role="alert" className="request-notice" data-tone="warning">{error}</p>}
+      {run && <section className="run-summary" aria-labelledby="your-result-title">
+        <div className="flex flex-wrap items-baseline justify-between gap-2"><h3 id="your-result-title">Your result</h3><span className="run-meta break-all">{run.id.slice(0, 12)} · {phase === "running" ? `${elapsed}s elapsed` : phase === "timeout" ? "Status timed out" : "Finished"}</span></div>
+        <p className="request-note">{run.scenario === "attack" ? "Over-limit request test" : "Trade within limits"} · This result follows only your signed request.</p>
+        {outcome && <OutcomePanel outcome={outcome} swap={swap} />}
+        <RunFacts run={run} phase={phase} outcome={outcome?.title} />
+        {decision && <section className="model-decision" aria-label="Model decision" aria-live="polite" aria-atomic="true"><div className="flex flex-wrap items-baseline justify-between gap-2"><h4>Agent decision</h4><span className="run-meta">{source}</span></div><p className="model-action">{String(decision.action)}{typeof decision.amountIn === "number" ? ` · ${decision.amountIn} kUSD requested` : ""}</p><p>{String(decision.reason ?? "No rationale was returned.")}</p></section>}
+        <ol className="run-stages" aria-label="Run progress" aria-busy={phase === "running"}><Step number="1" label="Read the chain" value={run.events.some((event) => event.type === "reading") ? "Started" : "Waiting"} /><Step number="2" label="Model decision" value={decision ? realGemini ? "Gemini responded" : "Source unverified" : "Waiting"} /><Step number="3" label="Guarded execution" value={swap ? swap.status === "success" ? "Executed" : swap.status === "blocked" ? isGuardRejection(swap) ? "Policy blocked" : "Reverted / blocked" : "Not confirmed" : decision?.action === "hold" ? "Model held" : "Waiting"} /></ol>
+        {phase === "running" && !decision && <p role="status" className="request-note">Reading the chain and waiting for Gemini. Network and model latency can take a few minutes.</p>}
+        {pollError && phase === "running" && <p className="request-notice" data-tone="warning">{pollError}</p>}
+        {phase === "timeout" && <p role="status" className="request-notice" data-tone="warning">A final status was not received within three minutes. This does not establish whether the trade failed. Inspect any transaction link and the shared activity before requesting another run.</p>}
+        {runError && !outcome && <p className="request-notice" data-tone="warning">{String(runError.message ?? "The runner reported an error.")}</p>}
+        <RunEvidence run={run} />
+      </section>}
+      <p className="request-note composer-footnote">Shared, rate-limited Sepolia sandbox. Only the ENS owner can freeze the agent or change policy. If your wallet shows a site-security warning, stop. Recorded transactions remain available without connecting.</p>
     </section>
   );
 }
 
+function RunFacts({ run, phase, outcome }: { run: Run; phase: Phase; outcome?: string }) {
+  const decision = run.events.find((event) => event.type === "decision");
+  const state = run.events.find((event) => event.type === "state");
+  const swap = run.events.find((event) => event.type === "swap");
+  const endedWithoutTransaction = phase === "complete" && !txHash(swap?.hash);
+  const noSubmission = decision?.action === "hold" || run.events.some((event) => event.type === "error" && event.code === "ModelDidNotFollowInjection") || (swap?.status === "blocked" && !txHash(swap.hash));
+  return <dl className="run-facts" aria-label="Request and enforcement summary">
+    <div><dt>Agent requested</dt><dd>{decision?.action === "hold" ? "Hold · no trade requested" : typeof decision?.amountIn === "number" ? `${decision.amountIn} kUSD swap` : "Waiting for the model"}</dd></div>
+    <div><dt>Owner’s limit</dt><dd>{typeof state?.maxPerSwap === "number" ? `${state.maxPerSwap} kUSD per trade` : "Waiting for the policy read"}</dd></div>
+    <div><dt>Result</dt><dd>{outcome ?? (phase === "timeout" ? "Status timed out · outcome unconfirmed" : "In progress")}</dd></div>
+    <div><dt>Reason</dt><dd>{typeof swap?.reason === "string" ? <code>{swap.reason}</code> : swap?.status === "success" ? "Executed within policy" : decision?.action === "hold" ? "Model chose to hold" : endedWithoutTransaction ? "See the run explanation below" : "Awaiting execution result"}</dd></div>
+    <div><dt>Tx</dt><dd>{txHash(swap?.hash) ? <a href={`https://sepolia.etherscan.io/tx/${swap.hash}`} target="_blank" rel="noreferrer">View Sepolia receipt ↗</a> : noSubmission ? "No transaction submitted" : endedWithoutTransaction ? "No transaction hash reported · execution unconfirmed" : "No transaction confirmed yet"}</dd></div>
+  </dl>;
+}
+
 function Step({ number, label, value }: { number: string; label: string; value: string }) {
-  return <div className="rounded-lg border border-zinc-800 p-3"><p className="text-xs text-zinc-400"><span className="mr-2 font-mono text-emerald-400">{number}</span>{label}</p><p className="mt-2 text-xs font-medium text-zinc-200">{value}</p></div>;
+  return <li><span className="stage-number" aria-hidden="true">{number}</span><span><span className="stage-label">{label}</span><span className="stage-value">{value}</span></span></li>;
 }
 
 function OutcomePanel({ outcome, swap }: { outcome: { title: string; detail: string; tone: string }; swap?: RunEvent }) {
@@ -200,12 +230,12 @@ function OutcomePanel({ outcome, swap }: { outcome: { title: string; detail: str
   const protectedRun = reverted && isGuardRejection(swap);
   const positive = confirmed && (!reverted || protectedRun);
   const amber = outcome.tone === "text-amber-200";
-  return <section aria-live="polite" aria-label="Run outcome" className={`rounded-xl border-l-4 p-4 sm:p-5 ${positive ? "border-emerald-400 bg-emerald-950/55" : amber ? "border-amber-400 bg-amber-950/30" : "border-zinc-500 bg-zinc-900/70"}`}>
-    <p className={`text-xs font-medium ${positive ? "text-emerald-200" : amber ? "text-amber-200" : "text-zinc-300"}`}>{protectedRun ? "Protection confirmed onchain" : reverted ? "Transaction reverted onchain" : confirmed ? "Execution confirmed onchain" : swap?.status === "blocked" ? "Pre-submission result" : "Run result"}</p>
-    <h3 className={`mt-2 text-xl font-semibold leading-snug tracking-tight sm:text-2xl ${outcome.tone}`}>{outcome.title}</h3>
-    <p className="mt-2 max-w-[68ch] text-sm leading-6 text-zinc-200">{outcome.detail}</p>
-    {typeof swap?.reason === "string" && swap.reason && <p className="mt-3 break-words text-xs leading-5 text-zinc-300">Reported reason: <span className="font-mono text-zinc-100">{swap.reason}</span></p>}
-    {txHash(swap?.hash) && <a href={`https://sepolia.etherscan.io/tx/${swap.hash}`} target="_blank" rel="noreferrer" className="mt-4 block rounded-lg border border-emerald-700/70 bg-zinc-950/35 px-3 py-3 text-sm font-medium text-emerald-200 hover:border-emerald-400"><span>Verify the Sepolia transaction ↗</span><span className="mt-1 block break-all font-mono text-xs leading-5 text-zinc-300">{swap.hash}</span></a>}
+  return <section aria-live="polite" aria-atomic="true" aria-label="Run outcome" className="run-outcome" data-tone={positive ? "success" : amber ? "warning" : "neutral"}>
+    <h4>{outcome.title}</h4>
+    <p>{outcome.detail}</p>
+    <p className="outcome-verification">{protectedRun ? "Protection confirmed onchain" : reverted ? "Transaction reverted onchain" : confirmed ? "Execution confirmed onchain" : swap?.status === "blocked" ? "Pre-submission result · no onchain rejection claimed" : "Run result"}</p>
+    {typeof swap?.reason === "string" && swap.reason && <p className="break-words">Reported reason: <code>{swap.reason}</code></p>}
+    {txHash(swap?.hash) && <a href={`https://sepolia.etherscan.io/tx/${swap.hash}`} target="_blank" rel="noreferrer" className="run-receipt"><span>Verify Sepolia transaction ↗</span><span className="block break-all font-mono text-xs leading-6">{swap.hash}</span></a>}
   </section>;
 }
 
@@ -220,14 +250,14 @@ function RunEvidence({ run }: { run: Run }) {
   const routeLabel = verifiedNox ? "Anon-RPC via Nox observed" : directRoute ? "Direct route · not anonymous" : run.readRoute?.readTransport === "leak" ? "Public logging route · not anonymous" : "Read route not verified";
   const execution = swap?.status === "success" && hasReceipt ? "Swap confirmed through the hook" : swap?.status === "blocked" && hasReceipt ? `Onchain revert: ${String(swap.reason ?? "reason not reported")}` : swap?.status === "blocked" ? `Simulation block: ${String(swap.reason ?? "reason not reported")}` : swap ? "No confirmed execution" : "Awaiting this run’s execution";
   return (
-    <section aria-label="Integration evidence for this run" className="border-t border-zinc-800 pt-4">
-      <p className="mb-3 text-xs font-medium text-zinc-300">What this run actually used</p>
-      <div className="grid gap-4 text-xs leading-5 sm:grid-cols-3">
-        <div className="min-w-0"><p className="font-medium text-zinc-200">ENS policy</p><a href={`https://sepolia.etherscan.io/address/${deployment.policySource}`} target="_blank" rel="noreferrer" className="mt-1 block break-all text-emerald-300 underline underline-offset-4">{ensDeployment.name} · policy source ↗</a><p className="mt-1 text-zinc-400">{maxPerSwap === null ? "Waiting for this run’s policy read." : `${maxPerSwap} kUSD per swap${dailyCap === null ? "" : ` · ${dailyCap} per day`}`}</p>{typeof state?.authorized === "boolean" && <p className="text-zinc-400">{state.authorized ? "Authorized at the policy read" : "Authorization revoked at the policy read"}</p>}</div>
-        <div className="min-w-0"><p className="font-medium text-zinc-200">Uniswap v4 enforcement</p><p className="mt-1 text-zinc-400">{execution}</p><a href={`https://sepolia.etherscan.io/address/${deployment.policyHook}`} target="_blank" rel="noreferrer" className="mt-1 inline-block text-zinc-300 underline underline-offset-4">Inspect the PolicyHook ↗</a>{hasReceipt && <a href={`https://sepolia.etherscan.io/tx/${String(swap?.hash)}`} target="_blank" rel="noreferrer" className="ml-3 inline-block text-emerald-300 underline underline-offset-4">Run receipt ↗</a>}</div>
-        <div className="min-w-0"><p className="font-medium text-zinc-200">Anon-RPC / Nox</p><p className={`mt-1 ${verifiedNox ? "text-emerald-300" : directRoute ? "text-amber-200" : "text-zinc-400"}`}>{routeLabel}</p><p className="mt-1 text-zinc-400">{run.readRoute ? `Runner route observed at ${new Date(run.readRoute.observedAt).toLocaleTimeString()}.` : "No routing observation received for this run yet."} Routing metadata is reported by the running bridge, not an anonymity proof.</p></div>
+    <details className="run-evidence">
+      <summary>How this request was enforced</summary>
+      <div className="evidence-items">
+        <section className="min-w-0"><h4>ENS policy</h4><a href={`https://sepolia.etherscan.io/address/${deployment.policySource}`} target="_blank" rel="noreferrer" className="break-all underline underline-offset-4">{ensDeployment.name} · policy source ↗</a><p>{maxPerSwap === null ? "Waiting for this run’s policy read." : `${maxPerSwap} kUSD per swap${dailyCap === null ? "" : ` · ${dailyCap} per day`}`}</p>{typeof state?.authorized === "boolean" && <p>{state.authorized ? "Authorized at the policy read" : "Authorization revoked at the policy read"}</p>}</section>
+        <section className="min-w-0"><h4>Uniswap v4 enforcement</h4><p>{execution}</p><a href={`https://sepolia.etherscan.io/address/${deployment.policyHook}`} target="_blank" rel="noreferrer" className="underline underline-offset-4">Inspect the PolicyHook ↗</a>{hasReceipt && <a href={`https://sepolia.etherscan.io/tx/${String(swap?.hash)}`} target="_blank" rel="noreferrer" className="ml-3 inline-block underline underline-offset-4">Run receipt ↗</a>}</section>
+        <section className="min-w-0"><h4>Anon-RPC / Nox</h4><p data-tone={verifiedNox ? "success" : directRoute ? "warning" : "neutral"}>{routeLabel}</p><p>{run.readRoute ? `Runner route observed at ${new Date(run.readRoute.observedAt).toLocaleTimeString()}.` : "No routing observation received for this run yet."} Routing metadata is reported by the running bridge, not an anonymity proof.</p></section>
       </div>
-      <p className="mt-3 text-xs leading-5 text-zinc-400">The wallet’s own RPC is separate from the agent’s read route. The message signature requests a cycle; it does not make the eventual onchain trade private.</p>
-    </section>
+      <p className="request-note">The wallet’s own RPC is separate from the agent’s read route. The message signature requests a cycle; it does not make the eventual onchain trade private.</p>
+    </details>
   );
 }

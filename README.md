@@ -11,11 +11,13 @@ AI trading with ENSv2 owner controls, Uniswap v4 enforcement and Ethereum Founda
 ## For judges
 
 1. Open the website without connecting a wallet. Inspect the configured agent, policy, budget and vault balances.
-2. Open **Demonstration → Try it yourself**, connect a supported wallet on Sepolia, choose **Normal trade** or **Poisoned-news challenge**, and sign the displayed message. No test ETH, token approval or transfer from your wallet is required.
-3. Follow your run's real Gemini decision and guarded Uniswap v4 execution, then inspect the transaction link. Connection and freshness labels distinguish current readings from stale data or recorded proof. **Owner controls** remain restricted to the current ENS name owner on Sepolia.
+2. Open **Agent workspace → Request a trade**, connect a supported wallet on Sepolia, choose **Trade within limits** or **Test an over-limit request**, and sign the displayed message. No test ETH, token approval or transfer from your wallet is required.
+3. Read **Your result**: the actual requested amount, owner's limit, outcome, decoded reason and receipt. Expand **How this request was enforced** for the run-specific ENS/Uniswap/Nox evidence. Shared activity and Integration details are separate disclosures. Freshness labels distinguish current readings from stale data or recorded proof. **Owner controls** remain restricted to the current ENS name owner on Sepolia.
 4. Follow the transaction links below to verify a complete run even when the presenter is offline.
 
 This release demonstrates one configured agent, `alpha.kusari-pramod.eth`, using a **shared funded Sepolia vault**, not a personal trading account. A visitor's EIP-191 message signature authorizes one fixed sandbox scenario; the backend agent supplies gas and test tokens. A normal decision may spend at most 1 kUSD. The poisoned-news scenario exercises rejection only if the real model requests more than the owner's current cap (5 kUSD in the rehearsal); a hold or refusal is reported honestly without claiming an attack was blocked onchain. The advanced `/setup` route is a vault tool, not a complete self-service agent onboarding flow.
+
+The current UI is a dark product workspace with persistent navigation, a task-first composer and compact policy controls. [Product context](PRODUCT.md), the [reusable UI prompt](docs/UI_BRIEF.md) and [design system](DESIGN.md) explain the flow, accessibility requirements and evidence boundaries for future contributors or AI assistants. Its new five-field result was verified with a user-signed real Gemini [1 kUSD swap](https://sepolia.etherscan.io/tx/0xa0e48bb4fdce53b6b8ed2b6701bcb8cb1f1b87dc855e0215af7d0fd61acddab7).
 
 ## What Kusari enforces
 
