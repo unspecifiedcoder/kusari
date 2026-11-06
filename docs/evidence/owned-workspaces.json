@@ -1,0 +1,274 @@
+{
+  "chainId": 11155111,
+  "origin": "https://kusari.outcomeseal.com",
+  "startedAt": "2026-11-06T18:17:58.269Z",
+  "status": "passed",
+  "fundingCeilingSepoliaETH": "0.0004",
+  "setupTransport": "direct public RPC for this CLI rehearsal only",
+  "executionTransport": "hosted workspace API: Anon-RPC / Nox; independently signed local agent transactions",
+  "keyHandling": "Four random private keys generated in memory, never sent to API or written to disk",
+  "assertions": {
+    "distinctOwners": true,
+    "distinctAgents": true,
+    "distinctResolvers": true,
+    "distinctENSNames": true,
+    "distinctVaults": true,
+    "frozenARejectedOnchain": true,
+    "bTradedWhileAFrozen": true,
+    "independentDailyAccounting": true,
+    "restoredA": true,
+    "actualGeminiDecisions": true,
+    "observedNoxReadsAndBroadcasts": true,
+    "anonymityProven": false
+  },
+  "transactions": [
+    {
+      "step": "Fund fresh rehearsal wallet with 0.0001 Sepolia ETH",
+      "to": "0x14539C720E17A84B766c674Bc8C22af69a5c12d3",
+      "hash": "0xab4f88795e627258de11dcd6eac4b3cc00bc626f90951b90a946207cb62f7fc7",
+      "status": "success"
+    },
+    {
+      "step": "Fund fresh rehearsal wallet with 0.0001 Sepolia ETH",
+      "to": "0xA4d497B28c8fbEb232cb46Bd9003F16823322B1c",
+      "hash": "0x3301c9c306e543dca3c726dffb613127a8e0b47224ec191daf8905b76e8e233f",
+      "status": "success"
+    },
+    {
+      "step": "Fund fresh rehearsal wallet with 0.0001 Sepolia ETH",
+      "to": "0xf8126e483CFeAbb2e7b9199375797A03cD50820B",
+      "hash": "0x8472a195f65e69f543e30eb59836daad763357fbd0c4552b9cd03f81376046a0",
+      "status": "success"
+    },
+    {
+      "step": "Fund fresh rehearsal wallet with 0.0001 Sepolia ETH",
+      "to": "0x8236913cd77BE2DB664F108a9a00502680C7CCd3",
+      "hash": "0x88e86cd8a310420ca34bf4cc6f70e46e266d289b0139d2c709894aec33c63515",
+      "status": "success"
+    },
+    {
+      "step": "A: owner deploys dedicated resolver",
+      "hash": "0x25f1719abdda0eb1c6c8db449fd475558df97d08033effffaeb5eb97b9f321c5",
+      "status": "success"
+    },
+    {
+      "step": "B: owner deploys dedicated resolver",
+      "hash": "0xe3610834049509ae5b2e7bc07b72234a7b6c5964633770100499e47391967f52",
+      "status": "success"
+    },
+    {
+      "step": "A: claims owned ENS label",
+      "hash": "0xf303d10cd8bf7d9cbc5ebeada9c63fe68e8688f4f2f9a6852fe8e52e5a932cf2",
+      "status": "success"
+    },
+    {
+      "step": "B: claims owned ENS label",
+      "hash": "0xbf18ffa041b43196a556b5ea6328f4da9ac9303e1eab6c85cad5365a653c8422",
+      "status": "success"
+    },
+    {
+      "step": "B: publishes ENS policy",
+      "hash": "0x159d27731c3ff73b15b5509123409bba53a5cf893c402b9ffe934bf6b5fea1d8",
+      "status": "success"
+    },
+    {
+      "step": "A: publishes ENS policy",
+      "hash": "0x39ee44a4590266c6898bcb3615bde4ca923103a0ff1f468b0df9759aa46f1ab7",
+      "status": "success"
+    },
+    {
+      "step": "A: binds agent to ENS policy",
+      "hash": "0x9ba607cea640dd62ed66d418981c65ce626702cdf8745f7967943359f37b8d8a",
+      "status": "success"
+    },
+    {
+      "step": "B: binds agent to ENS policy",
+      "hash": "0x1f0ae9b7b0e6d9590ee0cdd095dcd47c1539cf68e8175901779bfe7b99571051",
+      "status": "success"
+    },
+    {
+      "step": "A: authorizes restricted agent",
+      "hash": "0xbcd2bebdfcd171be482ee042ee5a426c0af3ce5f354d5db19f6e6c34b2eee049",
+      "status": "success"
+    },
+    {
+      "step": "B: authorizes restricted agent",
+      "hash": "0xad356ecc7eb3aec51c02478845995e8dc4965b31481bc29c17452adbb73163a8",
+      "status": "success"
+    },
+    {
+      "step": "A: creates owner-held vault",
+      "hash": "0x20015be9ab9de792f4b44abe2ab839b130844acb60cf56d36137dde2fe3a4c0a",
+      "status": "success"
+    },
+    {
+      "step": "B: creates owner-held vault",
+      "hash": "0x387dc0b53d16eae1f319e9efbe10aa01b0678bcf3786b5a0dce4c7fc8542853a",
+      "status": "success"
+    },
+    {
+      "step": "A: funds vault with 10 test kUSD",
+      "hash": "0xc3373781efb3fc090f36f2c7993af81088049d30c9f26148f560aed0f22a1f39",
+      "status": "success"
+    },
+    {
+      "step": "B: funds vault with 10 test kUSD",
+      "hash": "0x140508d442e3e86a67f90b49df39f4bd1c26304c46b746f43d76f9308d75ebba",
+      "status": "success"
+    },
+    {
+      "step": "A: freezes its own agent",
+      "hash": "0x3e7173000e9eed6fd9525704c6157a46a641f7341fbf703741167d48eb8274b3",
+      "status": "success"
+    },
+    {
+      "step": "A: restores its own agent",
+      "hash": "0x7f2441452f60095d9c4c47b4bb071d245018b80c6ba359af7db5a3dbee35674b",
+      "status": "success"
+    },
+    {
+      "step": "Return remaining ephemeral-wallet Sepolia ETH",
+      "from": "0x14539C720E17A84B766c674Bc8C22af69a5c12d3",
+      "hash": "0x494bfa5a8dd4c63cc8b7e7db9a489e2d8cec4a6b033424b78e7d3a5e3565a83f",
+      "status": "reverted"
+    },
+    {
+      "step": "Return remaining ephemeral-wallet Sepolia ETH",
+      "from": "0xA4d497B28c8fbEb232cb46Bd9003F16823322B1c",
+      "hash": "0x08b752441b24f3e99409021fe5386d7d2d6d46133ca557219fe7003d0d84d632",
+      "status": "reverted"
+    },
+    {
+      "step": "Return remaining ephemeral-wallet Sepolia ETH",
+      "from": "0xf8126e483CFeAbb2e7b9199375797A03cD50820B",
+      "hash": "0xd09f089388cdf655ab3687d18fd05805d56c4c47a7a74679166265d084644018",
+      "status": "reverted"
+    },
+    {
+      "step": "Return remaining ephemeral-wallet Sepolia ETH",
+      "from": "0x8236913cd77BE2DB664F108a9a00502680C7CCd3",
+      "hash": "0xade229e882aff3651364cc18548164e6e38df50387acdfec58e324217a6fa027",
+      "status": "reverted"
+    }
+  ],
+  "workspaces": {
+    "A": {
+      "owner": "0x14539C720E17A84B766c674Bc8C22af69a5c12d3",
+      "agent": "0xA4d497B28c8fbEb232cb46Bd9003F16823322B1c",
+      "resolver": "0x9493af1d2419B88FEeF3e76a4416f7AEDF6E1229",
+      "name": "a-6aaa4d2de513ca697207a7150a0d2c407ac7db93.kusari-pramod.eth",
+      "vault": "0xA63AD6c31648537F437C4f070857C35a70a99f10",
+      "maxPerSwap": "5",
+      "dailyCap": "100"
+    },
+    "B": {
+      "owner": "0xf8126e483CFeAbb2e7b9199375797A03cD50820B",
+      "agent": "0x8236913cd77BE2DB664F108a9a00502680C7CCd3",
+      "resolver": "0x2049200CCab1764EBF0ce6ced13b55cf7A844b07",
+      "name": "a-97053e8114c182e580d0c10bf5ea6104935549cb.kusari-pramod.eth",
+      "vault": "0xBDFA6E0f3101782450D90521D164A099ce9735Aa",
+      "maxPerSwap": "5",
+      "dailyCap": "100"
+    }
+  },
+  "runs": [
+    {
+      "label": "A: normal Gemini trade",
+      "workspace": "A",
+      "runId": "182f8603-9d5c-4f8a-8f2d-c151968d4e88",
+      "decision": {
+        "action": "swap",
+        "amountIn": 1,
+        "reason": "Analysts expect modest kETH upside this week and the pool price offers an attractive entry while within our daily limit.",
+        "ms": 7855,
+        "model": "gemini-flash-lite-latest"
+      },
+      "requestedKUSD": "1",
+      "limitKUSD": "5",
+      "status": "success",
+      "hash": "0xf63a6ed889e3d7110923e0efadc60100b7de24e196fd90ffd881e300a40c46ee",
+      "routing": {
+        "route": "Anon-RPC / Nox",
+        "rpcRequests": 16,
+        "httpFailures": 0,
+        "submissionRequests": 1,
+        "meaning": "Requests observed by this service, including retries. Public transaction data remains visible. These counters do not prove anonymity."
+      }
+    },
+    {
+      "label": "B: normal Gemini trade",
+      "workspace": "B",
+      "runId": "39e1343b-3a59-44ed-8ead-ddab292ad122",
+      "decision": {
+        "action": "swap",
+        "amountIn": 1,
+        "reason": "Analysts expect modest kETH upside this week and the daily limit allows a 1 kUSD swap.",
+        "ms": 6673,
+        "model": "gemini-flash-lite-latest"
+      },
+      "requestedKUSD": "1",
+      "limitKUSD": "5",
+      "status": "success",
+      "hash": "0xc29010571c41d82ece12b9eeb6143b09353b398a4491fdfa1889dbb75c6ae1f8",
+      "routing": {
+        "route": "Anon-RPC / Nox",
+        "rpcRequests": 16,
+        "httpFailures": 0,
+        "submissionRequests": 1,
+        "meaning": "Requests observed by this service, including retries. Public transaction data remains visible. These counters do not prove anonymity."
+      }
+    },
+    {
+      "label": "A: frozen Gemini trade",
+      "workspace": "A",
+      "runId": "847ba403-f306-4528-bc4a-d9be2409ca74",
+      "decision": {
+        "action": "swap",
+        "amountIn": 1,
+        "reason": "Analysts expect modest kETH upside and liquidity is steady, so utilizing the maximum daily limit of 1 kUSD to swap for kETH.",
+        "ms": 1893,
+        "model": "gemini-flash-lite-latest"
+      },
+      "requestedKUSD": "1",
+      "limitKUSD": "5",
+      "status": "reverted",
+      "hash": "0xba87b91c739ecb0715b3ccdc11301fad2002fa0c7bf5c6180760f78bafd91cdc",
+      "preflightReason": "Simulation reverted; the receipt determines the on-chain result.",
+      "routing": {
+        "route": "Anon-RPC / Nox",
+        "rpcRequests": 16,
+        "httpFailures": 0,
+        "submissionRequests": 1,
+        "meaning": "Requests observed by this service, including retries. Public transaction data remains visible. These counters do not prove anonymity."
+      }
+    },
+    {
+      "label": "B: Gemini trade while A is frozen",
+      "workspace": "B",
+      "runId": "094c9b08-d366-4ba2-a6d2-7d204fd9f586",
+      "decision": {
+        "action": "swap",
+        "amountIn": 1,
+        "reason": "Analysts expect modest kETH upside and liquidity is steady, so utilizing the maximum daily swap limit of 1 kUSD.",
+        "ms": 820,
+        "model": "gemini-flash-lite-latest"
+      },
+      "requestedKUSD": "1",
+      "limitKUSD": "5",
+      "status": "success",
+      "hash": "0xb447b2200e24c4163b7d54caad23a15b02d10ca6df435700a9a188bc71c0ceac",
+      "routing": {
+        "route": "Anon-RPC / Nox",
+        "rpcRequests": 16,
+        "httpFailures": 0,
+        "submissionRequests": 1,
+        "meaning": "Requests observed by this service, including retries. Public transaction data remains visible. These counters do not prove anonymity."
+      }
+    }
+  ],
+  "spending": {
+    "A": "1",
+    "B": "2"
+  },
+  "finishedAt": "2026-11-06T18:23:14.698Z"
+}
