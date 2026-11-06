@@ -124,8 +124,7 @@ export function createSandboxAccess({
       return entry;
     },
     // Same reservations and counters as browser sandbox runs; the API cannot add a second spending budget.
-    async apiRun(start) {
-      const address = "external-agent-api";
+    async apiRun(start, address = "external-agent-api") {
       admit(address); reserved = true;
       try {
         const acceptedAt = now(); prune(); walletLastRun.set(address, acceptedAt); globalLastRun = acceptedAt;

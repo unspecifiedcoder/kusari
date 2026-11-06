@@ -1,0 +1,91 @@
+1
+00:00:00,000 --> 00:00:08,000
+Kusari gives AI trading agents onchain limits and an owner-controlled ENS kill switch.
+
+2
+00:00:08,000 --> 00:00:15,000
+This is a recorded product walkthrough using real Kusari screens and earlier Sepolia receipts.
+
+3
+00:00:15,000 --> 00:00:22,000
+The agent proposes trades from a shared funded vault. It cannot withdraw the vault's funds.
+
+4
+00:00:22,000 --> 00:00:30,000
+Public normal runs ask Gemini for a trade of up to one test kUSD, or a hold.
+
+5
+00:00:30,000 --> 00:00:38,000
+The captured owner policy allows five kUSD per trade, one hundred per day, and two percent
+pool-price impact.
+
+6
+00:00:38,000 --> 00:00:45,000
+The Uniswap v4 hook checks the signed request, ENS authorization and spending policy.
+
+7
+00:00:45,000 --> 00:00:52,000
+After execution, it checks actual output and price impact. Rejection rolls back the entire swap.
+
+8
+00:00:52,000 --> 00:00:59,000
+The ENS identity is alpha.kusari-pramod.eth. The owner controls the agent's authority.
+
+9
+00:00:59,000 --> 00:01:06,000
+Its policy is ABI-encoded resolver data under kusari.policy, not an ordinary editable text limit.
+
+10
+00:01:06,000 --> 00:01:13,000
+In this earlier rehearsal, Gemini requested five kUSD within the owner's limit. The transaction
+executed.
+
+11
+00:01:13,000 --> 00:01:20,000
+These are recorded receipts. Public normal runs are separately capped at one kUSD.
+
+12
+00:01:20,000 --> 00:01:28,000
+Poisoned news persuaded the deliberately gullible demonstration agent to request ninety-five kUSD
+against a five kUSD cap.
+
+13
+00:01:28,000 --> 00:01:36,000
+The hook reverted that transaction with ExceedsPerSwap. The failed request did not spend vault
+tokens.
+
+14
+00:01:36,000 --> 00:01:44,000
+The owner then revoked the agent's ENS role. Revocation applies after its transaction confirms.
+
+15
+00:01:44,000 --> 00:01:52,000
+Even a small 0.1 kUSD trade then failed with NotAuthorized. A valid agent signature was not
+enough.
+
+16
+00:01:52,000 --> 00:01:59,000
+Only the owner can grant that role again. The earlier rehearsal restored the agent's authorization.
+
+17
+00:01:59,000 --> 00:02:06,000
+After restoration, a 0.1 kUSD swap succeeded. Every displayed outcome links to a Sepolia receipt.
+
+18
+00:02:06,000 --> 00:02:15,000
+Agent chain reads and signed transaction submissions use Anon-RPC through the Nox mixnet.
+
+19
+00:02:15,000 --> 00:02:24,000
+Routing observations are not proof of anonymity. Transactions stay public, and the wallet uses its
+own RPC.
+
+20
+00:02:24,000 --> 00:02:34,000
+The shared demo is the main judging path. Personal onboarding is beta; the separate session-vault
+experiment is not shown here.
+
+21
+00:02:34,000 --> 00:02:44,000
+Try the demo, inspect the source and verify the receipts. AI proposes; the owner sets authority; the
+contracts enforce it.

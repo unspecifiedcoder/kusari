@@ -25,10 +25,10 @@ RUN cd reader && node build.mjs
 
 COPY agent/src/ ./agent/src/
 COPY proxy/server.mjs ./proxy/server.mjs
-COPY shared/types.ts ./shared/types.ts
+COPY shared/types.ts shared/owner-policy-message.mjs ./shared/
 COPY config/chains.json ./config/chains.json
 COPY deployments/*.json ./deployments/
-COPY scripts/demo-gateway.mjs scripts/start-hosted-demo.mjs scripts/present-hosted-demo.mjs scripts/sandbox-access.mjs scripts/api-trade.mjs ./scripts/
+COPY scripts/demo-gateway.mjs scripts/start-hosted-demo.mjs scripts/present-hosted-demo.mjs scripts/sandbox-access.mjs scripts/api-trade.mjs scripts/owner-policy-check.mjs ./scripts/
 
 USER node
 EXPOSE 8788

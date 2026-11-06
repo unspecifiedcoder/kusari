@@ -8,6 +8,7 @@ const out = new URL("../src/generated/", import.meta.url);
 await mkdir(out, { recursive: true });
 
 await copyFile(new URL("shared/types.ts", root), new URL("types.ts", out));
+await copyFile(new URL("shared/owner-policy-message.mjs", root), new URL("owner-policy-message.mjs", out));
 
 const file = (process.env.DEPLOYMENT_FILE ?? "deployments/11155111.json").trim();
 const src = new URL(file, root);

@@ -2,7 +2,8 @@
 import { createServer } from "node:http";
 import { timingSafeEqual } from "node:crypto";
 import { pathToFileURL, fileURLToPath } from "node:url";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
+import { createOwnerPolicyAccess, OwnerPolicyError } from "./owner-policy-check.mjs";
 import { validateTradeInput, tradeRequestId, TradeApiError } from "./api-trade.mjs";
 import { createSandboxAccess, readSandboxJson, SandboxError } from "./sandbox-access.mjs";
 
@@ -55,6 +56,7 @@ export function createDemoGateway({
   streamDurationMs = 25_000,
   maxStreams = 24,
   sandboxAccess,
+  ownerPolicyAccess,
 } = {}) {
   if (typeof token !== "string" || token.length < 32) throw new Error("KUSARI_DEMO_GATEWAY_TOKEN must contain at least 32 characters");
   for (const origin of Object.values(upstreams)) {
@@ -71,6 +73,16 @@ export function createDemoGateway({
   const sandbox = sandboxAccess ?? createSandboxAccess({
     maxHourly: boundedLimit(process.env.KUSARI_SANDBOX_MAX_HOURLY, 20, 20),
     maxDaily: boundedLimit(process.env.KUSARI_SANDBOX_MAX_DAILY, 40, 40),
+  });
+  const fixedDeployment = JSON.parse(readFileSync(new URL("../" + (process.env.DEPLOYMENT_FILE ?? "deployments/11155111.json"), import.meta.url), "utf8"));
+  const fixedENS = JSON.parse(readFileSync(new URL("../" + (process.env.ENS_OUT ?? "deployments/11155111-ens.json"), import.meta.url), "utf8"));
+  const ownerChecks = ownerPolicyAccess ?? createOwnerPolicyAccess({
+    admission: sandbox, agent: fixedENS.agent, vault: fixedDeployment.demoVault,
+    readContext: async () => {
+      const response = await fetch(new URL("/policy-check/owner", upstreams.agent), { redirect: "error", signal: AbortSignal.timeout(60_000) });
+      if (!response.ok) { await response.body?.cancel(); throw new OwnerPolicyError(response.status === 409 ? 409 : 503, "Live ENS ownership or anonymous route could not be verified"); }
+      return response.json();
+    },
   });
   let streams = 0;
   const server = createServer(async (req, res) => {
@@ -109,6 +121,30 @@ export function createDemoGateway({
     const url = new URL(req.url ?? "/", "http://gateway.local");
     if (url.search) return send(res, 400, { error: "Query parameters are not supported" });
 
+    if (["/policy-check/challenge", "/policy-check/run", "/policy-check/result"].includes(url.pathname)) {
+      if (req.method !== "POST") return send(res, 405, { error: "Owner policy checks require POST" });
+      if (String(req.headers["content-type"] ?? "").toLowerCase().split(";")[0].trim() !== "application/json") return send(res, 415, { error: "Owner policy checks require application/json" });
+      try {
+        const input = await readSandboxJson(req, 4096);
+        if (url.pathname === "/policy-check/challenge") return send(res, 200, await ownerChecks.challenge(input));
+        if (url.pathname === "/policy-check/run") {
+          const result = await ownerChecks.run(input, async ({ requestId, owner }) => {
+            const response = await fetch(new URL("/policy-check/run", upstreams.agent), { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ requestId, owner }), redirect: "error", signal: AbortSignal.timeout(60_000) });
+            if (!response.ok) { await response.body?.cancel(); throw new OwnerPolicyError(response.status === 409 ? 409 : 503, response.status === 409 ? "Shared agent is busy; wait for its current request" : "Fixed owner policy check could not start"); }
+            const accepted = await response.json();
+            if (accepted.requestId !== requestId || accepted.status !== "accepted") throw new OwnerPolicyError(503, "Owner policy check acceptance could not be confirmed");
+          });
+          return send(res, 202, result);
+        }
+        if (!input || Object.keys(input).length !== 1 || !tradeRequestId(input.requestId)) throw new OwnerPolicyError(400, "Expected one policy check request ID");
+        const response = await fetch(new URL("/policy-check/result", upstreams.agent), { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ requestId: input.requestId }), redirect: "error", signal: AbortSignal.timeout(requestTimeoutMs) });
+        const raw = await response.text(); if (raw.length > 16_384) throw new Error("Policy check response too large");
+        return send(res, [200,400,404,410,503].includes(response.status) ? response.status : 503, JSON.parse(raw));
+      } catch (error) {
+        if (error instanceof OwnerPolicyError || error instanceof SandboxError) { if (error.retryAfterSeconds) res.setHeader("retry-after", String(error.retryAfterSeconds)); return send(res, error.status, { error: error.message, ...(error.retryAfterSeconds ? { retryAfterSeconds: error.retryAfterSeconds } : {}) }); }
+        return send(res, 503, { error: "Owner policy check unavailable. Inspect any known request ID before retrying." });
+      }
+    }
     if (["/workspace/challenge", "/workspace/prepare", "/workspace/relay", "/workspace/result", "/workspace/status", "/workspace/state"].includes(url.pathname)) {
       if (req.method !== "POST") return send(res, 405, { error: "Workspace requests require POST" });
       if (String(req.headers["content-type"] ?? "").toLowerCase().split(";")[0].trim() !== "application/json") return send(res, 415, { error: "Workspace requests require application/json" });

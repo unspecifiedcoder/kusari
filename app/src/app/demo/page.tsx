@@ -8,6 +8,7 @@ import { AGENT_URL, ANON_BRIDGE, PROXY_URL, allowDemoControls } from "@/lib/endp
 import { HostedNotice } from "@/components/HostedNotice";
 import { SandboxControls } from "@/components/SandboxControls";
 import { AuthorityDiagram } from "@/components/AuthorityDiagram";
+import { OwnerPolicyControls } from "@/components/OwnerPolicyControls";
 import { deployment, ensDeployment } from "@/generated/deployment";
 
 const PROXY_EVENTS = `${PROXY_URL}/events`;
@@ -149,6 +150,8 @@ function LiveDemo() {
         </aside>
       </div>
 
+      <OwnerPolicyControls owner={k.owner} />
+
       <details className="workspace-activity workspace-details">
         <summary><div><h2>Shared activity</h2><p>Recent decisions and transactions from all visitors</p></div><StatusDot status={connection} /><DisclosureIcon /></summary>
         <div className="workspace-details-body"><p className="workspace-detail-note">This history is shared. Your result in the workspace follows only your signed request.</p><div className="activity-scroll" tabIndex={0} role="region" aria-label="Shared run history"><Activity entries={agent.entries} connection={connection} running={running} /></div></div>
@@ -157,7 +160,7 @@ function LiveDemo() {
       <details className="workspace-details workspace-integrations">
         <summary><div><h2>Integration details</h2><p>ENSv2 policy, Uniswap v4 enforcement and Anon-RPC / Nox routing</p></div><DisclosureIcon /></summary>
         <div className="workspace-details-body">
-          <AuthorityDiagram stage={stage} readRoute={readRoute} fresh={currentState} />
+          <AuthorityDiagram stage={stage} readRoute={readRoute} fresh={currentState} deterministic={Boolean(runEvent?.ownerPolicyCheck)} />
           <section aria-label="Observed RPC traffic" className="integration-grid">
             <Card title="Public-provider comparison log" right={<StatusDot status={proxy.status} />}>
               <Feed empty={proxy.status === "offline" ? "The comparison log is unavailable. Reconnecting automatically." : proxy.status === "connecting" ? "Connecting to the comparison log…" : allowDemoControls ? "No calls have reached the comparison provider. Turn Anon-RPC off for the controlled leak comparison." : "No calls have reached the comparison provider in this session. Routing changes stay presenter-controlled. An empty log alone does not prove anonymity."} rows={proxy.entries.map((e) => ({ t: time(e.t), main: `${String(e.ip)}  ${String(e.method)}`, sub: typeof e.detail === "object" && e.detail && "fn" in e.detail ? String((e.detail as { fn: string }).fn) : "", tone: "leak" }))} />
@@ -216,7 +219,7 @@ function Activity({ entries, connection, running }: { entries: Record<string, un
   const rows = entries.filter((e) => ["decision", "swap", "error", "inject"].includes(String(e.type)));
   if (!rows.length) return <div className="activity-empty"><p>{connection === "offline" ? "The activity feed is unavailable. This page will reconnect automatically." : connection === "connecting" ? "Connecting to the agent’s activity feed…" : running ? "The agent is reading the chain. Its decision and transaction result will appear here." : allowDemoControls ? "No activity yet. Run the agent once to begin the demonstration." : "The runner is connected. Request a trade to see a real decision and result here."}</p>{!allowDemoControls && <Link href="/#onchain-evidence">View recorded transactions</Link>}</div>;
   return <ul className="activity-list">{rows.map((e, i) => {
-    if (e.type === "decision") return <li key={i} className="activity-row" data-kind="decision"><div className="activity-row-heading"><span className="activity-time">{time(e.t)}</span><strong>Agent decision: {String(e.action)} {String(e.amountIn)} kUSD</strong>{e.injected ? <span className="activity-scenario">Poisoned news</span> : null}</div><p>{String(e.reason)}</p><span className="activity-source">{String(e.source)}</span></li>;
+    if (e.type === "decision") return <li key={i} className="activity-row" data-kind="decision"><div className="activity-row-heading"><span className="activity-time">{time(e.t)}</span><strong>{e.source === "owner-policy-check" ? "Fixed owner test" : "Agent decision"}: {String(e.action)} {String(e.amountIn)} kUSD</strong>{e.injected ? <span className="activity-scenario">Poisoned news</span> : null}</div><p>{String(e.reason)}</p><span className="activity-source">{String(e.source)}</span></li>;
     if (e.type === "swap") return <li key={i} className="activity-row" data-kind={e.status === "success" ? "success" : e.status === "blocked" ? "blocked" : "error"}><div className="activity-row-heading"><span className="activity-time">{time(e.t)}</span><strong>{e.status === "success" ? `${String(e.amountIn)} kUSD swap confirmed` : e.status === "blocked" && typeof e.hash === "string" ? `${String(e.amountIn)} kUSD transaction reverted onchain` : e.status === "blocked" ? `${String(e.amountIn)} kUSD request blocked in simulation` : "Swap could not be submitted"}</strong></div><p>{e.status === "success" ? "Executed within policy" : String(e.message ?? e.reason ?? "No confirmed execution")}</p>{typeof e.hash === "string" && <a className="activity-receipt" href={`https://sepolia.etherscan.io/tx/${e.hash}`} target="_blank" rel="noreferrer">View transaction {short(e.hash)} <ExternalLinkIcon /></a>}</li>;
     if (e.type === "inject") return <li key={i} className="activity-row" data-kind="decision"><span className="activity-time">{time(e.t)}</span><p>Poisoned news {e.injected ? "injected into the feed" : "removed"}</p></li>;
     return <li key={i} className="activity-row" data-kind="error"><span className="activity-time">{time(e.t)}</span><p>{String(e.message)}</p></li>;

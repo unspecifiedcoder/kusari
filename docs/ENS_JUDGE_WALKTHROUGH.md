@@ -106,6 +106,20 @@ Recorded proof from the completed shared rehearsal:
 | Owner restoration | [ENS role restored](https://sepolia.etherscan.io/tx/0x577bc7faeda7a24869189abf2b0691e604fc615a0e35d6786114b6421f0a3fe6) |
 | Small trade after restoration | [1 kUSD success](https://sepolia.etherscan.io/tx/0x5861ff93e6d4ce1cfeaf362fd41781a9f1823751fb3acfe4b40363cb7f58f45c) |
 
+## Repeatable live ENS limit edit
+
+The existing shared workspace also exposes **ENS policy demonstration** below the main trading area. Open it with the configured ENS owner connected on Sepolia. Other visitors cannot edit the policy or authorize its fixed test.
+
+1. Check **Current per-trade cap: 5 kUSD**. If necessary, use **Restore cap to 5 kUSD** and wait for confirmation.
+2. Click **Sign & run fixed 2 kUSD test**. Sign the explicitly labelled, expiring gas-free request. This test skips Gemini's variable decision and asks the existing agent to submit exactly 2 test kUSD through the same vault and hook. Wait for the actual success receipt; other live policy checks can still reject a request.
+3. Click **Set cap to 1 kUSD** and confirm one Sepolia transaction to the current ENS resolver. Wait for the confirmed cap read to become **1 kUSD**. The owner edits the ABI-encoded `kusari.policy` data record; it is not an ordinary text record. No contract deployment or app configuration change is involved.
+4. Repeat **Sign & run fixed 2 kUSD test**. Show **Requested: 2**, **Limit: 1**, the actual reverted receipt, and the separately labelled simulation reason if available. The fixed-test runner deliberately submits this bounded transaction even when simulation predicts rejection.
+5. Click **Restore cap to 5 kUSD**, confirm, and leave the shared agent authorized for other visitors. All other policy fields are copied from a verified snapshot; avoid simultaneous owner policy edits from another session.
+
+Say: **“The request stayed at 2 kUSD. I changed only the ENS record from 5 to 1. The hook read the new policy and rejected the next swap.”** This is a deterministic policy demonstration, not an LLM decision. Use the normal scenario separately to show Gemini. The public normal scenario and shared trade API retain their 1 kUSD ceiling throughout.
+
+The standard ENS app can show the name, owner and agent address; the ENS explorer can show indexed text/address records. The encoded `kusari.policy` data and its owner editor are implemented here. Do not promise an ordinary text-record editor changes these enforced limits. Two-owner isolation is separately evidenced by the CLI receipts; the shared workspace does not provide a reusable literal `beta.kusari-demo.eth` browser account.
+
 ## Ninety-second ENS explanation
 
 “Kusari separates an AI agent's decision from its authority. Gemini can propose a trade, but it does not own the funds or write its limits. Funds sit in a vault, and the owner controls an ENSv2 name with a policy record and a narrowly delegated agent role.

@@ -18,6 +18,7 @@
 !proxy/server.mjs
 !shared/
 !shared/types.ts
+!shared/owner-policy-message.mjs
 !config/
 !config/chains.json
 !deployments/
@@ -28,6 +29,7 @@
 !scripts/present-hosted-demo.mjs
 !scripts/sandbox-access.mjs
 !scripts/api-trade.mjs
+!scripts/owner-policy-check.mjs
 
 # These exclusions win even if a future source include is widened.
 **/.env

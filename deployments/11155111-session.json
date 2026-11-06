@@ -1,0 +1,49 @@
+{
+  "version": "session-v1",
+  "chainId": 11155111,
+  "owner": "0xc815eDb747e34DA879AFE1a0EF3DF641B4921000",
+  "agent": "0x72db032c0dFB6E7502e16A73fabdab31712dc706",
+  "hook": "0x9C8dfb140ffc368694644783a3f2Ac37B8B400c0",
+  "policySource": "0x2dAA4eEacfDe394679aaE27e1F554442002b3438",
+  "poolManager": "0xE03A1074c86CFeDd5C142C4F04F1a1536e203543",
+  "token0": "0x218885DEB694Dd7a822B936ca0a214C35C2467Fa",
+  "token1": "0xabD19b8591318cf8EAB1fE106000DDFf0E31d9F0",
+  "allowedPool": "0xa5919e6e4fdea32ead5822ec741ac0dd9e6155c32ec37c9d417452849eb5fc93",
+  "ensName": "alpha.kusari-pramod.eth",
+  "policyCoupling": "This rehearsal reuses the shared agent and ENS binding. Its ENS daily cap and role apply across all vaults of that agent; session allowances are per vault.",
+  "transactions": [
+    {
+      "step": "Deploy separate SessionVaultFactory",
+      "hash": "0x2a5ae8feb0600568341bb458bebe99337fa3cddae4e9865de046e13f38f1c1bf",
+      "status": "success",
+      "gasUsed": "13590896",
+      "effectiveGasPrice": "18"
+    },
+    {
+      "step": "Create separate owner-held SessionAgentVault",
+      "hash": "0xde82b37ed72af35b828d19a864b0c6a9bf42350972888a380a975a7d38ab4dba",
+      "status": "success",
+      "gasUsed": "11077035",
+      "effectiveGasPrice": "18"
+    },
+    {
+      "step": "Mint 2 test kUSD to new session vault",
+      "hash": "0x8e0cb89c27976f5c4d371a9cdb949c527eaccc48cebb22d71d644c1e1f80398f",
+      "status": "success",
+      "gasUsed": "140439",
+      "effectiveGasPrice": "18"
+    }
+  ],
+  "sessionVaultFactory": "0x3ae8a9e7775b280fd6d0b3fe65eb1894c6b6da2b",
+  "policyHook": "0x9C8dfb140ffc368694644783a3f2Ac37B8B400c0",
+  "poolId": "0xa5919e6e4fdea32ead5822ec741ac0dd9e6155c32ec37c9d417452849eb5fc93",
+  "factory": "0x3ae8a9e7775b280fd6d0b3fe65eb1894c6b6da2b",
+  "factoryCodeHash": "0x0df56d7a693b3644d2408e91e692c1422270ba8c011704f8dfd794ffca7fe8e7",
+  "sessionVault": "0x529489Af3b40a780fb499445116b364C083C3F90",
+  "vault": "0x529489Af3b40a780fb499445116b364C083C3F90",
+  "sessionVaultDeploymentBlock": "12078646",
+  "fundingTx": "0x8e0cb89c27976f5c4d371a9cdb949c527eaccc48cebb22d71d644c1e1f80398f",
+  "initialTestFunding": "2",
+  "vaultCodeHash": "0x6b10b64753a4c967dbe90ad9815282015dc17faa1b86e325e63c53c9a980b020",
+  "deployedAt": "2026-11-06T19:31:26.688Z"
+}

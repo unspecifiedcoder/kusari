@@ -14,6 +14,8 @@ import { readState, setReadRpc, readRpc, reader, type AgentState } from "./state
 import { decide, type Decision } from "./llm.ts";
 import { newsFeed } from "./news.ts";
 import { executeSwap, agentAccount, setWriteRpc, writeRpc } from "./swap.ts";
+import { createOwnerPolicyJobs, OwnerPolicyError } from "../../scripts/owner-policy-check.mjs";
+import { readOwnerPolicyContext } from "./owner-policy-context.ts";
 import { createSharedTradeJobs, TradeApiError, tradeRequestId } from "../../scripts/api-trade.mjs";
 import { createWorkspaceService, WorkspaceError } from "./workspace.ts";
 import { createSnapshotCache } from "./snapshot-cache.mjs";
@@ -192,6 +194,35 @@ const apiTradeJobs = createSharedTradeJobs({
   },
 });
 
+const ownerPolicyJobs = createOwnerPolicyJobs({
+  execute: async (owner: string, callbacks: { onState: (state: unknown) => void; onSubmitted: (hash: `0x${string}`) => void }) => {
+    activeScenario = null;
+    try {
+      if (readRpc !== ANON_RPC || writeRpc !== ANON_RPC) throw new OwnerPolicyError(503, "Fixed owner checks require pinned Anon-RPC");
+      const context = await readOwnerPolicyContext(agentAccount.address);
+      if (context.owner.toLowerCase() !== owner.toLowerCase()) throw new OwnerPolicyError(403, "ENS ownership changed before execution");
+      if (await reader.getBalance({ address: agentAccount.address }) < 500_000_000_000_000n) throw new OwnerPolicyError(503, "Shared agent gas reserve is low");
+      emit("reading", { transport: "anon", ownerPolicyCheck: true });
+      const state = await readState(agentAccount.address);
+      callbacks.onState({ limit: formatEther(state.policy.maxPerSwap), observedAt: Date.now() });
+      emit("state", summarizeState(state));
+      emit("decision", { action: "swap", amountIn: 2, reason: "Fixed owner-authorized policy check. Deterministic request; no Gemini call.", source: "owner-policy-check", deterministic: true, ownerPolicyCheck: true, injected: false });
+      emit("swapping", { amountIn: 2, ownerPolicyCheck: true });
+      const result = await executeSwap(2, { sendEvenIfBlocked: true, sqrtPriceX96: state.sqrtPriceX96, amountInWei: parseEther("2"), onSubmitted: callbacks.onSubmitted });
+      emit("swap", { ...result, ownerPolicyCheck: true });
+      return result;
+    } finally {
+      busy = false; snapshots.invalidate(); void snapshots.refresh(); emit("idle"); activeRunId = null;
+    }
+  },
+  readReceipt: async (hash: `0x${string}`) => {
+    if (readRpc !== ANON_RPC) throw new Error("Policy check receipt reads require Anon-RPC");
+    await readBridgeMode();
+    if (bridgeMode !== "anon" || await reader.getChainId() !== 11155111) throw new Error("Policy check receipt route is unavailable");
+    return reader.getTransactionReceipt({ hash });
+  },
+});
+
 const workspaceService = createWorkspaceService();
 
 const server = createServer(async (req, res) => {
@@ -210,6 +241,29 @@ const server = createServer(async (req, res) => {
   };
   if (url.pathname === "/status") {
     return json(200, { agent: agentAccount.address, vault: deployment.demoVault, readRpc, transport, readTransport: actualReadTransport(), bridgeMode, injected: activeScenario ? activeScenario === "attack" : injected, scriptedOnly, busy, activeRunId, canControl: true, recentEvents, ...snapshots.get() });
+  }
+  if (req.method === "GET" && url.pathname === "/policy-check/owner") {
+    try {
+      if (readRpc !== ANON_RPC || writeRpc !== ANON_RPC) throw new OwnerPolicyError(503, "Fixed owner checks require pinned Anon-RPC");
+      return json(200, { ...await readOwnerPolicyContext(agentAccount.address), busy });
+    } catch (error) { return json(error instanceof OwnerPolicyError ? error.status : 503, { error: error instanceof OwnerPolicyError ? error.message : "Live ENS owner could not be verified" }); }
+  }
+  if (req.method === "POST" && url.pathname === "/policy-check/run") {
+    if (busy) return json(409, { error: "Shared agent is busy; wait for its current run" });
+    busy = true;
+    try {
+      const input = await readSandboxJson(req, 1024) as { requestId: string; owner: string };
+      if (!input || typeof input.owner !== "string" || !tradeRequestId(input.requestId) || Object.keys(input).length !== 2) throw new OwnerPolicyError(400, "Invalid fixed owner check request");
+      if (readRpc !== ANON_RPC || writeRpc !== ANON_RPC) throw new OwnerPolicyError(503, "Fixed owner checks require pinned Anon-RPC");
+      const context = await readOwnerPolicyContext(agentAccount.address);
+      if (context.owner.toLowerCase() !== input.owner.toLowerCase()) throw new OwnerPolicyError(403, "The signer is no longer the ENS owner");
+      activeRunId = input.requestId;
+      return json(202, ownerPolicyJobs.accept(input));
+    } catch (error) { busy = false; activeRunId = null; return json(error instanceof OwnerPolicyError ? error.status : 503, { error: error instanceof OwnerPolicyError ? error.message : "Owner policy check could not be verified" }); }
+  }
+  if (req.method === "POST" && url.pathname === "/policy-check/result") {
+    try { return json(200, await ownerPolicyJobs.result(await readSandboxJson(req, 1024))); }
+    catch (error) { return json(error instanceof OwnerPolicyError ? error.status : 503, { error: error instanceof OwnerPolicyError ? error.message : "Owner policy check result unavailable" }); }
   }
   if (req.method === "POST" && url.pathname === "/api-trade/run") {
     if (busy) return json(409, { error: "Shared agent is busy; retry after its current run" });

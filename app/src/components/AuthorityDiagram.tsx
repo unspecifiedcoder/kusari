@@ -2,17 +2,18 @@ type AuthorityDiagramProps = {
   stage: "idle" | "waiting" | "reading" | "thinking" | "executing";
   readRoute: "anon" | "direct" | "unknown";
   fresh: boolean;
+  deterministic?: boolean;
 };
 
 /** Structural paths; only current observations can highlight a phase or route. */
-export function AuthorityDiagram({ stage, readRoute, fresh }: AuthorityDiagramProps) {
+export function AuthorityDiagram({ stage, readRoute, fresh, deterministic = false }: AuthorityDiagramProps) {
   const observedStage = fresh ? stage : "idle";
-  const stageLabel = !fresh ? "Awaiting current observation" : observedStage === "waiting" ? "Run in progress; awaiting phase" : observedStage === "reading" ? "Reading chain state" : observedStage === "thinking" ? "Model deciding" : observedStage === "executing" ? "Trade attempt in progress" : "Ready for a request";
+  const stageLabel = !fresh ? "Awaiting current observation" : observedStage === "waiting" ? "Run in progress; awaiting phase" : observedStage === "reading" ? "Reading chain state" : observedStage === "thinking" ? deterministic ? "Fixed request prepared" : "Model deciding" : observedStage === "executing" ? "Trade attempt in progress" : "Ready for a request";
   const anonymousRoute = fresh && readRoute === "anon";
   const directRoute = fresh && readRoute === "direct";
   const routeLabel = anonymousRoute ? "Anon-RPC via Nox observed" : directRoute ? "Direct RPC route observed" : "RPC route not currently verified";
   const steps = [
-    { title: "Gemini agent", detail: "Reads state and proposes", active: observedStage === "reading" || observedStage === "thinking" },
+    { title: deterministic ? "Owner policy check" : "Gemini agent", detail: deterministic ? "Fixed 2 kUSD · no model call" : "Reads state and proposes", active: observedStage === "reading" || observedStage === "thinking" },
     { title: "Vault", detail: "Holds trading funds", active: false },
     { title: "Uniswap v4 hook", detail: "Checks ENS policy", active: observedStage === "executing" },
     { title: "Swap or revert", detail: "Enforced atomically", active: false },

@@ -6,6 +6,7 @@ import { createDemoGateway } from "./demo-gateway.mjs";
 import { createSnapshotCache } from "../agent/src/snapshot-cache.mjs";
 import { createSandboxAccess } from "./sandbox-access.mjs";
 import { createRequire } from "node:module";
+import { readFileSync } from "node:fs";
 
 const require = createRequire(new URL("../agent/package.json", import.meta.url));
 const { privateKeyToAccount } = require("viem/accounts");
@@ -13,6 +14,51 @@ const { privateKeyToAccount } = require("viem/accounts");
 const TOKEN = "test-only-secret-with-more-than-32-characters";
 const listen = async (server) => { server.listen(0, "127.0.0.1"); await once(server, "listening"); return `http://127.0.0.1:${server.address().port}`; };
 const close = async (server) => { server.closeAllConnections(); await new Promise((resolve) => server.close(resolve)); };
+
+test("fixed owner-only two-kUSD route verifies the live ENS signer and shares sandbox allowance", async (t) => {
+  const account = privateKeyToAccount(`0x${"4".repeat(64)}`);
+  const outsider = privateKeyToAccount(`0x${"5".repeat(64)}`);
+  const ens = JSON.parse(readFileSync(new URL("../deployments/11155111-ens.json", import.meta.url), "utf8"));
+  const deployment = JSON.parse(readFileSync(new URL("../deployments/11155111.json", import.meta.url), "utf8"));
+  let starts = 0;
+  const source = createServer(async (req, res) => {
+    res.setHeader("content-type", "application/json");
+    if (req.url === "/policy-check/owner") {
+      res.end(JSON.stringify({ owner: account.address, agent: ens.agent, vault: deployment.demoVault, chainId: 11155111, readTransport: "anon", bridgeMode: "anon", busy: false }));
+      return;
+    }
+    let raw = ""; for await (const part of req) raw += part;
+    const input = JSON.parse(raw);
+    if (req.url === "/policy-check/run") {
+      starts++;
+      assert.deepEqual(Object.keys(input).sort(), ["owner", "requestId"]);
+      assert.equal(input.owner, account.address);
+      res.writeHead(202); res.end(JSON.stringify({ requestId: input.requestId, status: "accepted" }));
+      return;
+    }
+    res.end(JSON.stringify({ requestId: input.requestId, status: "reverted", requested: "2", limit: "1", source: "owner-policy-check", preflightReason: "ExceedsPerSwap", hash: `0x${"a".repeat(64)}` }));
+  });
+  const sourceUrl = await listen(source);
+  const sandbox = createSandboxAccess({ maxDaily: 1, maxHourly: 1, globalCooldownMs: 0, walletCooldownMs: 0 });
+  const gateway = createDemoGateway({ token: TOKEN, sandboxAccess: sandbox, upstreams: { agent: sourceUrl, bridge: sourceUrl, proxy: sourceUrl } });
+  const base = await listen(gateway);
+  t.after(async () => { await close(gateway); await close(source); });
+  const post = (path, value, bearer = TOKEN) => fetch(base + path, { method: "POST", headers: { authorization: `Bearer ${bearer}`, "content-type": "application/json" }, body: JSON.stringify(value) });
+  assert.equal((await post("/policy-check/challenge", { address: account.address }, "invalid")).status, 401);
+  assert.equal((await post("/policy-check/challenge", { address: outsider.address })).status, 403);
+  assert.equal((await post("/policy-check/challenge", { address: account.address, amountIn: "3" })).status, 400);
+  const challenge = await (await post("/policy-check/challenge", { address: account.address })).json();
+  const request = { address: account.address, nonce: challenge.nonce, signature: await account.signMessage({ message: challenge.message }) };
+  const response = await post("/policy-check/run", request);
+  assert.equal(response.status, 202);
+  const accepted = await response.json();
+  assert.equal(starts, 1);
+  assert.equal((await post("/policy-check/run", request)).status, 409);
+  assert.throws(() => sandbox.challenge({ address: account.address, scenario: "normal" }), { status: 429 });
+  const result = await (await post("/policy-check/result", { requestId: accepted.requestId })).json();
+  assert.equal(result.requested, "2"); assert.equal(result.limit, "1"); assert.equal(result.preflightReason, "ExceedsPerSwap");
+  assert.equal((await post("/policy-check/withdraw", {})).status, 405);
+});
 
 test("gateway admits only authenticated fixed read paths and redacts nested endpoint/IP information", async (t) => {
   let calls = 0;
