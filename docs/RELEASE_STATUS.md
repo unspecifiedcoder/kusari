@@ -1,33 +1,25 @@
 # Judge release checkpoints
 
-Deadline supplied by the team: 7 November 2026, 07:00 IST. Submission target: 05:00 IST.
+Updated 6 November 2026 after the live browser rehearsal. Team submission target remains before 7 November 2026, 07:00 IST. The official public event page currently lists 09:00 IST; use the earlier team target and confirm the dashboard.
 
-## Checkpoint 1: buildable, inspectable frontend
+## Verified release
 
-- Production URL: https://kusari-demo.vercel.app
-- Node 24.22.2 production build, TypeScript and ESLint pass.
-- Production HTTP checks: `/`, `/demo`, `/freeze`, `/setup` return 200 without authentication.
-- Public trade-control POST returns 403. No browser-visible gateway secret is used.
-- Homepage inspection requires no wallet. Recorded transaction evidence is labelled; owner management is separate.
-- Existing onchain deployment was read successfully: agent authorized, policy active, 5 kUSD per-swap cap, 100 kUSD daily cap, 2% impact limit. These are observations at verification time, not fixed application values.
+- Canonical live application: https://kusari.outcomeseal.com/demo#try-sandbox. DNS and HTTPS verified.
+- One Fly shared-CPU, 1 GB Machine serves the authenticated gateway, Gemini agent and Anon-RPC/Nox bridge. Vercel holds only the server-side gateway credential; owner/deployer keys are excluded from Fly.
+- Public visitors connect a Sepolia wallet and sign a fixed, single-use message for the funded shared sandbox. They need no tokens, approvals or gas. Public model runs require real Gemini.
+- 29 Node regression tests, ESLint, TypeScript and the production build passed. Prior contract validation passed 44 local and 16 Sepolia fork tests.
+- User-signed MetaMask normal and poisoned-news scenarios passed in the live UI. User-signed browser owner revocation and restoration passed on Sepolia. Public signed API requests confirmed NotAuthorized while frozen and successful execution after restoration. Exact receipts and the distinction between browser and API actions are in the README.
+- Final observed state: authorized and active, runner idle, fresh chain snapshot, readTransport=anon and bridgeMode=anon. Funds and daily allowance remained available.
+- Homepage at 320 px and sandbox at 390 px showed no horizontal overflow. Temporary viewport overrides were reset.
+- The custom-domain scanner returned NONE and the user reported no security warning during scenario signatures and owner transactions. The old kusari-demo.vercel.app classification review remains open; signing is disabled on deployment aliases. Never bypass a wallet warning.
+- Source and deployment changes are pushed to codex/judge-ready; the README links to the correct branch.
 
-## Checkpoint 2: backend boundaries and contract regression
+## Submission work still to confirm
 
-- 10 gateway/cache/startup/presenter tests pass, including concurrent stream admission and transport configuration.
-- Independent source review found two blockers; both were fixed and reviewed again.
-- All 60 existing contract tests pass: 44 local and 16 on a live Sepolia fork. Contracts were not modified or redeployed.
-- Fly package targets one shared CPU and 1 GB RAM in iad; no database, volume or dedicated IPv4.
-- Build context excludes local environment files and credentials. Owner and deployer keys stay outside Fly.
+- Complete the ETHGlobal dashboard fields, team/track selection and final submission confirmation.
+- Record and upload the demo video; keep recorded evidence visibly distinct from a live run.
+- Submit or confirm the Uniswap feedback form, including the public FEEDBACK.md link. The repository file already exists.
+- Document actual team contributions, AI-assisted files and any applicable specification/planning artifacts. Clearly distinguish reused libraries or project work.
+- Verify public source access and every submitted URL, then retain owner-wallet, agent-gas and model-quota headroom for judging.
 
-## Remaining release gates
-
-- Fly account authorization is complete; app `kusari-demo-backend` was created in the authorized account.
-- Remote Docker build passed. A temporary one-shared-CPU, 1GB iad Machine booted Chromium/Nox and completed two out of two anonymous Sepolia block reads before exiting successfully. No wallet key was used for this infrastructure check.
-- Existing demo agent/Gemini configuration is still required. Full-stack steady-state memory remains to be verified; increase RAM only if runtime evidence requires it.
-- Connect Fly gateway to Vercel through server-only environment variables.
-- Verify a fresh matching-agent snapshot with actual anonymous bridge mode through the public URL.
-- Rehearse normal trade, injected over-cap rejection, owner role revocation, blocked next trade, and reauthorization; restore initial state and retain gas/daily-cap headroom.
-- Verify desktop/mobile browser behavior and record the completed demonstration. Browser automation was unavailable during the initial frontend checkpoint; HTTP checks do not replace that verification.
-- Complete sponsor submission requirements, including the Uniswap feedback form.
-
-Until the remaining gates pass, the frontend is an inspectable public deployment, not a verified hosted end-to-end trading demo. Namera, Alt Mempools, multichain changes and optional policy editing remain outside this baseline release.
+Namera, Alt Mempools, personal agent onboarding, multichain changes and optional policy editing remain outside this complete shared-testnet release.
