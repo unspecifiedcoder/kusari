@@ -1,9 +1,10 @@
 @import "tailwindcss";
 
-/* Kusari is dark-only. Keep base styles inside a layer so Tailwind utilities can override them. */
+/* Kusari is dark-only: a quiet ink ground, ivory type, and colour reserved for meaning
+   (safe / blocked / leaking). The vermilion seal is the only brand colour. */
 :root {
-  --background: #09090b;
-  --foreground: #f4f4f5;
+  --background: #09090a;
+  --foreground: #f2f1ee;
   color-scheme: dark;
 }
 
@@ -14,10 +15,72 @@
   --font-mono: var(--font-geist-mono);
 }
 
+@theme {
+  --color-ink: #09090a;
+  --color-raised: #111113;
+  --color-raised-2: #18181b;
+  --color-line: rgb(255 255 255 / 0.08);
+  --color-line-strong: rgb(255 255 255 / 0.14);
+  --color-fg: #f2f1ee;
+  --color-muted: #a8a7a1;
+  --color-faint: #85847f;
+  --color-safe: #46d39a;
+  --color-danger: #ff5d6c;
+  --color-warn: #f5b440;
+  --color-seal: #d9442b;
+
+  --animate-shimmer: shimmer 1.6s ease-in-out infinite;
+  --animate-rise: rise 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+
+  @keyframes shimmer {
+    0%, 100% { opacity: 0.45; }
+    50% { opacity: 0.9; }
+  }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: none; }
+  }
+}
+
 @layer base {
   body {
     background: var(--background);
     color: var(--foreground);
     font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+    font-feature-settings: "ss01", "cv11";
+  }
+  ::selection {
+    background: rgb(242 241 238 / 0.9);
+    color: #09090a;
+  }
+  :focus-visible {
+    outline: 2px solid rgb(242 241 238 / 0.85);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+  a {
+    text-underline-offset: 3px;
+  }
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+  input::placeholder {
+    color: #85847f;
+  }
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(255 255 255 / 0.14) transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
