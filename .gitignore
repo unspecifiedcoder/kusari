@@ -17,6 +17,10 @@ app/src/generated/
 
 .vercel
 
+# Local capture frames and validation output; final media/evidence are committed explicitly.
+/work/
+/owner-policy-tests.log
+
 # Design source is shared; local skill sessions and generated captures are not.
 .impeccable/*
 !.impeccable/design.json
