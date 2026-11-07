@@ -122,7 +122,7 @@ The [completed canonical-HTTPS/CLI rehearsal](evidence/owner-policy-check.json) 
 
 The subsequent [recorded browser rehearsal](evidence/live-browser-demo.json) also completed with human MetaMask approvals: cap 5 success, cap 1 edit and rejection, cap 5 restoration, freeze, within-cap rejection, restore, and a real Gemini 1 kUSD success. Its eight new receipts and calldata were independently verified. Wallet popups are outside the page capture; the video shortens waits and labels reading holds.
 
-The standard ENS app can show the name, owner and agent address; the ENS explorer can show indexed text/address records. The encoded `kusari.policy` data and its owner editor are implemented here. Do not promise an ordinary text-record editor changes these enforced limits. Two-owner isolation is separately evidenced by the CLI receipts; the shared workspace does not provide a reusable literal `beta.kusari-demo.eth` browser account.
+The standard ENS app can show the name, owner and agent address; the ENS explorer can show indexed text/address records. A [screenshot of the standard ENS app on Sepolia](evidence/ens-app-alpha-kusari-pramod.png), captured on 2026-11-07, shows `alpha.kusari-pramod.eth` with its owner, description, GitHub link and the Ethereum address `0x72db…c706` (the agent). It does not show the `kusari.policy` data record or the agent's role. The encoded `kusari.policy` data and its owner editor are implemented here. Do not promise an ordinary text-record editor changes these enforced limits. Two-owner isolation is separately evidenced by the CLI receipts; the shared workspace does not provide a reusable literal `beta.kusari-demo.eth` browser account.
 
 ## Ninety-second ENS explanation
 
