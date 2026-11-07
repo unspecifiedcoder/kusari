@@ -27,6 +27,8 @@ The native request choices lead to one message-signing action. Real received eve
 
 Use PRODUCT.md for factual constraints and docs/UI_BRIEF.md for the reusable explanatory prompt. Keep exact decoded reasons and kUSD units. Staged poisoned news, model refusal, simulation-only rejection, unknown revert and confirmed onchain rejection are distinct states. Native labels, semantic headings, visible focus, real state text and reduced motion carry the interface without relying on visual position or color.
 
+The Two-agent isolation proof disclosure presents recorded Sepolia evidence below the owner policy controls. It starts closed, names the actual two generated ENS identities and their distinct owners/vaults/resolvers, and links the six trade, revocation and restoration receipts. Its recorded status and date stay explicit; it never substitutes for the visitor's live result or presents discarded CLI identities as reusable Alpha/Beta accounts. The public JSON mirrors the tracked source report.
+
 ## Verification ownership
 
 This brief records source-extracted structure and the user's chosen direction. The parent release process owns browser, source-detector, deployment and transaction verification; do not infer those results from this file.

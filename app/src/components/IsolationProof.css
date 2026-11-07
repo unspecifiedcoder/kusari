@@ -1,0 +1,29 @@
+.isolation-proof { scroll-margin-top: 24px; }
+.isolation-explanation { max-width: 72ch; color: var(--foreground); font-size: 16px; line-height: 1.7; margin-bottom: 10px; }
+.isolation-identities { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px; margin: 28px 0; }
+.isolation-identities section { min-width: 0; }
+.isolation-identities h3 { color: var(--foreground); font-size: 17px; font-weight: 600; margin-bottom: 8px; }
+.isolation-name { font-family: var(--font-geist-mono); color: var(--muted); font-size: 12px; line-height: 1.7; overflow-wrap: anywhere; margin-bottom: 18px; }
+.isolation-identities dl { display: grid; gap: 10px; }
+.isolation-identities dl > div { display: grid; grid-template-columns: 100px minmax(0, 1fr); gap: 12px; }
+.isolation-identities dt { color: var(--muted); font-size: 13px; }
+.isolation-identities dd { color: var(--foreground); font-size: 13px; font-variant-numeric: tabular-nums; }
+.isolation-identities a, .isolation-links a, .isolation-sequence a { color: var(--accent); text-decoration: underline; text-underline-offset: 4px; }
+.isolation-identities dd a { font-family: var(--font-geist-mono); overflow-wrap: anywhere; }
+.isolation-sequence { list-style: decimal; padding-left: 24px; margin: 0; }
+.isolation-sequence li { padding: 14px 0 14px 4px; border-top: 1px solid var(--rule); font-size: 14px; line-height: 1.6; }
+.isolation-sequence li::marker { color: var(--muted); font-variant-numeric: tabular-nums; }
+.isolation-sequence li > span { display: inline-block; min-width: min(100%, 300px); padding-right: 20px; }
+.isolation-sequence strong { display: inline-block; min-width: 150px; font-weight: 500; }
+.isolation-sequence strong[data-tone="safe"] { color: var(--accent); }
+.isolation-sequence strong[data-tone="blocked"] { color: #f1bdc6; }
+.isolation-sequence a { display: inline-flex; align-items: center; gap: 6px; padding: 7px 0; }
+.isolation-accounting { max-width: 72ch; color: var(--foreground); font-size: 14px; line-height: 1.7; margin: 24px 0 10px; }
+.isolation-links { display: flex; flex-wrap: wrap; gap: 8px 24px; margin-top: 18px; font-size: 13px; }
+.isolation-links a { display: inline-flex; align-items: center; min-height: 44px; }
+@media (max-width: 700px) {
+  .isolation-identities { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .isolation-identities section + section { border-top: 1px solid var(--rule); padding-top: 24px; }
+  .isolation-sequence li > span { display: block; padding-right: 0; }
+  .isolation-sequence strong { min-width: 0; margin-right: 18px; }
+}

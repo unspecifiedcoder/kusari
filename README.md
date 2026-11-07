@@ -99,6 +99,31 @@ Owner wallet -> AgentVault.withdraw   (agent cannot withdraw)
 
 Limits are an **ABI-encoded `Policy` in the `kusari.policy` data record**, read via **ENSIP-10 `resolve(dnsName, data(node,key))`**. They are not an ordinary text record or application-only cached rule. The hook reads authority on every trade, so a confirmed revoke also blocks an intent signed before revocation. The parent administrator remains a trust root; these subnames are not emancipated.
 
+### ENS standards: enforcement and discovery
+
+| Standard or ENSv2 feature | Kusari's current use |
+| --- | --- |
+| ENSv2 Enhanced Access Control | A narrow role on each agent's subname grants trading authorization. The owner can revoke or restore it; the hook checks current authorization on every swap. |
+| ENSv2 Permissioned Resolver | The owner publishes the ABI-encoded limits under `kusari.policy`; the agent cannot edit its own policy. |
+| [ENSIP-10](https://docs.ens.domains/ensip/10/) | The policy source calls the resolver's `resolve` entry point with the DNS-encoded name and inner record query. |
+| [ENSIP-24](https://docs.ens.domains/ensip/24/) | Kusari consumes the arbitrary-bytes `data(bytes32,string)` record profile for `kusari.policy`, through `resolve`. The deployed ENSv2 resolver supplies this profile. |
+| [ERC-8004](https://eips.ethereum.org/EIPS/eip-8004) | An optional agent identity, reputation and validation layer. This release does not register an ERC-8004 agent. |
+| [ENSIP-25](https://docs.ens.domains/ensip/25/) | Optional verification linking an ENS name to an actual agent registry entry through `agent-registration[<registry>][<agentId>]`. This release does not publish that attestation. |
+| [ENSIP-26](https://docs.ens.domains/ensip/26/) | Optional agent discovery through `agent-context` and `agent-endpoint[<protocol>]` text records. These records are not part of this release's enforced policy or advertised integration. |
+
+The distinction for judges: **identity and discovery explain who an agent is; Kusari's ENSv2 role and policy determine what its vault may execute now.** ERC-8004 and ENSIP-25/26 can complement this boundary without replacing the hook's checks. They are not requirements of the event's [Best Use of ENSv2 track](https://ethglobal.com/events/mumbai/prizes). Consult the linked specifications for their current status; this table describes the exercised integration rather than a blanket standards-conformance claim.
+
+### Per-agent permissions
+
+| Actor | Authority in the current product |
+| --- | --- |
+| Each ENS subname's owner | Grants or revokes that agent's marker role on that name. The dedicated resolver's owner controls its policy record. |
+| Each restricted agent | Holds exactly `ROLE_RENEW` (`65536`) on its bound subname. Kusari uses this existing narrow ENSv2 role as its trading-authorization marker; ENS itself does not define a native `TRADER` role. The hook also rejects agents with resolver-repointing authority. |
+| Each vault's owner | Can withdraw that vault's funds. Agent authorization does not grant withdrawal rights. |
+| Shared-demo visitor | Can sign admission for a bounded hosted run; connecting does not grant ENS ownership or permission to freeze the shared agent. |
+
+The role grant is scoped to the agent's ENS label, and hook spending is keyed by agent address. Revoking A's marker therefore does not revoke B's independent label role. Agent roles, resolver policy permissions and vault ownership are separate checks, exercised together in the [two-owner isolation proof](#two-owner-isolation-proof).
+
 **Uniswap v4 checks the actual execution.** [`AgentVault`](contracts/src/AgentVault.sol) accepts swaps only from its immutable agent, requires the configured hook and attaches the signed intent. [`PolicyHook.beforeSwap`](contracts/src/PolicyHook.sol) verifies identity, pool, direction, nonce, expiry, authorization and input caps. `afterSwap` checks the **actual BalanceDelta output** against the signed minimum and the pool's **actual before/after price movement**. Failure rolls back settlement, nonce use and spending accounting. The EIP-712 domain is `Kusari / 1 / 11155111 / PolicyHook`; its verifying contract is the hook, not the vault.
 
 Direct integration pointers at the verified source revision: [vault swap entry, line 34](https://github.com/unspecifiedcoder/kusari/blob/67fd59f5fab87aebccd837f0925508b4eedaf27b/contracts/src/AgentVault.sol#L34), [PoolManager unlock callback, line 47](https://github.com/unspecifiedcoder/kusari/blob/67fd59f5fab87aebccd837f0925508b4eedaf27b/contracts/src/AgentVault.sol#L47), [before-swap checks, line 71](https://github.com/unspecifiedcoder/kusari/blob/67fd59f5fab87aebccd837f0925508b4eedaf27b/contracts/src/PolicyHook.sol#L71), [after-swap output/impact checks, line 93](https://github.com/unspecifiedcoder/kusari/blob/67fd59f5fab87aebccd837f0925508b4eedaf27b/contracts/src/PolicyHook.sol#L93), and [live ENS authorization/policy reads, line 147](https://github.com/unspecifiedcoder/kusari/blob/67fd59f5fab87aebccd837f0925508b4eedaf27b/contracts/src/PolicyHook.sol#L147).
@@ -119,7 +144,7 @@ Direct integration pointers at the verified source revision: [vault swap entry, 
 | Agent reads and submissions use the configured Nox route | [Bridge](reader/src/bridge.mjs), [runner](agent/src/runtime.ts), [personal relay](agent/src/workspace.ts) | [Workspace transport/admission tests](agent/src/workspace.test.ts) | Mode observations and routing counts; no anonymity proof |
 | Optional session vault adds a finite allowance and owner output floor | [SessionAgentVault](contracts/src/SessionAgentVault.sol) | [15 real-v4 session tests](contracts/test/SessionAgentVault.t.sol) | Separate deployed beta vault; session unopened and live execution not yet rehearsed |
 
-Latest completed regression baselines: **87 Solidity tests** — **59 local and 28 Sepolia fork tests** — and **82 Node tests**, with no failures in those completed runs. Testing is not a security audit. A receipt confirms success/revert; reason names come from decoded simulation/execution data and tests, not its status field alone.
+Latest completed regression baselines: **87 Solidity tests** — **59 local and 28 Sepolia fork tests** — and **85 Node tests**, including [public isolation-evidence integrity checks](scripts/isolation-proof.test.mjs), with no failures in those completed runs. Testing is not a security audit. A receipt confirms success/revert; reason names come from decoded simulation/execution data and tests, not its status field alone.
 
 ## Recorded shared-demo receipts
 
@@ -152,6 +177,8 @@ Agent execution used Nox; owner CLI revoke/restore deliberately used a public RP
 
 ## Two-owner isolation proof
 
+Open **Two-agent isolation proof** on the [demo workspace](https://kusari.outcomeseal.com/demo#two-agent-proof) to inspect the two identities and all six recorded steps without signing. Each step links to its actual Sepolia receipt. It is a recorded proof, separate from the live shared agent and the visitor's own result.
+
 The [live report](docs/evidence/owned-workspaces.json) records two owners, agents, dedicated resolvers, ENS labels and vaults. Real Gemini decisions were signed locally and submitted through the hosted Nox relay. Owner/setup calls used public RPC in this CLI test.
 
 | Check | Live receipt |
@@ -166,6 +193,8 @@ The [live report](docs/evidence/owned-workspaces.json) records two owners, agent
 A's spending stayed at **1 kUSD**; B's reached **2 kUSD**. Each execution observed **16 Nox RPC requests and one submission**, with no observed HTTP failures. Exact `NotAuthorized` behavior and denial of cross-owner policy edits, rebinds, freezes and withdrawals are additionally asserted in [real-contract fork tests](contracts/test/ens/OwnedAgentIsolation.t.sol).
 
 These were generated CLI identities: `a-6aaa4d2de513ca697207a7150a0d2c407ac7db93.kusari-pramod.eth` and `a-97053e8114c182e580d0c10bf5ea6104935549cb.kusari-pramod.eth`. Four private keys existed only in the test process and were discarded afterward; these are not reusable browser-demo accounts. This proves the exercised contract/API isolation, **not completed browser onboarding or a fixed two-owner UI demonstration**. [Rehearsal source](scripts/rehearse-owned-workspaces.mjs).
+
+**Alpha/Beta terminology:** the live shared workspace is `alpha.kusari-pramod.eth`. Agents A and B in the isolation proof are the generated names above, not literal `alpha.kusari-demo.eth` and `beta.kusari-demo.eth`. A reusable live two-wallet presentation would require separately provisioned identities and retained, user-controlled keys. The UI exposes the existing receipts without granting anyone control over the shared agent. [Four-minute presentation and Q&A](docs/JUDGING_PLAYBOOK.md).
 
 ## Deployed contracts
 

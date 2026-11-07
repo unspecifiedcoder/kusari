@@ -9,6 +9,7 @@ import { HostedNotice } from "@/components/HostedNotice";
 import { SandboxControls } from "@/components/SandboxControls";
 import { AuthorityDiagram } from "@/components/AuthorityDiagram";
 import { OwnerPolicyControls } from "@/components/OwnerPolicyControls";
+import { IsolationProof } from "@/components/IsolationProof";
 import { deployment, ensDeployment } from "@/generated/deployment";
 
 const PROXY_EVENTS = `${PROXY_URL}/events`;
@@ -151,6 +152,8 @@ function LiveDemo() {
       </div>
 
       <OwnerPolicyControls owner={k.owner} />
+
+      <IsolationProof />
 
       <details className="workspace-activity workspace-details">
         <summary><div><h2>Shared activity</h2><p>Recent decisions and transactions from all visitors</p></div><StatusDot status={connection} /><DisclosureIcon /></summary>
