@@ -207,6 +207,32 @@ Shared manifests: [`11155111.json`](deployments/11155111.json), [`11155111-ens.j
 
 `PolicyMirror` is a tested cross-chain prototype with a separate admin-managed trust model; it is not this release's live ENS policy source.
 
+## Use Anon-RPC from any RPC client
+
+The upstream [Anon-RPC](https://github.com/ethereum/anon-rpc) repository ships a browser harness. We did not find a Node harness, so a server-side agent cannot call it directly. [`reader/src/bridge.mjs`](reader/src/bridge.mjs) fills that gap: it runs `@anon-rpc/browser-harness` and the Nox worker in headless Chromium and serves a plain JSON-RPC endpoint on `127.0.0.1:8546`. A client only needs the URL:
+
+```sh
+cd reader && npm ci && npx playwright install chromium
+npm run bridge                                   # boots the worker, then serves JSON-RPC on :8546
+cast block-number --rpc-url http://localhost:8546
+curl -s http://localhost:8546/metrics            # requests, failures, median and p90 latency
+```
+
+We tested `cast` (`eth_blockNumber` and `eth_getBalance`). The agent uses the same endpoint for reads and for transaction submission ([`agent/src/config.ts`](agent/src/config.ts), [`fly.toml`](fly.toml)), and the hosted launcher starts the bridge next to the runner ([`start-hosted-demo.mjs`](scripts/start-hosted-demo.mjs)). In one test on 2026-11-07, all 9 calls succeeded after a 5.9 s worker boot; the bridge measured a median of about 1.0 s and a slowest call of about 3.8 s. That is a small sample from one machine, not a benchmark. `ANON_MODE=direct` is an emergency fallback that is **not** anonymous: the bridge prints a warning and labels the transport `direct (NOT anonymous)`. The bridge listens on localhost unless `ANON_BRIDGE_HOST` is set.
+
+### Who learns what
+
+| Party | What it can learn | Basis |
+| --- | --- | --- |
+| Kusari's hosted runner and gateway | Caller IP, wallet address and run metadata. It holds the shared agent key and runs the bridge, so it sees every request before it enters Anon-RPC. | [CROPS](#crops) |
+| Gemini | The news and chain context placed in each prompt. | [CROPS](#crops) |
+| The bridge process | Every JSON-RPC request it forwards. It records only method, duration, success and transport, not the caller. | [`bridge.mjs` L132-L133](https://github.com/unspecifiedcoder/kusari/blob/4d71768d29bc2b3a56faffe6e47fe6b92d7b83a7/reader/src/bridge.mjs#L132-L133) |
+| Anon-RPC harness and worker | Only what the host passes in calls. The worker gets no access to the host's origin or identity beyond that, and whether it keeps requests unlinkable from one another is up to the worker. | [Anon-RPC spec](https://github.com/ethereum/anon-rpc/blob/main/SPEC.md) §6, §9.3 |
+| Nox entry, relay and exit nodes | The Anon-RPC spec puts the KPS wire protocol out of scope and never says what individual network nodes learn. Nox makes its own anonymity claims; we have not verified them. | Spec §1; not verified by us |
+| Final RPC provider | The request payloads: methods, addresses, calldata and signed transactions. Whether it can learn who sent them depends on the network claims above. Our routing counters are observations, not proof. | [CROPS](#crops) |
+| Anyone | Transactions, calldata, addresses and ENS state are public on Sepolia. | [CROPS](#crops) |
+| Not routed through Anon-RPC | Owner-wallet RPC, the browser's labelled public-reader fallback, deployment/bootstrap and independent CLI verification. | [CROPS](#crops) |
+
 ## Build, run and verify
 
 Use **Node 24.22.2** ([`.nvmrc`](.nvmrc)) and Foundry. Check out the submission branch with pinned submodules:
